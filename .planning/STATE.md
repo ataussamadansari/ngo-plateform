@@ -12,10 +12,15 @@ See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_webs
 
 - **Milestone**: v1.1
 - **Phase**: 10 of 12 (White-Label Settings & Payment Methods Resources)
-- **Status**: Ready to plan
+- **Status**: Planned (2 plans ready: 10-01, 10-02)
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
-- **Active Wave**: Not started
+- **Active Wave**: 1
 - **Blockers**: None
+
+## Phase 10 Plans
+
+- [ ] [10-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/10-white-label-settings-payment-methods-resources/10-01-PLAN.md) — Wave 1: Native Filament `SiteSetting` White-Label Administration Engine (FIL-02)
+- [ ] [10-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/10-white-label-settings-payment-methods-resources/10-02-PLAN.md) — Wave 2: Native Filament `PaymentMethodResource` (UPI QR & Bank Accounts) (FIL-03)
 
 ## Phase 9 Plans (Completed)
 
