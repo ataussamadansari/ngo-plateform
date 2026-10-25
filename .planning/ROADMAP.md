@@ -50,6 +50,7 @@
 ---
 
 ### Phase 11: Core Operations Migration (Donations, Ledger, Causes, Volunteers, Events)
+**Status:** Completed (2026-10-26)  
 **Goal:** Implement native Filament resources for Donations, Fund Distributions, Causes/Campaigns, Volunteers, and Events with parity to v1.0 workflows.  
 **Mode:** mvp  
 **UI hint:** yes  
