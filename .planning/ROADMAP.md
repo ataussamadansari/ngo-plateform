@@ -105,8 +105,9 @@ A modular, vertical MVP roadmap organized into 8 focused phases. Each phase deli
 
 ---
 
-### Phase 7: Public Website Frontend & Dynamic Theming
+### Phase 7: Public Website Frontend & Dynamic Theming (Completed)
 **Goal:** Build a high-trust, responsive public website with Home, About Us, Impact Counters, Navigation, and Footer styled with dynamic NGO branding.  
+**Status:** Completed (2026-10-25)
 **Mode:** mvp  
 **UI hint:** yes  
 **Requirements:** PUB-01, PUB-02, PUB-03, PUB-04  

@@ -5,19 +5,29 @@ use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminDonationController;
 use App\Http\Controllers\Admin\AdminEventController;
 use App\Http\Controllers\Admin\AdminFundDistributionController;
+use App\Http\Controllers\Admin\AdminInquiryController;
 use App\Http\Controllers\Admin\AdminVolunteerController;
 use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\DonationStatusController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\TransparencyController;
 use App\Http\Controllers\VolunteerController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Phase 7: Flagship Public Homepage with Live Impact Metrics
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Phase 7: Institutional About Us & Contact Portals
+Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
+Route::post('/contact', [ContactController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('contact.store');
 
 // Phase 6: Public Events Directory & RSVP Registration
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
@@ -94,6 +104,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/events/{event}/participants', [AdminEventController::class, 'participants'])->name('events.participants');
     Route::patch('/events/{event}/registrations/{registration}/attendance', [AdminEventController::class, 'updateAttendance'])->name('events.attendance');
     Route::post('/events/{event}/participants', [AdminEventController::class, 'addParticipant'])->name('events.addParticipant');
+
+    // Phase 7: Visitor Contact Inquiries Management
+    Route::get('/inquiries', [AdminInquiryController::class, 'index'])->name('inquiries.index');
+    Route::patch('/inquiries/{inquiry}', [AdminInquiryController::class, 'updateStatus'])->name('inquiries.update');
+    Route::delete('/inquiries/{inquiry}', [AdminInquiryController::class, 'destroy'])->name('inquiries.destroy');
 });
 
 // Phase 3: Official 80G PDF Receipt Download and Preview
