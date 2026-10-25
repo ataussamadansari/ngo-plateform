@@ -34,8 +34,8 @@
                     <span>{{ auth()->user()->name }}</span>
                 </div>
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('admin.dashboard') }}" class="font-bold text-emerald-400 hover:text-emerald-300 transition">Back-Office Command &rarr;</a>
-                    <form action="{{ route('admin.logout') }}" method="POST" class="inline">
+                    <a href="{{ url('/admin') }}" class="font-bold text-emerald-400 hover:text-emerald-300 transition">Back-Office Command &rarr;</a>
+                    <form action="{{ url('/admin/logout') }}" method="POST" class="inline">
                         @csrf
                         <button type="submit" class="text-slate-400 hover:text-white transition font-medium">Logout</button>
                     </form>

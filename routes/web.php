@@ -62,17 +62,18 @@ Route::get('/donation-status', [DonationStatusController::class, 'index'])->name
 Route::get('/transparency', [TransparencyController::class, 'index'])->name('transparency.index');
 Route::get('/campaigns/{campaign:slug}/transparency', [TransparencyController::class, 'campaignLedger'])->name('campaigns.transparency');
 
-// Phase 8: Administrative Authentication Gateway
-Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('login');
-Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
-Route::post('/admin/login', [AdminAuthController::class, 'login'])->middleware('throttle:5,1')->name('admin.login.submit');
-Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+// Phase 9: Native Filament Authentication & Dashboard Integration
+Route::get('/login', fn () => redirect('/admin/login'))->name('login');
 
-// Phase 3, 4, 5, 6, 7 & 8: Administrative Back-Office Routes (Protected by Auth & Role)
+// Legacy Admin Endpoints (retained for backward compatibility until Phase 12 deprecation)
+Route::get('/admin/legacy-login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/legacy-login', [AdminAuthController::class, 'login'])->middleware('throttle:5,1')->name('admin.login.submit');
+Route::post('/admin/legacy-logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+Route::get('/admin/legacy-dashboard', [AdminDashboardController::class, 'index'])->middleware(['admin.role'])->name('admin.dashboard');
+Route::get('/admin/legacy-dashboard-alias', [AdminDashboardController::class, 'index'])->middleware(['admin.role'])->name('admin.dashboard.alias');
+
+// Phase 3, 4, 5, 6 & 7: Operational Administrative Endpoints (Retained until Phase 11 Filament Resource migrations)
 Route::prefix('admin')->name('admin.')->middleware(['admin.role'])->group(function () {
-    // Phase 8: Central Administrative Command Dashboard
-    Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.alias');
 
     // Phase 3: Donation Verification
     Route::get('/donations', [AdminDonationController::class, 'index'])->name('donations.index');
