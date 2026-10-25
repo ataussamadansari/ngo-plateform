@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -22,6 +23,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'role',
+        'is_active',
     ];
 
     /**
@@ -44,6 +48,39 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Donations verified by this admin/manager.
+     */
+    public function verifiedDonations(): HasMany
+    {
+        return $this->hasMany(Donation::class, 'verified_by');
+    }
+
+    /**
+     * Fund distributions created by this admin/manager.
+     */
+    public function fundDistributions(): HasMany
+    {
+        return $this->hasMany(FundDistribution::class, 'created_by');
+    }
+
+    /**
+     * Check if user is super admin.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    /**
+     * Check if user is manager.
+     */
+    public function isManager(): bool
+    {
+        return $this->role === 'manager';
     }
 }
