@@ -9,11 +9,16 @@ See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_webs
 
 ## Current Position
 
-- **Phase**: 4 of 8 (Fund Distribution & Public Transparency Ledger) — COMPLETED
-- **Next Phase**: Phase 5: Causes & Campaigns Management Engine
-- **Status**: Ready for Phase 5 Planning
+- **Phase**: 5 of 8 (Causes & Campaigns Management Engine)
+- **Status**: Planned (2 plans ready: 05-01, 05-02)
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
+- **Active Wave**: 1
 - **Blockers**: None
+
+## Phase 5 Plans
+
+- [ ] [05-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/05-causes-campaigns-management-engine/05-01-PLAN.md) — Wave 1: Admin Cause Categories & Campaign Management Engine (CMP-01, CMP-02)
+- [ ] [05-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/05-causes-campaigns-management-engine/05-02-PLAN.md) — Wave 2: Public Campaigns Directory & High-Conversion Cause Story Portal (CMP-03, CMP-04)
 
 ## Phase 4 Plans (Completed)
 
