@@ -75,12 +75,12 @@ Route::get('/admin/legacy-dashboard-alias', [AdminDashboardController::class, 'i
 // Phase 3, 4, 5, 6 & 7: Operational Administrative Endpoints (Retained until Phase 11 Filament Resource migrations)
 Route::prefix('admin')->name('admin.')->middleware(['admin.role'])->group(function () {
 
-    // Phase 3: Donation Verification
-    Route::get('/donations', [AdminDonationController::class, 'index'])->name('donations.index');
-    Route::get('/donations/create', [AdminDonationController::class, 'create'])->name('donations.create');
-    Route::post('/donations', [AdminDonationController::class, 'store'])->name('donations.store');
-    Route::post('/donations/{donation}/approve', [AdminDonationController::class, 'approve'])->name('donations.approve');
-    Route::post('/donations/{donation}/reject', [AdminDonationController::class, 'reject'])->name('donations.reject');
+    // Legacy Phase 3: Donation Verification (Retained for backward compatibility until Phase 12)
+    Route::get('/legacy-donations', [AdminDonationController::class, 'index'])->name('donations.index');
+    Route::get('/legacy-donations/create', [AdminDonationController::class, 'create'])->name('donations.create');
+    Route::post('/legacy-donations', [AdminDonationController::class, 'store'])->name('donations.store');
+    Route::post('/legacy-donations/{donation}/approve', [AdminDonationController::class, 'approve'])->name('donations.approve');
+    Route::post('/legacy-donations/{donation}/reject', [AdminDonationController::class, 'reject'])->name('donations.reject');
 
     // Phase 4: Fund Distribution Ledger
     Route::get('/distributions', [AdminFundDistributionController::class, 'index'])->name('distributions.index');

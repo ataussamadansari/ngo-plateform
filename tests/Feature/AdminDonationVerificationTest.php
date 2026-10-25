@@ -65,7 +65,7 @@ class AdminDonationVerificationTest extends TestCase
             'verified_at' => now(),
         ]);
 
-        $response = $this->get('/admin/donations');
+        $response = $this->get(route('admin.donations.index'));
 
         $response->assertStatus(200);
         $response->assertSee('Donation Verification Queue');
@@ -88,7 +88,7 @@ class AdminDonationVerificationTest extends TestCase
 
         $this->assertEquals(0.00, (float) $this->campaign->fresh()->raised_amount);
 
-        $response = $this->post("/admin/donations/{$donation->id}/approve");
+        $response = $this->post(route('admin.donations.approve', $donation));
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -117,7 +117,7 @@ class AdminDonationVerificationTest extends TestCase
             'verified_at' => now(),
         ]);
 
-        $response = $this->post("/admin/donations/{$donation->id}/approve");
+        $response = $this->post(route('admin.donations.approve', $donation));
 
         $response->assertRedirect();
         $response->assertSessionHas('error');
@@ -134,7 +134,7 @@ class AdminDonationVerificationTest extends TestCase
             'status' => 'pending',
         ]);
 
-        $response = $this->post("/admin/donations/{$donation->id}/reject", [
+        $response = $this->post(route('admin.donations.reject', $donation), [
             'admin_remarks' => 'UTR number does not exist on bank statement.',
         ]);
 
@@ -159,9 +159,9 @@ class AdminDonationVerificationTest extends TestCase
             'admin_remarks' => 'Handed over cash in charity office.',
         ];
 
-        $response = $this->post('/admin/donations', $payload);
+        $response = $this->post(route('admin.donations.store'), $payload);
 
-        $response->assertRedirect('/admin/donations?status=verified');
+        $response->assertRedirect(route('admin.donations.index', ['status' => 'verified']));
         $response->assertSessionHas('success');
 
         $donation = Donation::where('donor_name', 'Cash Benefactor')->first();
