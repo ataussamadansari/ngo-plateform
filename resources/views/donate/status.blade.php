@@ -133,13 +133,18 @@
                                     <!-- Receipt Download Container -->
                                     <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-4">
                                         <div>
-                                            <span class="text-xs font-bold text-emerald-900 block">Official 80G Receipt</span>
-                                            <span class="text-xs text-emerald-700 font-mono">Receipt No: {{ $donation->receipt_number ?? (setting('receipt_prefix', 'KSF') . '-' . date('Y') . '-' . str_pad($donation->id, 4, '0', STR_PAD_LEFT)) }}</span>
+                                            <span class="text-xs font-bold text-emerald-900 block">Official 80G Tax Exemption Receipt</span>
+                                            <span class="text-xs text-emerald-700 font-mono">Receipt No: {{ $donation->receipt_number }}</span>
                                         </div>
-                                        <button type="button" onclick="alert('80G Receipt PDF download will be activated in Phase 3.')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-xs transition flex items-center justify-center gap-2">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                            Download Receipt (PDF)
-                                        </button>
+                                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                                            <a href="{{ route('donation.receipt.preview', $donation->id) }}" target="_blank" class="w-full sm:w-auto px-4 py-2.5 rounded-xl font-bold text-xs text-emerald-800 bg-emerald-100 hover:bg-emerald-200 transition text-center">
+                                                Preview
+                                            </a>
+                                            <a href="{{ route('donation.receipt', $donation->id) }}" class="w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-xs transition flex items-center justify-center gap-2 text-center">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                                Download Receipt (PDF)
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
 
