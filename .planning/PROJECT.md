@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A dynamic, white-label ready NGO web platform and donation management system built on Laravel 12. It enables non-profit organizations to showcase campaigns, accept manual donations via dynamic UPI QR codes and bank transfers without payment gateway fees, verify payments via UTR and screenshot proof, issue automated 80G compliant PDF receipts, and display a completely transparent fund utilization ledger with bills and impact photos.
+A dynamic, white-label ready NGO web platform and donation management system built on Laravel 12 and FilamentPHP. It enables non-profit organizations to showcase campaigns, accept manual donations via dynamic UPI QR codes and bank transfers without payment gateway fees, verify payments via UTR and screenshot proof, issue automated 80G compliant PDF receipts, and display a completely transparent fund utilization ledger with bills and impact photos.
 
 ## Core Value
 
@@ -13,40 +13,54 @@ Frictionless, fee-free manual donation verification paired with 100% transparent
 - **Customer**: Non-profits, charitable trusts, and grassroots NGOs needing a credible, high-trust digital presence.
 - **Revenue model**: White-label turnkey software deployment and customization for NGO clients.
 - **Success metric**: 100% verified donation-to-distribution reconciliation with sub-2 minute receipt generation and zero gateway commissions.
-- **Strategy notes**: Fast-to-market monolithic architecture combining Laravel 12 Blade + Tailwind CSS for SEO-optimized public pages and FilamentPHP for rapid back-office administration.
+- **Strategy notes**: Fast-to-market monolithic architecture combining Laravel 12 Blade + Tailwind CSS for SEO-optimized public pages and native FilamentPHP for back-office administration.
+
+## Current State
+
+- **Milestone v1.0 (Core MVP)**: Shipped 2026-10-25. 8 phases, 16 plans, 86 passing feature tests. All public donor, volunteer, event, and transparency interfaces fully operational.
+- **Active Milestone v1.1**: Native FilamentPHP Back-Office Migration & White-Label Administration.
 
 ## Requirements
 
-### Validated
+### Validated (v1.0 Milestone)
 
-- ✓ Laravel 12 baseline application skeleton initialized — existing
+- ✓ Foundation & 10-table database schema with Eloquent models — Phase 1
+- ✓ Dynamic white-label branding, theme colors, and site settings engine with cached global helper — Phase 1
+- ✓ Active payment methods display, manual donation submission, UTR deduplication, and screenshot proof upload — Phase 2
+- ✓ Public donation status and receipt lookup portal — Phase 2
+- ✓ Admin donation verification queue with side-by-side proof check, 1-click approve/reject, and automated PDF receipt generation (80G/12A compliance) — Phase 3
+- ✓ Fund distribution ledger with bill upload, impact photos, and public transparency breakdown — Phase 4
+- ✓ Causes and campaigns engine with automated raised and distributed fund synchronization — Phase 5
+- ✓ Volunteer registration, screening queue, and volunteer ID code issuance — Phase 6
+- ✓ Events management with volunteer and participant registration tracking — Phase 6
+- ✓ Public frontend pages: Home with live impact counters, About Us with legal credentials, Campaigns, Transparency, Events, and Volunteer join — Phase 7
+- ✓ Executive financial overview metrics, quick-action queues, and turnkey client handover (`HANDOVER.md`) — Phase 8
 
-### Active
+### Active (Milestone v1.1: Native FilamentPHP Migration)
 
-- [ ] Dynamic white-label branding, theme colors, and site settings engine with cached global helper
-- [ ] Dynamic QR code and bank account payment methods management
-- [ ] Public manual donation submission flow with UTR deduplication and screenshot proof upload
-- [ ] Admin donation verification queue with side-by-side proof check, 1-click approve/reject, and automated PDF receipt generation (80G/12A compliance)
-- [ ] Public donation status and receipt lookup portal
-- [ ] Fund distribution ledger with bill upload, impact photos, and public transparency breakdown
-- [ ] Causes and campaigns engine with automated raised and distributed fund synchronization
-- [ ] Volunteer registration, admin review queue, and volunteer ID code issuance
-- [ ] Events management with volunteer and participant registration tracking
-- [ ] Public frontend pages: Home with live impact counters, About Us with legal credentials, Campaigns listing/detail, Transparency ledger, Events, and Volunteer portal
-- [ ] FilamentPHP back-office admin panel for centralized management
+- [ ] **FIL-01**: Native FilamentPHP 5 Panel Provider configured at `/admin` with `FilamentUser` access gating (`super_admin`, `manager`) and user profile management.
+- [ ] **FIL-02**: Native Filament `SiteSetting` Management (Page or Resource) providing full UI for NGO legal name, dynamic theme color pickers (`--color-primary`, `--color-secondary`), 80G/12A/PAN/Darpan credentials, logo, and digital signature uploads with automatic cache clearing.
+- [ ] **FIL-03**: Native Filament `PaymentMethodResource` for managing dynamic UPI QR code uploads, UPI IDs, bank accounts, and active status toggles.
+- [ ] **FIL-04**: Native Filament `DonationResource` with status filters, side-by-side payment proof modal, atomic `DB::transaction()` approval, rejection remarks, direct receipt generation action, and manual cash donation entry.
+- [ ] **FIL-05**: Native Filament `FundDistributionResource` with bill/invoice upload, impact photos upload, and atomic campaign `distributed_amount` synchronization.
+- [ ] **FIL-06**: Native Filament `CampaignResource` & `CauseCategoryResource` with cover thumbnail, gallery uploads, and rich story editor.
+- [ ] **FIL-07**: Native Filament `VolunteerResource` with application review, status filters, and sequential ID code issuance (`VOL-YYYY-XXXX`).
+- [ ] **FIL-08**: Native Filament `EventResource` and attendee RSVP RelationManager with attendance check-in toggle.
+- [ ] **FIL-09**: Native Filament Dashboard Widgets: executive financial statistics (`Total Raised`, `Total Distributed`, `Available Treasury`, `Pending Items`) and quick-action triage queues.
+- [ ] **FIL-10**: Deprecation & removal of custom `app/Http/Controllers/Admin/*`, custom Blade views (`resources/views/admin/*`), and custom admin routes from `routes/web.php` to restore clean native Filament routing over `/admin`.
 
 ### Out of Scope
 
-- Automated Payment Gateway integration (Razorpay/Stripe) — Excluded for v1 to avoid gateway transaction fees (2-3%) and complex KYC onboarding for non-profits; utilizes verified UPI/Bank transfers.
+- Automated Payment Gateway integration (Razorpay/Stripe) — Excluded to avoid gateway transaction fees (2-3%) and complex KYC onboarding for non-profits; utilizes verified UPI/Bank transfers.
 - Multi-tenant shared database architecture — Excluded to allow independent, isolated deployments per client with 1-command `.env` and database seeding.
 - Live donor chat system — Excluded to minimize operational overhead for small NGO teams.
 - Mobile application — Web-first responsive SSR design fulfills all mobile donor and admin requirements.
 
 ## Context
 
-- Technical Stack: PHP 8.2+, Laravel 12, MySQL/SQLite, Tailwind CSS, Alpine.js, FilamentPHP, spatie/laravel-pdf or dompdf.
-- Architecture: Monolithic modular design. Public views utilize Blade + Tailwind with CSS variables (`--color-primary`, `--color-secondary`) for dynamic runtime theming. Admin uses FilamentPHP for rapid table filters, modals, and actions.
-- Operational Model: Solo developer execution optimized for rapid shipping, clean code separation (Public vs Admin controllers/resources), and zero-friction client onboarding.
+- Technical Stack: PHP 8.2+, Laravel 12, MySQL/SQLite, Tailwind CSS, Alpine.js, FilamentPHP 5, barryvdh/laravel-dompdf.
+- Architecture: Monolithic modular design. Public views utilize Blade + Tailwind with CSS variables (`--color-primary`, `--color-secondary`) for dynamic runtime theming. Admin uses native FilamentPHP Panel Provider for back-office administration.
+- Operational Model: Zero gateway commissions, high-trust ground proof verification, and 60-second turnkey client deployment.
 
 ## Constraints
 
@@ -59,27 +73,10 @@ Frictionless, fee-free manual donation verification paired with 100% transparent
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Manual QR/Bank Payment over Gateway | Zero platform cuts, zero gateway setup delays, full trust in UPI/direct bank transfers | — Pending |
-| FilamentPHP for Back-Office Admin | 70% faster development for verification queues, CRUD tables, modals, and filters | — Pending |
-| `site_settings` Key-Value with Cached `setting()` Helper | Allows instant white-label client reselling without touching application code | — Pending |
-| Blade + Tailwind + Alpine for Frontend | High SEO performance for causes/events, instant page loads, no SPA complexity | — Pending |
-
-## Evolution
-
-This document evolves at phase transitions and milestone boundaries.
-
-**After each phase transition** (via `/gsd-transition`):
-1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
-3. New requirements emerged? → Add to Active
-4. Decisions to log? → Add to Key Decisions
-5. "What This Is" still accurate? → Update if drifted
-
-**After each milestone** (via `/gsd-complete-milestone`):
-1. Full review of all sections
-2. Core Value check — still the right priority?
-3. Audit Out of Scope — reasons still valid?
-4. Update Context with current state
+| Manual QR/Bank Payment over Gateway | Zero platform cuts, zero gateway setup delays, full trust in UPI/direct bank transfers | Validated (v1.0) |
+| Native FilamentPHP 5 Panel for Back-Office | Modern, extensible administrative UX with native resources, forms, tables, and actions | Migrating in v1.1 |
+| `site_settings` Key-Value with Cached `setting()` Helper | Allows instant white-label client reselling without touching application code | Validated (v1.0) |
+| Blade + Tailwind + Alpine for Frontend | High SEO performance for causes/events, instant page loads, no SPA complexity | Validated (v1.0) |
 
 ---
-*Last updated: 2026-10-25 after initialization*
+*Last updated: 2026-10-26 for Milestone v1.1*

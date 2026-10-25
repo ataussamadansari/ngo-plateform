@@ -2,69 +2,38 @@
 
 ## Project Reference
 
-See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/PROJECT.md) (updated 2026-10-25)
+See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/PROJECT.md) (updated 2026-10-26)
 
 **Core value:** Frictionless, fee-free manual donation verification paired with 100% transparent public fund distribution tracking and automated compliance receipts.  
-**Current focus:** Phase 8: Back-Office Filament Admin Dashboard & Client Handover
+**Current focus:** Milestone v1.1 — Native FilamentPHP Back-Office Migration & White-Label Administration  
+**Next action:** `/gsd-plan-phase 9` to plan Phase 9: Native Filament Panel Setup, Auth & Route Release
 
 ## Current Position
 
-- **Phase**: 8 of 8 (Back-Office Admin Dashboard, RBAC & Client Handover)
-- **Status**: Completed (All 8 phases executed, 86 feature tests passing)
+- **Milestone**: v1.1
+- **Phase**: 9 of 12 (Native Filament Panel Setup, Auth & Route Release)
+- **Status**: Ready to plan
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
-- **Active Wave**: Complete
+- **Active Wave**: Not started
 - **Blockers**: None
 
-## Phase 8 Plans (Completed)
+## Milestone v1.1 Phases
 
-- [x] [08-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/08-back-office-filament-admin-dashboard-client-handover/08-01-PLAN.md) — Wave 1: Back-Office Admin Dashboard, Financial Metric Cards & Quick-Action Verification Queues (ADM-01, ADM-02)
-- [x] [08-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/08-back-office-filament-admin-dashboard-client-handover/08-02-PLAN.md) — Wave 2: Administrative Authentication Gateway, Role-Based Access Control & Turnkey Client Handover (ADM-03)
+- [ ] **Phase 9**: Native Filament Panel Setup, Auth & Route Release (FIL-01, FIL-10)
+- [ ] **Phase 10**: White-Label Settings & Payment Methods Resources (FIL-02, FIL-03)
+- [ ] **Phase 11**: Core Operations Migration (Donations, Ledger, Causes, Volunteers, Events) (FIL-04, FIL-05, FIL-06, FIL-07, FIL-08)
+- [ ] **Phase 12**: Executive Dashboard Widgets, Legacy Deprecation & Verification (FIL-09, FIL-10)
 
+## Completed Milestones
 
-## Phase 7 Plans (Completed)
-
-- [x] [07-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/07-public-website-frontend-dynamic-theming/07-01-PLAN.md) — Wave 1: High-Conversion Public Homepage, Live Impact Metrics Engine & Global Header/Footer Experience (PUB-01, PUB-03)
-- [x] [07-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/07-public-website-frontend-dynamic-theming/07-02-PLAN.md) — Wave 2: About Us Credibility Page, Accreditation Certificate Previews & Contact Inquiries Engine (PUB-02, PUB-04)
-
-## Phase 6 Plans (Completed)
-
-- [x] [06-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/06-volunteers-onboarding-event-management/06-01-PLAN.md) — Wave 1: Volunteer Registration, Application Screening & Code Generation Engine (VOL-01, VOL-02, VOL-03)
-- [x] [06-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/06-volunteers-onboarding-event-management/06-02-PLAN.md) — Wave 2: Events Management, Public RSVP Registration & Attendance Tracking (VOL-04, VOL-05, VOL-06)
-
-## Phase 5 Plans (Completed)
-
-- [x] [05-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/05-causes-campaigns-management-engine/05-01-PLAN.md) — Wave 1: Admin Cause Categories & Campaign Management Engine (CMP-01, CMP-02)
-- [x] [05-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/05-causes-campaigns-management-engine/05-02-PLAN.md) — Wave 2: Public Campaigns Directory & High-Conversion Cause Story Portal (CMP-03, CMP-04)
-
-## Phase 4 Plans (Completed)
-
-- [x] [04-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/04-fund-distribution-public-transparency-ledger/04-01-PLAN.md) — Wave 1: Admin Fund Distribution Ledger & Atomic Campaign Allocation Service (DIS-01, DIS-02)
-- [x] [04-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/04-fund-distribution-public-transparency-ledger/04-02-PLAN.md) — Wave 2: Public Transparency Ledger & Cause-Specific Fund Utilization Breakdown (DIS-03, DIS-04)
-
-## Phase 3 Plans (Completed)
-
-- [x] [03-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/03-admin-donation-verification-pdf-receipt-engine/03-01-PLAN.md) — Wave 1: Verification Queue, Side-by-Side Proof Modal, and Atomic Approval/Rejection Engine (VER-01, VER-02, VER-03, VER-04, VER-05)
-- [x] [03-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/03-admin-donation-verification-pdf-receipt-engine/03-02-PLAN.md) — Wave 2: 80G Compliant PDF Receipt Generator & Public Download Portal (VER-06)
-
-## Phase 2 Plans (Completed)
-
-- [x] [02-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/02-payment-methods-public-manual-donation-engine/02-01-PLAN.md) — Wave 1: Payment Methods Engine & Public Donation Page with Manual Proof Upload (DON-01, DON-02, DON-03, DON-04, DON-05)
-- [x] [02-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/02-payment-methods-public-manual-donation-engine/02-02-PLAN.md) — Wave 2: Public Donation Status Lookup Portal & UTR Tracking (DON-06)
-
-## Phase 1 Plans (Completed)
-
-- [x] [01-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/01-foundation-white-label-engine-database-schema/01-01-PLAN.md) — Wave 1: Database Schema Migrations & Eloquent Domain Models (FND-01, FND-02)
-- [x] [01-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/01-foundation-white-label-engine-database-schema/01-02-PLAN.md) — Wave 2: White-Label Settings Engine, Dynamic CSS Theming & Client Seeder (FND-03, FND-04, WHT-01, WHT-02, WHT-03, WHT-04)
-
-## Milestones & History
-
-- **v1.0 MVP Milestone**: Initialized 2026-10-25 (8 vertical MVP phases, 41 requirements mapped)
-- **Phase 1 Planned**: 2026-10-25 (Walking skeleton, 2 execution plans)
+- **v1.0 (Core MVP)**: Shipped 2026-10-25 (8 phases, 16 plans, 86 feature tests passed).
+  - Archived Roadmap: [.planning/milestones/v1.0-ROADMAP.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/milestones/v1.0-ROADMAP.md)
+  - Archived Requirements: [.planning/milestones/v1.0-REQUIREMENTS.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/milestones/v1.0-REQUIREMENTS.md)
 
 ## Accumulated Context
 
-- **Tech Stack**: Laravel 12, PHP 8.2+, MySQL/SQLite, Blade, Tailwind CSS, Alpine.js, FilamentPHP v3/v5, spatie/laravel-pdf or dompdf.
-- **Architecture**: Monolithic modular white-label system with cached `setting()` helper, CSS variable theming, and clean Public vs Admin controller segregation.
+- **Tech Stack**: Laravel 12, PHP 8.2+, MySQL/SQLite, Blade, Tailwind CSS, Alpine.js, FilamentPHP 5, barryvdh/laravel-dompdf.
+- **Architecture**: Monolithic modular white-label system with cached `setting()` helper, CSS variable theming (`--color-primary`, `--color-secondary`), public Blade views, and native FilamentPHP panel for back-office administration.
 - **Execution Guardrails**:
   - `DB::transaction()` mandatory for all donation verifications and fund distributions.
   - Unique index and validation on `utr_number`.

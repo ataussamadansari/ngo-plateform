@@ -1,135 +1,76 @@
-# Roadmap: NGO Dynamic Website & Donation Management Platform
+# Roadmap: Milestone v1.1 — Native FilamentPHP Back-Office Migration & White-Label Administration
 
-## Overview
+## Milestone Summary
 
-A modular, vertical MVP roadmap organized into 8 focused phases. Each phase delivers a complete, testable capability for rapid execution and white-label client deployment.
+- **Milestone**: v1.1
+- **Focus**: Migrate from custom `/admin` Blade controllers to native FilamentPHP 5, build complete Admin UIs for `SiteSetting` and `PaymentMethod`, implement native Filament resources for all core operations, and cleanly deprecate legacy custom admin code.
+- **Previous Milestone**: [Milestone v1.0 (Core MVP)](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/milestones/v1.0-ROADMAP.md) — Shipped 2026-10-25 (8 phases, 86 tests passed).
+
+---
 
 ## Phase Summary
 
 | Phase | Name | Goal | Requirements | Success Criteria |
 |---|---|---|---|---|
-| 1 | Foundation, White-Label Engine & Database Schema | 10-table schema, Eloquent models, cached `setting()` helper, dynamic CSS variable system, and client onboarding seeder | FND-01..04, WHT-01..04 | 4 |
-| 2 | Payment Methods & Public Manual Donation Engine | Active UPI QR & bank transfer display, manual proof submission, UTR deduplication, and status lookup | DON-01..06 | 4 |
-| 3 | Admin Donation Verification & PDF Receipt Engine | Verification queue, side-by-side proof check, atomic `DB::transaction()` approval, and 80G compliance PDF receipts | VER-01..06 | 4 |
-| 4 | Fund Distribution & Public Transparency Ledger | Expense ledger, bill/proof uploads, atomic campaign distribution balance sync, and public transparency page | DIS-01..04 | 4 |
-| 5 | Causes & Campaigns Management Engine | Categories CRUD, rich campaign stories, live raised/distributed progress bars, and recent donors list | CMP-01..04 | 4 |
-| 6 | Volunteers Onboarding & Event Management | Volunteer registration form, admin review queue, volunteer code generation, and event participant tracking | VOL-01..06 | 4 |
-| 7 | Public Website Frontend & Dynamic Theming | High-conversion Home page, Impact counters, About Us with legal credentials, dynamic navigation and footer | PUB-01..04 | 4 |
-| 8 | Back-Office Filament Admin Dashboard & Client Handover | Filament admin integration, financial analytics cards, quick-action queues, and turnkey client seeding verification | ADM-01..03 | 3 |
+| 9 | Native Filament Panel Setup, Auth & Route Release | Configure FilamentPHP 5 AdminPanelProvider at `/admin`, implement `FilamentUser` on `User`, release custom `/admin` routes from `web.php` | FIL-01, FIL-10 | 4 |
+| 10 | White-Label Settings & Payment Methods Resources | Build Filament UI for `SiteSetting` (branding, color pickers, tax credentials, logo/signature) and `PaymentMethodResource` (UPI QR/bank accounts) | FIL-02, FIL-03 | 4 |
+| 11 | Core Operations Migration (Donations, Ledger, Causes, Volunteers, Events) | Build native Filament resources for Donations (side-by-side verification, 80G receipt), Distributions, Campaigns, Volunteers, and Events | FIL-04, FIL-05, FIL-06, FIL-07, FIL-08 | 5 |
+| 12 | Executive Dashboard Widgets, Legacy Deprecation & Verification | Build native Filament dashboard widgets, remove legacy `app/Http/Controllers/Admin` and Blade views, verify full test suite | FIL-09, FIL-10 | 4 |
 
 ---
 
 ## Phase Details
 
-### Phase 1: Foundation, White-Label Engine & Database Schema (Completed)
-**Goal:** Establish complete 10-table database schema, Eloquent models, global cached `setting()` helper, dynamic CSS variable system, and client onboarding seeder.  
-**Status:** Completed (2026-10-25)
-**Mode:** mvp  
-**UI hint:** no  
-**Requirements:** FND-01, FND-02, FND-03, FND-04, WHT-01, WHT-02, WHT-03, WHT-04  
-**Success Criteria:**
-1. All 10 database migrations (users, cause_categories, campaigns, payment_methods, donations, fund_distributions, events, volunteers, event_registrations, site_settings) run cleanly with proper foreign keys and indexes.
-2. Eloquent models are configured with strict casts, mass-assignment guards, and typed relationships.
-3. Global helper `setting($key, $default)` retrieves cached values via `Cache::rememberForever()` and clears instantly upon settings mutation.
-4. `php artisan db:seed --class=NgoWhiteLabelSeeder` sets up working default white-label keys, default cause categories, and super admin account.
-
----
-
-### Phase 2: Payment Methods & Public Manual Donation Engine (Completed)
-**Goal:** Enable donor manual payment proof submission with UPI QR display, bank details, UTR deduplication, screenshot upload, and status lookup.  
-**Status:** Completed (2026-10-25)
+### Phase 9: Native Filament Panel Setup, Auth & Route Release
+**Goal:** Initialize FilamentPHP 5 `AdminPanelProvider` mounted at `/admin`, implement `FilamentUser` on `App\Models\User` with role gating, and remove conflicting custom admin routes from `routes/web.php`.  
 **Mode:** mvp  
 **UI hint:** yes  
-**Requirements:** DON-01, DON-02, DON-03, DON-04, DON-05, DON-06  
+**Requirements:** FIL-01, FIL-10  
 **Success Criteria:**
-1. `/donate` route renders active UPI QR code image and copyable bank account fields (Account Number, IFSC, Bank Name).
-2. Public submission form accepts donor details, validates unique UTR number, and enforces rate-limiting (`throttle:5,1`).
-3. Payment screenshots are securely stored in `storage/app/public/donations` with max 2MB validation.
-4. Donors can verify status (Pending / Verified / Rejected) at `/donation-status` using their UTR number or Phone.
+1. `AdminPanelProvider` is registered and loads natively at `/admin/login` and `/admin`.
+2. `App\Models\User` implements `FilamentUser`, allowing `super_admin` and `manager` access while denying inactive accounts.
+3. Conflicting custom `/admin` routes (`login`, `logout`, custom middleware) in `routes/web.php` are cleanly removed or redirected so Filament natively owns `/admin`.
+4. Global layout admin command bar reflects native Filament dashboard and logout routes.
 
 ---
 
-### Phase 3: Admin Donation Verification & PDF Receipt Engine (Completed)
-**Goal:** Provide administrative verification queue with side-by-side proof preview, atomic approval, campaign balance increment, and 80G compliant PDF receipt download.  
-**Status:** Completed (2026-10-25)
+### Phase 10: White-Label Settings & Payment Methods Resources
+**Goal:** Create full administrative interfaces for `SiteSetting` (dynamic theme colors, branding, tax credentials, logo/signature uploads) and `PaymentMethodResource` (UPI QR codes, bank accounts).  
 **Mode:** mvp  
 **UI hint:** yes  
-**Requirements:** VER-01, VER-02, VER-03, VER-04, VER-05, VER-06  
+**Requirements:** FIL-02, FIL-03  
 **Success Criteria:**
-1. Admin view lists pending donations with filters by status, payment mode, campaign, and date.
-2. Verification interface displays donor UTR number alongside the uploaded payment screenshot for quick bank statement matching.
-3. Approving a donation executes in `DB::transaction()`, setting status to `verified`, generating a unique sequential receipt number (e.g. `KSF-2026-0001`), and incrementing campaign `raised_amount`.
-4. Verified donors and admins can generate/download an official PDF receipt with NGO logo, donor PAN, 80G registration number, and digital signature stamp.
+1. Dedicated Filament Settings page or resource allows modifying NGO legal name, contact details, PAN, 80G, 12A, and NGO Darpan registration.
+2. Color picker inputs for primary (`--color-primary`) and secondary (`--color-secondary`) theme colors update live site theming.
+3. Logo, favicon, and digital authorized signature can be uploaded via Filament FileUpload and save to public storage, invalidating settings cache automatically.
+4. `PaymentMethodResource` provides full CRUD for dynamic UPI QR codes and bank account details with active status toggles.
 
 ---
 
-### Phase 4: Fund Distribution & Public Transparency Ledger (Completed)
-**Goal:** Enable recording of verified fund expenditures with invoice/bill uploads and provide a public transparency page with real-time utilization breakdown.  
-**Status:** Completed (2026-10-25)
+### Phase 11: Core Operations Migration (Donations, Ledger, Causes, Volunteers, Events)
+**Goal:** Implement native Filament resources for Donations, Fund Distributions, Causes/Campaigns, Volunteers, and Events with parity to v1.0 workflows.  
 **Mode:** mvp  
 **UI hint:** yes  
-**Requirements:** DIS-01, DIS-02, DIS-03, DIS-04  
+**Requirements:** FIL-04, FIL-05, FIL-06, FIL-07, FIL-08  
 **Success Criteria:**
-1. Admin can log fund distribution entries with beneficiary details, amount, category, invoice image, and impact photos.
-2. Saving distribution automatically updates linked campaign's `distributed_amount` inside `DB::transaction()`.
-3. Public `/transparency` page presents verified financial totals (Total Raised vs Distributed) and itemized public distribution cards.
-4. Campaign detail page displays dedicated fund utilization breakdown for that specific cause.
+1. `DonationResource` displays donor verification queue with status filters, side-by-side screenshot proof modal, atomic `DB::transaction()` approval with 80G receipt generation, and rejection remarks.
+2. `FundDistributionResource` enables logging verified expenditures with invoice and impact photo uploads, atomically incrementing campaign distributed amount.
+3. `CampaignResource` & `CauseCategoryResource` enable full campaign lifecycle management with thumbnail/gallery uploads and rich text story editing.
+4. `VolunteerResource` provides screening table with sequential volunteer code generation (`VOL-YYYY-XXXX`) and applicant ID proof inspection.
+5. `EventResource` enables event scheduling with banner upload and attendee RSVP RelationManager with 1-click attendance check-in.
 
 ---
 
-### Phase 5: Causes & Campaigns Management Engine (Completed)
-**Goal:** Build end-to-end campaign creation, category management, urgent cause highlights, and live financial progress synchronization.  
-**Status:** Completed (2026-10-25)
+### Phase 12: Executive Dashboard Widgets, Legacy Deprecation & Verification
+**Goal:** Build native Filament executive summary widgets, delete legacy custom admin controllers and views, and achieve 100% test passing across the migrated platform.  
 **Mode:** mvp  
 **UI hint:** yes  
-**Requirements:** CMP-01, CMP-02, CMP-03, CMP-04  
+**Requirements:** FIL-09, FIL-10  
 **Success Criteria:**
-1. Admin can create, edit, and toggle status (draft, active, completed, paused) for donation campaigns.
-2. Public `/campaigns` lists active and completed campaigns with category filtering.
-3. Campaign detail view renders full rich story, photo gallery, target vs raised progress bar, and recent verified donors list.
-4. Campaign financial fields (`raised_amount`, `distributed_amount`) stay perfectly synchronized with verified transactions.
+1. Filament Dashboard displays `FinancialOverviewWidget` with real-time stats: Total Raised, Total Distributed, Net Available Treasury, and Pending Verifications.
+2. Quick-action widgets on the dashboard allow 1-click donation approval and volunteer screening.
+3. Obsolete custom controllers (`app/Http/Controllers/Admin/*`) and obsolete custom Blade views (`resources/views/admin/*`) are completely deleted.
+4. Automated feature test suite passes with full verification of Filament admin operations and public-facing features.
 
 ---
-
-### Phase 6: Volunteers Onboarding & Event Management (Completed)
-**Goal:** Facilitate volunteer registration, application screening, volunteer code generation, and event registration with attendance tracking.  
-**Status:** Completed (2026-10-25)
-**Mode:** mvp  
-**UI hint:** yes  
-**Requirements:** VOL-01, VOL-02, VOL-03, VOL-04, VOL-05, VOL-06  
-**Success Criteria:**
-1. Public `/volunteer-join` captures volunteer applications with city, skills, availability, and ID proof upload.
-2. Admin review queue allows 1-click Approval/Rejection with automatic generation of formatted volunteer code (e.g. `KSF-VOL-2026-001`).
-3. Admin can publish events with date, time, venue, and Google Map location.
-4. Event registration form captures attendee details and allows admin to mark attendance (attended/absent).
-
----
-
-### Phase 7: Public Website Frontend & Dynamic Theming (Completed)
-**Goal:** Build a high-trust, responsive public website with Home, About Us, Impact Counters, Navigation, and Footer styled with dynamic NGO branding.  
-**Status:** Completed (2026-10-25)
-**Mode:** mvp  
-**UI hint:** yes  
-**Requirements:** PUB-01, PUB-02, PUB-03, PUB-04  
-**Success Criteria:**
-1. Home page renders dynamic hero banner, live impact counter cards (Total Raised, Distributed, Volunteers, Causes), featured urgent causes, and upcoming events.
-2. About Us page highlights NGO mission, vision, founder story, core team, and accreditation documents preview (NGO Darpan, 80G, 12A).
-3. Global layout adopts dynamic CSS variables (`--color-primary`, `--color-secondary`) and renders responsive navigation and legal footer.
-4. Mobile donor experience is fully responsive with frictionless navigation and sub-second SSR performance.
-
----
-
-### Phase 8: Back-Office Filament Admin Dashboard & Client Handover
-**Status:** Completed (2026-10-25)  
-**Goal:** Integrate FilamentPHP admin panel with financial overview metrics, quick-action queues, and complete turnkey client setup validation.  
-**Mode:** mvp  
-**UI hint:** yes  
-**Requirements:** ADM-01, ADM-02, ADM-03  
-**Success Criteria:**
-1. Filament admin dashboard displays live metric cards: Total Verified Funds, Total Distributed Funds, Available Balance, and Pending Verifications Count.
-2. Quick-action widgets allow verifying pending donations and reviewing volunteer applications directly from the dashboard.
-3. White-label client handover verified: changing `.env` database and executing `php artisan migrate --seed` produces a ready-to-use NGO portal for a new client in under 60 seconds.
-
----
-*Roadmap defined: 2026-10-25*
-
+*Roadmap defined: 2026-10-26 for Milestone v1.1*
