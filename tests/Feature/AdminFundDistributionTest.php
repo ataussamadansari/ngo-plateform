@@ -72,7 +72,7 @@ class AdminFundDistributionTest extends TestCase
             'created_by' => $this->admin->id,
         ]);
 
-        $response = $this->get('/admin/distributions');
+        $response = $this->get(route('admin.distributions.index'));
 
         $response->assertStatus(200);
         $response->assertSee('Fund Distribution Ledger');
@@ -102,9 +102,9 @@ class AdminFundDistributionTest extends TestCase
             'is_public' => '1',
         ];
 
-        $response = $this->post('/admin/distributions', $payload);
+        $response = $this->post(route('admin.distributions.store'), $payload);
 
-        $response->assertRedirect('/admin/distributions');
+        $response->assertRedirect(route('admin.distributions.index'));
         $response->assertSessionHas('success');
 
         $distribution = FundDistribution::where('title', 'Dry Ration Kits Distribution')->first();
@@ -135,9 +135,9 @@ class AdminFundDistributionTest extends TestCase
             'is_public' => '1',
         ];
 
-        $response = $this->post('/admin/distributions', $payload);
+        $response = $this->post(route('admin.distributions.store'), $payload);
 
-        $response->assertRedirect('/admin/distributions');
+        $response->assertRedirect(route('admin.distributions.index'));
 
         $this->campaign->refresh();
         $this->assertEquals(15000.00, (float) $this->campaign->distributed_amount);
@@ -145,7 +145,7 @@ class AdminFundDistributionTest extends TestCase
 
     public function test_validation_enforces_required_fields_and_positive_amounts(): void
     {
-        $response = $this->post('/admin/distributions', []);
+        $response = $this->post(route('admin.distributions.store'), []);
 
         $response->assertSessionHasErrors([
             'title',
@@ -155,7 +155,7 @@ class AdminFundDistributionTest extends TestCase
             'description',
         ]);
 
-        $invalidResponse = $this->post('/admin/distributions', [
+        $invalidResponse = $this->post(route('admin.distributions.store'), [
             'amount_spent' => -500,
             'distribution_date' => now()->addDays(5)->format('Y-m-d'),
         ]);

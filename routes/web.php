@@ -82,11 +82,11 @@ Route::prefix('admin')->name('admin.')->middleware(['admin.role'])->group(functi
     Route::post('/legacy-donations/{donation}/approve', [AdminDonationController::class, 'approve'])->name('donations.approve');
     Route::post('/legacy-donations/{donation}/reject', [AdminDonationController::class, 'reject'])->name('donations.reject');
 
-    // Phase 4: Fund Distribution Ledger
-    Route::get('/distributions', [AdminFundDistributionController::class, 'index'])->name('distributions.index');
-    Route::get('/distributions/create', [AdminFundDistributionController::class, 'create'])->name('distributions.create');
-    Route::post('/distributions', [AdminFundDistributionController::class, 'store'])->name('distributions.store');
-    Route::get('/distributions/{distribution}', [AdminFundDistributionController::class, 'show'])->name('distributions.show');
+    // Legacy Phase 4: Fund Distribution Ledger (Retained for backward compatibility until Phase 12)
+    Route::get('/legacy-distributions', [AdminFundDistributionController::class, 'index'])->name('distributions.index');
+    Route::get('/legacy-distributions/create', [AdminFundDistributionController::class, 'create'])->name('distributions.create');
+    Route::post('/legacy-distributions', [AdminFundDistributionController::class, 'store'])->name('distributions.store');
+    Route::get('/legacy-distributions/{distribution}', [AdminFundDistributionController::class, 'show'])->name('distributions.show');
 
     // Legacy Phase 5: Cause Categories Management (Retained for backward compatibility until Phase 12)
     Route::get('/legacy-categories', [AdminCategoryController::class, 'index'])->name('categories.index');
