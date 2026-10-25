@@ -63,8 +63,9 @@ A modular, vertical MVP roadmap organized into 8 focused phases. Each phase deli
 
 ---
 
-### Phase 4: Fund Distribution & Public Transparency Ledger
+### Phase 4: Fund Distribution & Public Transparency Ledger (Completed)
 **Goal:** Enable recording of verified fund expenditures with invoice/bill uploads and provide a public transparency page with real-time utilization breakdown.  
+**Status:** Completed (2026-10-25)
 **Mode:** mvp  
 **UI hint:** yes  
 **Requirements:** DIS-01, DIS-02, DIS-03, DIS-04  
