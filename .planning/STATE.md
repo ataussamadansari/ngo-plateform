@@ -10,10 +10,15 @@ See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_webs
 ## Current Position
 
 - **Phase**: 7 of 8 (Public Website Frontend & Dynamic Theming)
-- **Status**: Ready to Plan Phase 7
+- **Status**: Planned (2 plans ready: 07-01, 07-02)
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
-- **Active Wave**: Ready for planning
+- **Active Wave**: 1
 - **Blockers**: None
+
+## Phase 7 Plans
+
+- [ ] [07-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/07-public-website-frontend-dynamic-theming/07-01-PLAN.md) — Wave 1: High-Conversion Public Homepage, Live Impact Metrics Engine & Global Header/Footer Experience (PUB-01, PUB-03)
+- [ ] [07-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/07-public-website-frontend-dynamic-theming/07-02-PLAN.md) — Wave 2: About Us Credibility Page, Accreditation Certificate Previews & Contact Inquiries Engine (PUB-02, PUB-04)
 
 ## Phase 6 Plans (Completed)
 
