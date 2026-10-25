@@ -10,13 +10,20 @@ See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_webs
 ## Current Position
 
 - **Phase**: 1 of 8 (Foundation, White-Label Engine & Database Schema)
-- **Status**: Ready to plan
+- **Status**: Planned (2 plans ready: 01-01, 01-02)
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
+- **Active Wave**: 1
 - **Blockers**: None
+
+## Phase 1 Plans
+
+- [ ] [01-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/01-foundation-white-label-engine-database-schema/01-01-PLAN.md) — Wave 1: Database Schema Migrations & Eloquent Domain Models (FND-01, FND-02)
+- [ ] [01-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/01-foundation-white-label-engine-database-schema/01-02-PLAN.md) — Wave 2: White-Label Settings Engine, Dynamic CSS Theming & Client Seeder (FND-03, FND-04, WHT-01, WHT-02, WHT-03, WHT-04)
 
 ## Milestones & History
 
 - **v1.0 MVP Milestone**: Initialized 2026-10-25 (8 vertical MVP phases, 41 requirements mapped)
+- **Phase 1 Planned**: 2026-10-25 (Walking skeleton, 2 execution plans)
 
 ## Accumulated Context
 
