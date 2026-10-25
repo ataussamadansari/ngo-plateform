@@ -39,9 +39,14 @@
                 </div>
             </a>
 
-            <nav class="flex items-center gap-4">
-                <a href="{{ url('/') }}" class="text-sm font-medium text-slate-600 hover:text-slate-900">Home</a>
-                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">80G Certified</span>
+            <nav class="flex items-center gap-3 sm:gap-6">
+                <a href="{{ url('/') }}" class="text-sm font-medium {{ request()->is('/') ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900' }}">Home</a>
+                <a href="{{ route('donate.index') }}" class="text-sm font-medium {{ request()->is('donate') ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900' }}">Donate</a>
+                <a href="{{ route('donation.status') }}" class="text-sm font-medium hidden sm:inline-block {{ request()->is('donation-status') ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900' }}">Track Donation</a>
+
+                <a href="{{ route('donate.index') }}" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:opacity-95 shadow-xs transition">
+                    Donate Now
+                </a>
             </nav>
         </div>
     </header>
@@ -50,15 +55,47 @@
         @yield('content')
     </main>
 
-    <footer class="bg-slate-900 text-slate-400 py-10 mt-16 border-t border-slate-800">
+    <footer class="bg-slate-900 text-slate-400 py-12 mt-16 border-t border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-800">
                 <div>
-                    <span class="text-white font-semibold">{{ setting('ngo_name', 'NGO Platform') }}</span>
-                    <p class="text-xs text-slate-400 mt-1">{{ setting('contact_address', 'Registered Non-Profit Organisation') }}</p>
+                    <span class="text-white font-bold text-lg block">{{ setting('ngo_name', 'NGO Platform') }}</span>
+                    <p class="text-xs text-slate-400 mt-2">{{ setting('ngo_tagline', 'Serving Humanity with Complete Transparency') }}</p>
+                    <p class="text-xs text-slate-500 mt-2 leading-relaxed">{{ setting('contact_address', 'Registered Non-Profit Organisation') }}</p>
                 </div>
-                <div class="text-xs text-slate-500">
-                    &copy; {{ date('Y') }} {{ setting('ngo_name') }}. All rights reserved.
+
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-3">Quick Navigation</span>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="{{ url('/') }}" class="hover:text-white transition">Home</a></li>
+                        <li><a href="{{ route('donate.index') }}" class="hover:text-white transition">Make a Donation</a></li>
+                        <li><a href="{{ route('donation.status') }}" class="hover:text-white transition">Track Donation Status</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-3">Contact & Legal</span>
+                    <ul class="space-y-1.5 text-xs text-slate-400">
+                        <li>Email: <a href="mailto:{{ setting('contact_email') }}" class="hover:text-white">{{ setting('contact_email', 'contact@kashiseva.org') }}</a></li>
+                        <li>Phone: {{ setting('contact_phone', '+91 9876543210') }}</li>
+                        @if(setting('ngo_reg_number'))
+                            <li class="pt-2 text-slate-500">Reg No: {{ setting('ngo_reg_number') }}</li>
+                        @endif
+                        @if(setting('80g_reg_number'))
+                            <li class="text-slate-500">80G Reg: {{ setting('80g_reg_number') }}</li>
+                        @endif
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 text-xs text-slate-500">
+                <div>
+                    &copy; {{ date('Y') }} {{ setting('ngo_name') }}. 100% Transparent Non-Profit Platform.
+                </div>
+                <div class="flex items-center gap-4">
+                    <span>80G Tax Exemption Certified</span>
+                    <span>&bull;</span>
+                    <span>Zero Platform Fees</span>
                 </div>
             </div>
         </div>

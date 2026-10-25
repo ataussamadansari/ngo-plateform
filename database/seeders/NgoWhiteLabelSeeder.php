@@ -212,5 +212,8 @@ class NgoWhiteLabelSeeder extends Seeder
                 ]
             );
         }
+
+        // 4. Default Payment Methods
+        (new PaymentMethodSeeder)->run();
     }
 }

@@ -35,8 +35,9 @@ A modular, vertical MVP roadmap organized into 8 focused phases. Each phase deli
 
 ---
 
-### Phase 2: Payment Methods & Public Manual Donation Engine
+### Phase 2: Payment Methods & Public Manual Donation Engine (Completed)
 **Goal:** Enable donor manual payment proof submission with UPI QR display, bank details, UTR deduplication, screenshot upload, and status lookup.  
+**Status:** Completed (2026-10-25)
 **Mode:** mvp  
 **UI hint:** yes  
 **Requirements:** DON-01, DON-02, DON-03, DON-04, DON-05, DON-06  
