@@ -10,10 +10,15 @@ See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_webs
 ## Current Position
 
 - **Phase**: 6 of 8 (Volunteers Onboarding & Event Management)
-- **Status**: Ready to plan
+- **Status**: Planned (2 plans ready: 06-01, 06-02)
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
-- **Active Wave**: 0
+- **Active Wave**: 1
 - **Blockers**: None
+
+## Phase 6 Plans
+
+- [ ] [06-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/06-volunteers-onboarding-event-management/06-01-PLAN.md) — Wave 1: Volunteer Registration, Application Screening & Code Generation Engine (VOL-01, VOL-02, VOL-03)
+- [ ] [06-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/06-volunteers-onboarding-event-management/06-02-PLAN.md) — Wave 2: Events Management, Public RSVP Registration & Attendance Tracking (VOL-04, VOL-05, VOL-06)
 
 ## Phase 5 Plans (Completed)
 
