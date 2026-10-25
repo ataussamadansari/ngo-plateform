@@ -160,6 +160,7 @@
 
                 <!-- Bank Transfer Tab Panel -->
                 <div id="panel-bank" class="space-y-4 hidden">
+                    @if($bankMethod)
                     <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 space-y-3">
                         <div class="flex items-center justify-between pb-2 border-b border-slate-200">
                             <span class="text-xs font-semibold text-slate-500 uppercase">Account Details</span>
@@ -179,8 +180,8 @@
                         <div class="flex items-center justify-between text-xs sm:text-sm">
                             <span class="text-slate-500">Bank Name</span>
                             <div class="flex items-center gap-2">
-                                <span class="font-semibold text-slate-900" id="bank-name">{{ $bankMethod->bank_name ?? 'State Bank of India' }}</span>
-                                <button type="button" onclick="copyToClipboard('{{ $bankMethod->bank_name ?? 'State Bank of India' }}', this)" class="text-slate-400 hover:text-slate-600">
+                                <span class="font-semibold text-slate-900" id="bank-name">{{ $bankMethod->bank_name }}</span>
+                                <button type="button" onclick="copyToClipboard('{{ $bankMethod->bank_name }}', this)" class="text-slate-400 hover:text-slate-600">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                                 </button>
                             </div>
@@ -189,8 +190,8 @@
                         <div class="flex items-center justify-between text-xs sm:text-sm">
                             <span class="text-slate-500">Account Number</span>
                             <div class="flex items-center gap-2">
-                                <span class="font-mono font-bold text-slate-900" id="bank-acc">{{ $bankMethod->account_number ?? '41238901234' }}</span>
-                                <button type="button" onclick="copyToClipboard('{{ $bankMethod->account_number ?? '41238901234' }}', this)" class="text-slate-400 hover:text-slate-600">
+                                <span class="font-mono font-bold text-slate-900" id="bank-acc">{{ $bankMethod->account_number }}</span>
+                                <button type="button" onclick="copyToClipboard('{{ $bankMethod->account_number }}', this)" class="text-slate-400 hover:text-slate-600">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                                 </button>
                             </div>
@@ -199,8 +200,8 @@
                         <div class="flex items-center justify-between text-xs sm:text-sm">
                             <span class="text-slate-500">IFSC Code</span>
                             <div class="flex items-center gap-2">
-                                <span class="font-mono font-bold text-slate-900" id="bank-ifsc">{{ $bankMethod->ifsc_code ?? 'SBIN0001234' }}</span>
-                                <button type="button" onclick="copyToClipboard('{{ $bankMethod->ifsc_code ?? 'SBIN0001234' }}', this)" class="text-slate-400 hover:text-slate-600">
+                                <span class="font-mono font-bold text-slate-900" id="bank-ifsc">{{ $bankMethod->ifsc_code }}</span>
+                                <button type="button" onclick="copyToClipboard('{{ $bankMethod->ifsc_code }}', this)" class="text-slate-400 hover:text-slate-600">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                                 </button>
                             </div>
@@ -208,7 +209,7 @@
 
                         <div class="flex items-center justify-between text-xs sm:text-sm">
                             <span class="text-slate-500">Branch</span>
-                            <span class="font-medium text-slate-800" id="bank-branch">{{ $bankMethod->branch_name ?? 'Assi Ghat Branch, Varanasi' }}</span>
+                            <span class="font-medium text-slate-800" id="bank-branch">{{ $bankMethod->branch_name }}</span>
                         </div>
                     </div>
 
@@ -216,6 +217,11 @@
                         <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                         Copy All Bank Details
                     </button>
+                    @else
+                    <div class="p-6 bg-slate-50 rounded-xl border border-slate-200 text-center text-slate-500 text-sm">
+                        Direct bank transfer is currently unavailable. Please donate using UPI.
+                    </div>
+                    @endif
                 </div>
             </div>
 

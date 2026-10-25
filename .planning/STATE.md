@@ -6,21 +6,21 @@ See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_webs
 
 **Core value:** Frictionless, fee-free manual donation verification paired with 100% transparent public fund distribution tracking and automated compliance receipts.  
 **Current focus:** Milestone v1.1 — Native FilamentPHP Back-Office Migration & White-Label Administration  
-**Next action:** `/gsd-plan-phase 9` to plan Phase 9: Native Filament Panel Setup, Auth & Route Release
+**Next action:** `/gsd-plan-phase 11` to plan Phase 11: Core Operations Migration (Donations, Ledger, Causes, Volunteers, Events)
 
 ## Current Position
 
 - **Milestone**: v1.1
 - **Phase**: 10 of 12 (White-Label Settings & Payment Methods Resources)
-- **Status**: Planned (2 plans ready: 10-01, 10-02)
+- **Status**: Completed (10-01, 10-02 complete)
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
-- **Active Wave**: 1
+- **Active Wave**: 2 (Complete)
 - **Blockers**: None
 
-## Phase 10 Plans
+## Phase 10 Plans (Completed)
 
-- [ ] [10-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/10-white-label-settings-payment-methods-resources/10-01-PLAN.md) — Wave 1: Native Filament `SiteSetting` White-Label Administration Engine (FIL-02)
-- [ ] [10-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/10-white-label-settings-payment-methods-resources/10-02-PLAN.md) — Wave 2: Native Filament `PaymentMethodResource` (UPI QR & Bank Accounts) (FIL-03)
+- [x] [10-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/10-white-label-settings-payment-methods-resources/10-01-PLAN.md) — Wave 1: Native Filament `SiteSetting` White-Label Administration Engine (FIL-02)
+- [x] [10-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/10-white-label-settings-payment-methods-resources/10-02-PLAN.md) — Wave 2: Native Filament `PaymentMethodResource` (UPI QR & Bank Accounts) (FIL-03)
 
 ## Phase 9 Plans (Completed)
 
@@ -29,7 +29,7 @@ See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_webs
 ## Milestone v1.1 Phases
 
 - [x] **Phase 9**: Native Filament Panel Setup, Auth & Route Release (FIL-01, FIL-10)
-- [ ] **Phase 10**: White-Label Settings & Payment Methods Resources (FIL-02, FIL-03)
+- [x] **Phase 10**: White-Label Settings & Payment Methods Resources (FIL-02, FIL-03)
 - [ ] **Phase 11**: Core Operations Migration (Donations, Ledger, Causes, Volunteers, Events) (FIL-04, FIL-05, FIL-06, FIL-07, FIL-08)
 - [ ] **Phase 12**: Executive Dashboard Widgets, Legacy Deprecation & Verification (FIL-09, FIL-10)
 
