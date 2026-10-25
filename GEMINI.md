@@ -21,21 +21,32 @@ A dynamic, white-label ready NGO web platform and donation management system bui
 
 ## Technology Stack
 
-Technology stack not yet documented. Will populate after codebase mapping or first phase.
+- **Backend**: Laravel 12.0, PHP 8.2+, Eloquent ORM, Laravel Tinker
+- **Database & Cache**: SQLite (dev) / MySQL (prod), Database cache driver (`cache` table), Database queues
+- **Frontend & CSS**: Tailwind CSS v4 (`@tailwindcss/vite`), Vite 7.0, Axios, Blade Templates, CSS custom properties (`:root`)
+- **Admin & Document Tools**: FilamentPHP (planned), Spatie Laravel-PDF / Dompdf (planned)
+- **Code Quality & Testing**: PHPUnit 11, Laravel Pint, Mockery, Faker, Laravel Pail
 <!-- GSD:stack-end -->
 
 <!-- GSD:conventions-start source:CONVENTIONS.md -->
 
 ## Conventions
 
-Conventions not yet established. Will populate as patterns emerge during development.
+- **Code Style**: PSR-12 / Laravel opinionated conventions enforced via `laravel/pint`
+- **Typing**: Strict return types on methods and attribute casting on all Eloquent models
+- **Financial Precision**: All monetary values use `decimal(12, 2)` or `decimal(14, 2)` - never floats
+- **Data Integrity**: Mandatory `DB::transaction()` on all donation approvals and fund disbursements
+- **Security**: Route rate-limiting (`throttle:5,1`), max 2MB file uploads (jpeg/png/webp only), unique index on `utr_number`
 <!-- GSD:conventions-end -->
 
 <!-- GSD:architecture-start source:ARCHITECTURE.md -->
 
 ## Architecture
 
-Architecture not yet mapped. Follow existing patterns found in the codebase.
+- **Pattern**: Monolithic modular architecture with domain separation (Public Donor Controllers vs Back-Office Filament Admin)
+- **White-Label Engine**: Database-backed `site_settings` key-value store with cached `setting()` helper and model-event cache buster
+- **Theming**: Dynamic CSS custom property injection in base layout (`--color-primary`, `--color-secondary`)
+- **Verification Workflow**: Offline UPI QR & Bank transfer -> Donor UTR + proof submission -> Admin side-by-side verification -> Automated 80G PDF receipt
 <!-- GSD:architecture-end -->
 
 <!-- GSD:skills-start source:skills/ -->
