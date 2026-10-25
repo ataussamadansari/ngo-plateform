@@ -24,8 +24,28 @@
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-800 antialiased font-sans flex flex-col justify-between">
 
+    @auth
+        @if(auth()->user()->isSuperAdmin() || auth()->user()->isManager())
+            <!-- Admin Global Command Strip -->
+            <div class="bg-slate-900 text-slate-300 text-xs py-1.5 px-4 sm:px-6 lg:px-8 flex items-center justify-between border-b border-slate-800 relative z-50">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span class="font-bold text-white">{{ auth()->user()->isSuperAdmin() ? 'Super Admin' : 'Manager' }}:</span>
+                    <span>{{ auth()->user()->name }}</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('admin.dashboard') }}" class="font-bold text-emerald-400 hover:text-emerald-300 transition">Back-Office Command &rarr;</a>
+                    <form action="{{ route('admin.logout') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="text-slate-400 hover:text-white transition font-medium">Logout</button>
+                    </form>
+                </div>
+            </div>
+        @endif
+    @endauth
+
     <!-- Top Navigation Header -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
             
             <!-- Brand Logo & Name -->

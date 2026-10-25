@@ -143,7 +143,7 @@ class VolunteerRegistrationAndScreeningTest extends TestCase
             'joined_at' => now(),
         ]);
 
-        $response = $this->get('/admin/volunteers');
+        $response = $this->actingAs($this->admin)->get('/admin/volunteers');
 
         $response->assertOk();
         $response->assertSee('Volunteer Screening & Roster');
@@ -173,7 +173,7 @@ class VolunteerRegistrationAndScreeningTest extends TestCase
         $year = date('Y');
         $expectedCode = "KSF-VOL-{$year}-0001";
 
-        $response = $this->post("/admin/volunteers/{$volunteer->id}/approve");
+        $response = $this->actingAs($this->admin)->post("/admin/volunteers/{$volunteer->id}/approve");
 
         $response->assertSessionHas('success');
 
@@ -212,7 +212,7 @@ class VolunteerRegistrationAndScreeningTest extends TestCase
             'status' => 'pending',
         ]);
 
-        $response = $this->post("/admin/volunteers/{$volunteer->id}/reject");
+        $response = $this->actingAs($this->admin)->post("/admin/volunteers/{$volunteer->id}/reject");
 
         $response->assertSessionHas('info');
 

@@ -44,6 +44,8 @@ class AdminCampaignManagementTest extends TestCase
             'distributed_amount' => 20000.00,
             'status' => 'active',
         ]);
+
+        $this->actingAs($this->admin);
     }
 
     protected function createFakeImage(string $name = 'thumb.png', int $sizeKb = 50): UploadedFile

@@ -10,15 +10,16 @@ See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_webs
 ## Current Position
 
 - **Phase**: 8 of 8 (Back-Office Admin Dashboard, RBAC & Client Handover)
-- **Status**: Planned (2 plans ready: 08-01, 08-02)
+- **Status**: Completed (All 8 phases executed, 86 feature tests passing)
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
-- **Active Wave**: 1
+- **Active Wave**: Complete
 - **Blockers**: None
 
-## Phase 8 Plans
+## Phase 8 Plans (Completed)
 
-- [ ] [08-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/08-back-office-filament-admin-dashboard-client-handover/08-01-PLAN.md) — Wave 1: Back-Office Admin Dashboard, Financial Metric Cards & Quick-Action Verification Queues (ADM-01, ADM-02)
-- [ ] [08-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/08-back-office-filament-admin-dashboard-client-handover/08-02-PLAN.md) — Wave 2: Administrative Authentication Gateway, Role-Based Access Control & Turnkey Client Handover (ADM-03)
+- [x] [08-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/08-back-office-filament-admin-dashboard-client-handover/08-01-PLAN.md) — Wave 1: Back-Office Admin Dashboard, Financial Metric Cards & Quick-Action Verification Queues (ADM-01, ADM-02)
+- [x] [08-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/08-back-office-filament-admin-dashboard-client-handover/08-02-PLAN.md) — Wave 2: Administrative Authentication Gateway, Role-Based Access Control & Turnkey Client Handover (ADM-03)
+
 
 ## Phase 7 Plans (Completed)
 

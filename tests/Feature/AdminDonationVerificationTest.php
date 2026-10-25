@@ -26,6 +26,7 @@ class AdminDonationVerificationTest extends TestCase
         $this->seed(PaymentMethodSeeder::class);
 
         $this->admin = User::where('role', 'super_admin')->first();
+        $this->actingAs($this->admin);
 
         $category = CauseCategory::first();
         $this->campaign = Campaign::create([
