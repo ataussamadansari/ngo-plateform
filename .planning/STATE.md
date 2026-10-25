@@ -9,11 +9,16 @@ See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_webs
 
 ## Current Position
 
-- **Phase**: 7 of 8 completed (Public Website Frontend & Dynamic Theming)
-- **Status**: Completed (2 plans verified: 07-01, 07-02)
+- **Phase**: 8 of 8 (Back-Office Admin Dashboard, RBAC & Client Handover)
+- **Status**: Planned (2 plans ready: 08-01, 08-02)
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
-- **Next Phase**: Phase 8 (Back-Office Filament Admin Dashboard & Client Handover)
+- **Active Wave**: 1
 - **Blockers**: None
+
+## Phase 8 Plans
+
+- [ ] [08-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/08-back-office-filament-admin-dashboard-client-handover/08-01-PLAN.md) — Wave 1: Back-Office Admin Dashboard, Financial Metric Cards & Quick-Action Verification Queues (ADM-01, ADM-02)
+- [ ] [08-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/08-back-office-filament-admin-dashboard-client-handover/08-02-PLAN.md) — Wave 2: Administrative Authentication Gateway, Role-Based Access Control & Turnkey Client Handover (ADM-03)
 
 ## Phase 7 Plans (Completed)
 
