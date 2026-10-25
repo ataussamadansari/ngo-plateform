@@ -63,43 +63,43 @@ class AdminCampaignManagementTest extends TestCase
     public function test_admin_can_manage_cause_categories(): void
     {
         // 1. Create Category
-        $response = $this->post('/admin/categories', [
+        $response = $this->post(route('admin.categories.store'), [
             'name' => 'Animal Welfare',
             'slug' => 'animal-welfare',
             'icon' => 'heart',
             'is_active' => '1',
         ]);
 
-        $response->assertRedirect('/admin/categories');
+        $response->assertRedirect(route('admin.categories.index'));
         $this->assertDatabaseHas('cause_categories', ['name' => 'Animal Welfare']);
 
         $category = CauseCategory::where('slug', 'animal-welfare')->first();
 
         // 2. Update Category
-        $updateResponse = $this->put("/admin/categories/{$category->id}", [
+        $updateResponse = $this->put(route('admin.categories.update', $category), [
             'name' => 'Wildlife & Animal Welfare',
             'slug' => 'animal-welfare',
             'is_active' => '1',
         ]);
 
-        $updateResponse->assertRedirect('/admin/categories');
+        $updateResponse->assertRedirect(route('admin.categories.index'));
         $this->assertDatabaseHas('cause_categories', ['name' => 'Wildlife & Animal Welfare']);
 
         // 3. Delete Category (empty)
-        $deleteResponse = $this->delete("/admin/categories/{$category->id}");
-        $deleteResponse->assertRedirect('/admin/categories');
+        $deleteResponse = $this->delete(route('admin.categories.destroy', $category));
+        $deleteResponse->assertRedirect(route('admin.categories.index'));
         $this->assertDatabaseMissing('cause_categories', ['id' => $category->id]);
 
         // 4. Deleting Category with linked campaigns is blocked
-        $blockedDelete = $this->delete("/admin/categories/{$this->category->id}");
-        $blockedDelete->assertRedirect('/admin/categories');
+        $blockedDelete = $this->delete(route('admin.categories.destroy', $this->category));
+        $blockedDelete->assertRedirect(route('admin.categories.index'));
         $blockedDelete->assertSessionHas('error');
         $this->assertDatabaseHas('cause_categories', ['id' => $this->category->id]);
     }
 
     public function test_admin_can_view_campaigns_list_and_metrics(): void
     {
-        $response = $this->get('/admin/campaigns');
+        $response = $this->get(route('admin.campaigns.index'));
 
         $response->assertStatus(200);
         $response->assertSee('Campaigns Management');
@@ -129,9 +129,9 @@ class AdminCampaignManagementTest extends TestCase
             'status' => 'active',
         ];
 
-        $response = $this->post('/admin/campaigns', $payload);
+        $response = $this->post(route('admin.campaigns.store'), $payload);
 
-        $response->assertRedirect('/admin/campaigns');
+        $response->assertRedirect(route('admin.campaigns.index'));
         $response->assertSessionHas('success');
 
         $campaign = Campaign::where('title', 'Mobile Health Clinic Van')->first();
@@ -157,13 +157,13 @@ class AdminCampaignManagementTest extends TestCase
             'status' => 'active',
         ];
 
-        $response = $this->put("/admin/campaigns/{$this->campaign->id}", $payload);
+        $response = $this->put(route('admin.campaigns.update', $this->campaign), $payload);
 
-        $response->assertRedirect('/admin/campaigns');
+        $response->assertRedirect(route('admin.campaigns.index'));
         $this->assertEquals('Emergency Oxygen Supply - Phase 2', $this->campaign->fresh()->title);
 
         // Toggle Status
-        $toggleResponse = $this->patch("/admin/campaigns/{$this->campaign->id}/status", [
+        $toggleResponse = $this->patch(route('admin.campaigns.status', $this->campaign), [
             'status' => 'completed',
         ]);
 

@@ -88,19 +88,19 @@ Route::prefix('admin')->name('admin.')->middleware(['admin.role'])->group(functi
     Route::post('/distributions', [AdminFundDistributionController::class, 'store'])->name('distributions.store');
     Route::get('/distributions/{distribution}', [AdminFundDistributionController::class, 'show'])->name('distributions.show');
 
-    // Phase 5: Cause Categories Management
-    Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
-    Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
-    Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
-    Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+    // Legacy Phase 5: Cause Categories Management (Retained for backward compatibility until Phase 12)
+    Route::get('/legacy-categories', [AdminCategoryController::class, 'index'])->name('categories.index');
+    Route::post('/legacy-categories', [AdminCategoryController::class, 'store'])->name('categories.store');
+    Route::put('/legacy-categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/legacy-categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
 
-    // Phase 5: Campaigns Management
-    Route::get('/campaigns', [AdminCampaignController::class, 'index'])->name('campaigns.index');
-    Route::get('/campaigns/create', [AdminCampaignController::class, 'create'])->name('campaigns.create');
-    Route::post('/campaigns', [AdminCampaignController::class, 'store'])->name('campaigns.store');
-    Route::get('/campaigns/{campaign}/edit', [AdminCampaignController::class, 'edit'])->name('campaigns.edit');
-    Route::put('/campaigns/{campaign}', [AdminCampaignController::class, 'update'])->name('campaigns.update');
-    Route::patch('/campaigns/{campaign}/status', [AdminCampaignController::class, 'toggleStatus'])->name('campaigns.status');
+    // Legacy Phase 5: Campaigns Management (Retained for backward compatibility until Phase 12)
+    Route::get('/legacy-campaigns', [AdminCampaignController::class, 'index'])->name('campaigns.index');
+    Route::get('/legacy-campaigns/create', [AdminCampaignController::class, 'create'])->name('campaigns.create');
+    Route::post('/legacy-campaigns', [AdminCampaignController::class, 'store'])->name('campaigns.store');
+    Route::get('/legacy-campaigns/{campaign}/edit', [AdminCampaignController::class, 'edit'])->name('campaigns.edit');
+    Route::put('/legacy-campaigns/{campaign}', [AdminCampaignController::class, 'update'])->name('campaigns.update');
+    Route::patch('/legacy-campaigns/{campaign}/status', [AdminCampaignController::class, 'toggleStatus'])->name('campaigns.status');
 
     // Phase 6: Volunteer Screening & Code Generation
     Route::get('/volunteers', [AdminVolunteerController::class, 'index'])->name('volunteers.index');
