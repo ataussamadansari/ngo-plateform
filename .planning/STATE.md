@@ -5,20 +5,20 @@
 See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/PROJECT.md) (updated 2026-10-25)
 
 **Core value:** Frictionless, fee-free manual donation verification paired with 100% transparent public fund distribution tracking and automated compliance receipts.  
-**Current focus:** Phase 5: Causes & Campaigns Management Engine
+**Current focus:** Phase 6: Volunteers Onboarding & Event Management
 
 ## Current Position
 
-- **Phase**: 5 of 8 (Causes & Campaigns Management Engine)
-- **Status**: Planned (2 plans ready: 05-01, 05-02)
+- **Phase**: 6 of 8 (Volunteers Onboarding & Event Management)
+- **Status**: Ready to plan
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
-- **Active Wave**: 1
+- **Active Wave**: 0
 - **Blockers**: None
 
-## Phase 5 Plans
+## Phase 5 Plans (Completed)
 
-- [ ] [05-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/05-causes-campaigns-management-engine/05-01-PLAN.md) — Wave 1: Admin Cause Categories & Campaign Management Engine (CMP-01, CMP-02)
-- [ ] [05-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/05-causes-campaigns-management-engine/05-02-PLAN.md) — Wave 2: Public Campaigns Directory & High-Conversion Cause Story Portal (CMP-03, CMP-04)
+- [x] [05-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/05-causes-campaigns-management-engine/05-01-PLAN.md) — Wave 1: Admin Cause Categories & Campaign Management Engine (CMP-01, CMP-02)
+- [x] [05-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/05-causes-campaigns-management-engine/05-02-PLAN.md) — Wave 2: Public Campaigns Directory & High-Conversion Cause Story Portal (CMP-03, CMP-04)
 
 ## Phase 4 Plans (Completed)
 

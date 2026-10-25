@@ -77,8 +77,9 @@ A modular, vertical MVP roadmap organized into 8 focused phases. Each phase deli
 
 ---
 
-### Phase 5: Causes & Campaigns Management Engine
+### Phase 5: Causes & Campaigns Management Engine (Completed)
 **Goal:** Build end-to-end campaign creation, category management, urgent cause highlights, and live financial progress synchronization.  
+**Status:** Completed (2026-10-25)
 **Mode:** mvp  
 **UI hint:** yes  
 **Requirements:** CMP-01, CMP-02, CMP-03, CMP-04  
