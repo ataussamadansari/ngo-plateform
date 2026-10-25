@@ -50,7 +50,7 @@ class Event extends Model
     {
         return $query->where(function (Builder $q) {
             $q->where('event_date', '<', now()->toDateString())
-              ->orWhere('status', 'completed');
+                ->orWhere('status', 'completed');
         })->orderByDesc('event_date');
     }
 }

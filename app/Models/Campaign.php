@@ -74,6 +74,7 @@ class Campaign extends Model
                     return 0;
                 }
                 $raised = (float) $this->raised_amount;
+
                 return min(100, round(($raised / $goal) * 100, 1));
             }
         );
