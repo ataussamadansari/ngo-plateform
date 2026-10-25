@@ -5,17 +5,22 @@
 See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/PROJECT.md) (updated 2026-10-25)
 
 **Core value:** Frictionless, fee-free manual donation verification paired with 100% transparent public fund distribution tracking and automated compliance receipts.  
-**Current focus:** Phase 1: Foundation, White-Label Engine & Database Schema
+**Current focus:** Phase 2: Payment Methods & Public Manual Donation Engine
 
 ## Current Position
 
-- **Phase**: 1 of 8 (Foundation, White-Label Engine & Database Schema)
-- **Status**: Complete (2 plans executed: 01-01, 01-02)
+- **Phase**: 2 of 8 (Payment Methods & Public Manual Donation Engine)
+- **Status**: Planned (2 plans ready: 02-01, 02-02)
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
-- **Active Wave**: Complete
+- **Active Wave**: 1
 - **Blockers**: None
 
-## Phase 1 Plans
+## Phase 2 Plans
+
+- [ ] [02-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/02-payment-methods-public-manual-donation-engine/02-01-PLAN.md) — Wave 1: Payment Methods Engine & Public Donation Page with Manual Proof Upload (DON-01, DON-02, DON-03, DON-04, DON-05)
+- [ ] [02-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/02-payment-methods-public-manual-donation-engine/02-02-PLAN.md) — Wave 2: Public Donation Status Lookup Portal & UTR Tracking (DON-06)
+
+## Phase 1 Plans (Completed)
 
 - [x] [01-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/01-foundation-white-label-engine-database-schema/01-01-PLAN.md) — Wave 1: Database Schema Migrations & Eloquent Domain Models (FND-01, FND-02)
 - [x] [01-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/01-foundation-white-label-engine-database-schema/01-02-PLAN.md) — Wave 2: White-Label Settings Engine, Dynamic CSS Theming & Client Seeder (FND-03, FND-04, WHT-01, WHT-02, WHT-03, WHT-04)
