@@ -91,8 +91,9 @@ A modular, vertical MVP roadmap organized into 8 focused phases. Each phase deli
 
 ---
 
-### Phase 6: Volunteers Onboarding & Event Management
+### Phase 6: Volunteers Onboarding & Event Management (Completed)
 **Goal:** Facilitate volunteer registration, application screening, volunteer code generation, and event registration with attendance tracking.  
+**Status:** Completed (2026-10-25)
 **Mode:** mvp  
 **UI hint:** yes  
 **Requirements:** VOL-01, VOL-02, VOL-03, VOL-04, VOL-05, VOL-06  

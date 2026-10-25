@@ -5,20 +5,20 @@
 See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/PROJECT.md) (updated 2026-10-25)
 
 **Core value:** Frictionless, fee-free manual donation verification paired with 100% transparent public fund distribution tracking and automated compliance receipts.  
-**Current focus:** Phase 6: Volunteers Onboarding & Event Management
+**Current focus:** Phase 7: Public Website Frontend & Dynamic Theming
 
 ## Current Position
 
-- **Phase**: 6 of 8 (Volunteers Onboarding & Event Management)
-- **Status**: Planned (2 plans ready: 06-01, 06-02)
+- **Phase**: 7 of 8 (Public Website Frontend & Dynamic Theming)
+- **Status**: Ready to Plan Phase 7
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
-- **Active Wave**: 1
+- **Active Wave**: Ready for planning
 - **Blockers**: None
 
-## Phase 6 Plans
+## Phase 6 Plans (Completed)
 
-- [ ] [06-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/06-volunteers-onboarding-event-management/06-01-PLAN.md) — Wave 1: Volunteer Registration, Application Screening & Code Generation Engine (VOL-01, VOL-02, VOL-03)
-- [ ] [06-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/06-volunteers-onboarding-event-management/06-02-PLAN.md) — Wave 2: Events Management, Public RSVP Registration & Attendance Tracking (VOL-04, VOL-05, VOL-06)
+- [x] [06-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/06-volunteers-onboarding-event-management/06-01-PLAN.md) — Wave 1: Volunteer Registration, Application Screening & Code Generation Engine (VOL-01, VOL-02, VOL-03)
+- [x] [06-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/06-volunteers-onboarding-event-management/06-02-PLAN.md) — Wave 2: Events Management, Public RSVP Registration & Attendance Tracking (VOL-04, VOL-05, VOL-06)
 
 ## Phase 5 Plans (Completed)
 

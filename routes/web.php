@@ -3,17 +3,35 @@
 use App\Http\Controllers\Admin\AdminCampaignController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminDonationController;
+use App\Http\Controllers\Admin\AdminEventController;
 use App\Http\Controllers\Admin\AdminFundDistributionController;
+use App\Http\Controllers\Admin\AdminVolunteerController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\DonationStatusController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\TransparencyController;
+use App\Http\Controllers\VolunteerController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Phase 6: Public Events Directory & RSVP Registration
+Route::get('/events', [EventController::class, 'index'])->name('events.index');
+Route::get('/events/{event:slug}', [EventController::class, 'show'])->name('events.show');
+Route::post('/events/{event:slug}/register', [EventController::class, 'register'])
+    ->middleware('throttle:5,1')
+    ->name('events.register');
+
+// Phase 6: Public Volunteer Registration Portal
+Route::get('/volunteer-join', [VolunteerController::class, 'create'])->name('volunteers.create');
+Route::post('/volunteer-join', [VolunteerController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('volunteers.store');
+Route::get('/volunteer-join/success', [VolunteerController::class, 'success'])->name('volunteers.success');
 
 // Phase 5: Public Campaigns Directory & High-Conversion Cause Story Portal
 Route::get('/campaigns', [CampaignController::class, 'index'])->name('campaigns.index');
@@ -32,7 +50,7 @@ Route::get('/donation-status', [DonationStatusController::class, 'index'])->name
 Route::get('/transparency', [TransparencyController::class, 'index'])->name('transparency.index');
 Route::get('/campaigns/{campaign:slug}/transparency', [TransparencyController::class, 'campaignLedger'])->name('campaigns.transparency');
 
-// Phase 3, 4 & 5: Administrative Back-Office Routes
+// Phase 3, 4, 5 & 6: Administrative Back-Office Routes
 Route::prefix('admin')->name('admin.')->group(function () {
     // Phase 3: Donation Verification
     Route::get('/donations', [AdminDonationController::class, 'index'])->name('donations.index');
@@ -60,6 +78,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/campaigns/{campaign}/edit', [AdminCampaignController::class, 'edit'])->name('campaigns.edit');
     Route::put('/campaigns/{campaign}', [AdminCampaignController::class, 'update'])->name('campaigns.update');
     Route::patch('/campaigns/{campaign}/status', [AdminCampaignController::class, 'toggleStatus'])->name('campaigns.status');
+
+    // Phase 6: Volunteer Screening & Code Generation
+    Route::get('/volunteers', [AdminVolunteerController::class, 'index'])->name('volunteers.index');
+    Route::get('/volunteers/{volunteer}', [AdminVolunteerController::class, 'show'])->name('volunteers.show');
+    Route::post('/volunteers/{volunteer}/approve', [AdminVolunteerController::class, 'approve'])->name('volunteers.approve');
+    Route::post('/volunteers/{volunteer}/reject', [AdminVolunteerController::class, 'reject'])->name('volunteers.reject');
+
+    // Phase 6: Events Management & Attendance Roster
+    Route::get('/events', [AdminEventController::class, 'index'])->name('events.index');
+    Route::get('/events/create', [AdminEventController::class, 'create'])->name('events.create');
+    Route::post('/events', [AdminEventController::class, 'store'])->name('events.store');
+    Route::get('/events/{event}/edit', [AdminEventController::class, 'edit'])->name('events.edit');
+    Route::put('/events/{event}', [AdminEventController::class, 'update'])->name('events.update');
+    Route::get('/events/{event}/participants', [AdminEventController::class, 'participants'])->name('events.participants');
+    Route::patch('/events/{event}/registrations/{registration}/attendance', [AdminEventController::class, 'updateAttendance'])->name('events.attendance');
+    Route::post('/events/{event}/participants', [AdminEventController::class, 'addParticipant'])->name('events.addParticipant');
 });
 
 // Phase 3: Official 80G PDF Receipt Download and Preview

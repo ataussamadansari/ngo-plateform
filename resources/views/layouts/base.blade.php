@@ -42,7 +42,9 @@
             <nav class="flex items-center gap-3 sm:gap-6">
                 <a href="{{ url('/') }}" class="text-sm font-medium {{ request()->is('/') ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900' }}">Home</a>
                 <a href="{{ route('campaigns.index') }}" class="text-sm font-medium {{ request()->is('campaigns*') ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900' }}">Causes</a>
+                <a href="{{ route('events.index') }}" class="text-sm font-medium hidden sm:inline-block {{ request()->is('events*') ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900' }}">Events</a>
                 <a href="{{ route('transparency.index') }}" class="text-sm font-medium {{ request()->is('transparency*') ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900' }}">Transparency</a>
+                <a href="{{ route('volunteers.create') }}" class="text-sm font-medium hidden md:inline-block {{ request()->is('volunteer-join*') ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900' }}">Volunteer</a>
                 <a href="{{ route('donate.index') }}" class="text-sm font-medium {{ request()->is('donate') ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900' }}">Donate</a>
                 <a href="{{ route('donation.status') }}" class="text-sm font-medium hidden sm:inline-block {{ request()->is('donation-status') ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900' }}">Track Donation</a>
 
@@ -71,7 +73,9 @@
                     <ul class="space-y-2 text-xs">
                         <li><a href="{{ url('/') }}" class="hover:text-white transition">Home</a></li>
                         <li><a href="{{ route('campaigns.index') }}" class="hover:text-white transition">Active Causes</a></li>
+                        <li><a href="{{ route('events.index') }}" class="hover:text-white transition">Community Events</a></li>
                         <li><a href="{{ route('transparency.index') }}" class="hover:text-white transition">Transparency Ledger</a></li>
+                        <li><a href="{{ route('volunteers.create') }}" class="hover:text-white transition">Volunteer With Us</a></li>
                         <li><a href="{{ route('donate.index') }}" class="hover:text-white transition">Make a Donation</a></li>
                         <li><a href="{{ route('donation.status') }}" class="hover:text-white transition">Track Donation Status</a></li>
                     </ul>
