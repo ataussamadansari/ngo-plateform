@@ -5,17 +5,22 @@
 See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/PROJECT.md) (updated 2026-10-25)
 
 **Core value:** Frictionless, fee-free manual donation verification paired with 100% transparent public fund distribution tracking and automated compliance receipts.  
-**Current focus:** Phase 2: Payment Methods & Public Manual Donation Engine
+**Current focus:** Phase 3: Admin Donation Verification & PDF Receipt Engine
 
 ## Current Position
 
-- **Phase**: 2 of 8 (Payment Methods & Public Manual Donation Engine)
-- **Status**: Complete (2 plans executed: 02-01, 02-02)
+- **Phase**: 3 of 8 (Admin Donation Verification & PDF Receipt Engine)
+- **Status**: Planned (2 plans ready: 03-01, 03-02)
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
-- **Active Wave**: Complete
+- **Active Wave**: 1
 - **Blockers**: None
 
-## Phase 2 Plans
+## Phase 3 Plans
+
+- [ ] [03-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/03-admin-donation-verification-pdf-receipt-engine/03-01-PLAN.md) — Wave 1: Verification Queue, Side-by-Side Proof Modal, and Atomic Approval/Rejection Engine (VER-01, VER-02, VER-03, VER-04, VER-05)
+- [ ] [03-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/03-admin-donation-verification-pdf-receipt-engine/03-02-PLAN.md) — Wave 2: 80G Compliant PDF Receipt Generator & Public Download Portal (VER-06)
+
+## Phase 2 Plans (Completed)
 
 - [x] [02-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/02-payment-methods-public-manual-donation-engine/02-01-PLAN.md) — Wave 1: Payment Methods Engine & Public Donation Page with Manual Proof Upload (DON-01, DON-02, DON-03, DON-04, DON-05)
 - [x] [02-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/02-payment-methods-public-manual-donation-engine/02-02-PLAN.md) — Wave 2: Public Donation Status Lookup Portal & UTR Tracking (DON-06)
