@@ -12,10 +12,14 @@ See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_webs
 
 - **Milestone**: v1.1
 - **Phase**: 9 of 12 (Native Filament Panel Setup, Auth & Route Release)
-- **Status**: Ready to plan
+- **Status**: Planned (1 plan ready: 09-01)
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
-- **Active Wave**: Not started
+- **Active Wave**: 1
 - **Blockers**: None
+
+## Phase 9 Plans
+
+- [ ] [09-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/09-native-filament-panel-setup-auth-route-release/09-01-PLAN.md) — Wave 1: Native Filament Panel Provider Setup, FilamentUser Auth & Route Release (FIL-01, FIL-10)
 
 ## Milestone v1.1 Phases
 
