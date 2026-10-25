@@ -102,21 +102,21 @@ Route::prefix('admin')->name('admin.')->middleware(['admin.role'])->group(functi
     Route::put('/legacy-campaigns/{campaign}', [AdminCampaignController::class, 'update'])->name('campaigns.update');
     Route::patch('/legacy-campaigns/{campaign}/status', [AdminCampaignController::class, 'toggleStatus'])->name('campaigns.status');
 
-    // Phase 6: Volunteer Screening & Code Generation
-    Route::get('/volunteers', [AdminVolunteerController::class, 'index'])->name('volunteers.index');
-    Route::get('/volunteers/{volunteer}', [AdminVolunteerController::class, 'show'])->name('volunteers.show');
-    Route::post('/volunteers/{volunteer}/approve', [AdminVolunteerController::class, 'approve'])->name('volunteers.approve');
-    Route::post('/volunteers/{volunteer}/reject', [AdminVolunteerController::class, 'reject'])->name('volunteers.reject');
+    // Legacy Phase 6: Volunteer Screening & Code Generation (Retained for backward compatibility until Phase 12)
+    Route::get('/legacy-volunteers', [AdminVolunteerController::class, 'index'])->name('volunteers.index');
+    Route::get('/legacy-volunteers/{volunteer}', [AdminVolunteerController::class, 'show'])->name('volunteers.show');
+    Route::post('/legacy-volunteers/{volunteer}/approve', [AdminVolunteerController::class, 'approve'])->name('volunteers.approve');
+    Route::post('/legacy-volunteers/{volunteer}/reject', [AdminVolunteerController::class, 'reject'])->name('volunteers.reject');
 
-    // Phase 6: Events Management & Attendance Roster
-    Route::get('/events', [AdminEventController::class, 'index'])->name('events.index');
-    Route::get('/events/create', [AdminEventController::class, 'create'])->name('events.create');
-    Route::post('/events', [AdminEventController::class, 'store'])->name('events.store');
-    Route::get('/events/{event}/edit', [AdminEventController::class, 'edit'])->name('events.edit');
-    Route::put('/events/{event}', [AdminEventController::class, 'update'])->name('events.update');
-    Route::get('/events/{event}/participants', [AdminEventController::class, 'participants'])->name('events.participants');
-    Route::patch('/events/{event}/registrations/{registration}/attendance', [AdminEventController::class, 'updateAttendance'])->name('events.attendance');
-    Route::post('/events/{event}/participants', [AdminEventController::class, 'addParticipant'])->name('events.addParticipant');
+    // Legacy Phase 6: Events Management & Attendance Roster (Retained for backward compatibility until Phase 12)
+    Route::get('/legacy-events', [AdminEventController::class, 'index'])->name('events.index');
+    Route::get('/legacy-events/create', [AdminEventController::class, 'create'])->name('events.create');
+    Route::post('/legacy-events', [AdminEventController::class, 'store'])->name('events.store');
+    Route::get('/legacy-events/{event}/edit', [AdminEventController::class, 'edit'])->name('events.edit');
+    Route::put('/legacy-events/{event}', [AdminEventController::class, 'update'])->name('events.update');
+    Route::get('/legacy-events/{event}/participants', [AdminEventController::class, 'participants'])->name('events.participants');
+    Route::patch('/legacy-events/{event}/registrations/{registration}/attendance', [AdminEventController::class, 'updateAttendance'])->name('events.attendance');
+    Route::post('/legacy-events/{event}/participants', [AdminEventController::class, 'addParticipant'])->name('events.addParticipant');
 
     // Phase 7: Visitor Contact Inquiries Management
     Route::get('/inquiries', [AdminInquiryController::class, 'index'])->name('inquiries.index');

@@ -143,7 +143,7 @@ class VolunteerRegistrationAndScreeningTest extends TestCase
             'joined_at' => now(),
         ]);
 
-        $response = $this->actingAs($this->admin)->get('/admin/volunteers');
+        $response = $this->actingAs($this->admin)->get(route('admin.volunteers.index'));
 
         $response->assertOk();
         $response->assertSee('Volunteer Screening & Roster');
@@ -152,7 +152,7 @@ class VolunteerRegistrationAndScreeningTest extends TestCase
         $response->assertSee('KSF-VOL-2026-0001');
 
         // Status filter
-        $pendingFilter = $this->get('/admin/volunteers?status=pending');
+        $pendingFilter = $this->get(route('admin.volunteers.index', ['status' => 'pending']));
         $pendingFilter->assertOk();
         $pendingFilter->assertSee('Pending Applicant');
         $pendingFilter->assertDontSee('Approved Member');
@@ -173,7 +173,7 @@ class VolunteerRegistrationAndScreeningTest extends TestCase
         $year = date('Y');
         $expectedCode = "KSF-VOL-{$year}-0001";
 
-        $response = $this->actingAs($this->admin)->post("/admin/volunteers/{$volunteer->id}/approve");
+        $response = $this->actingAs($this->admin)->post(route('admin.volunteers.approve', $volunteer));
 
         $response->assertSessionHas('success');
 
@@ -193,7 +193,7 @@ class VolunteerRegistrationAndScreeningTest extends TestCase
             'status' => 'pending',
         ]);
 
-        $this->post("/admin/volunteers/{$secondVolunteer->id}/approve");
+        $this->post(route('admin.volunteers.approve', $secondVolunteer));
 
         $secondVolunteer->refresh();
         $expectedSecondCode = "KSF-VOL-{$year}-0002";
@@ -212,7 +212,7 @@ class VolunteerRegistrationAndScreeningTest extends TestCase
             'status' => 'pending',
         ]);
 
-        $response = $this->actingAs($this->admin)->post("/admin/volunteers/{$volunteer->id}/reject");
+        $response = $this->actingAs($this->admin)->post(route('admin.volunteers.reject', $volunteer));
 
         $response->assertSessionHas('info');
 
