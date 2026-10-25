@@ -6,16 +6,23 @@ See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_webs
 
 **Core value:** Frictionless, fee-free manual donation verification paired with 100% transparent public fund distribution tracking and automated compliance receipts.  
 **Current focus:** Milestone v1.1 — Native FilamentPHP Back-Office Migration & White-Label Administration  
-**Next action:** `/gsd-plan-phase 11` to plan Phase 11: Core Operations Migration (Donations, Ledger, Causes, Volunteers, Events)
+**Next action:** `/gsd-execute-phase 11` to execute Phase 11: Core Operations Migration (Donations, Ledger, Causes, Volunteers, Events)
 
 ## Current Position
 
 - **Milestone**: v1.1
-- **Phase**: 10 of 12 (White-Label Settings & Payment Methods Resources)
-- **Status**: Completed (10-01, 10-02 complete)
+- **Phase**: 11 of 12 (Core Operations Migration: Donations, Ledger, Causes, Volunteers, Events)
+- **Status**: Planned (4 plans ready: 11-01, 11-02, 11-03, 11-04)
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
-- **Active Wave**: 2 (Complete)
+- **Active Wave**: 1
 - **Blockers**: None
+
+## Phase 11 Plans
+
+- [ ] [11-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/11-core-operations-migration/11-01-PLAN.md) — Wave 1: Native Filament `CampaignResource` & `CauseCategoryResource` (FIL-06)
+- [ ] [11-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/11-core-operations-migration/11-02-PLAN.md) — Wave 2: Native Filament `DonationResource` with Side-by-Side Proof & 80G Receipt (FIL-04)
+- [ ] [11-03-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/11-core-operations-migration/11-03-PLAN.md) — Wave 2: Native Filament `FundDistributionResource` with Ledger & Proof Uploads (FIL-05)
+- [ ] [11-04-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/11-core-operations-migration/11-04-PLAN.md) — Wave 3: Native Filament `VolunteerResource` & `EventResource` with Attendance Roster (FIL-07, FIL-08)
 
 ## Phase 10 Plans (Completed)
 
