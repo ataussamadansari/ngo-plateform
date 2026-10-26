@@ -10,7 +10,6 @@ use Database\Seeders\NgoWhiteLabelSeeder;
 use Database\Seeders\PaymentMethodSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class EventManagementAndRegistrationTest extends TestCase
@@ -34,8 +33,6 @@ class EventManagementAndRegistrationTest extends TestCase
 
         return UploadedFile::fake()->createWithContent($name, $onePixelPng);
     }
-
-
 
     public function test_public_can_browse_events_directory(): void
     {

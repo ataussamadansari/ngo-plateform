@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\Volunteer;
 use Database\Seeders\NgoWhiteLabelSeeder;
 use Database\Seeders\PaymentMethodSeeder;
+use Filament\Pages\Dashboard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -119,7 +120,7 @@ class FilamentDashboardAndWidgetsTest extends TestCase
 
         // Dashboard Livewire component renders widget
         Livewire::actingAs($this->admin)
-            ->test(\Filament\Pages\Dashboard::class)
+            ->test(Dashboard::class)
             ->assertSeeLivewire(FinancialOverviewWidget::class);
     }
 

@@ -78,8 +78,8 @@
         <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Uploaded Payment Screenshot</span>
         @if($record->payment_screenshot)
             <div class="rounded-2xl border border-slate-200 dark:border-slate-700 p-2 bg-slate-50 dark:bg-slate-800 text-center">
-                <a href="{{ \Illuminate\Support\Facades\Storage::url($record->payment_screenshot) }}" target="_blank" class="block group relative overflow-hidden rounded-xl">
-                    <img src="{{ \Illuminate\Support\Facades\Storage::url($record->payment_screenshot) }}"
+                <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($record->payment_screenshot) }}" target="_blank" class="block group relative overflow-hidden rounded-xl">
+                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($record->payment_screenshot) }}"
                          alt="Payment Screenshot Proof"
                          class="max-h-96 w-full object-contain mx-auto rounded-xl group-hover:scale-105 transition duration-200" />
                     <span class="absolute bottom-2 right-2 bg-slate-900/80 text-white text-[10px] px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition">

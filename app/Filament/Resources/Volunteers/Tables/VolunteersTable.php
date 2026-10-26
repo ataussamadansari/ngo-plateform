@@ -77,6 +77,15 @@ class VolunteersTable
                     ->options(fn () => Volunteer::distinct()->whereNotNull('city')->pluck('city', 'city')->toArray()),
             ])
             ->actions([
+                Action::make('inspect')
+                    ->label('Inspect')
+                    ->icon('heroicon-o-identification')
+                    ->color('gray')
+                    ->modalHeading('Volunteer Application & Identity Verification')
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->modalContent(fn (Volunteer $record) => view('filament.resources.volunteers.inspect-modal', ['record' => $record])),
+
                 Action::make('approve')
                     ->label('Approve')
                     ->icon('heroicon-o-check-badge')
