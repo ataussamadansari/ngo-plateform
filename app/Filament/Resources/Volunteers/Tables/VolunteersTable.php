@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Volunteers\Tables;
 
+use App\Filament\Infolists\VolunteerInspectInfolist;
 use App\Models\Volunteer;
 use App\Services\VolunteerCodeService;
 use Filament\Actions\Action;
@@ -84,7 +85,7 @@ class VolunteersTable
                     ->modalHeading('Volunteer Application & Identity Verification')
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Close')
-                    ->modalContent(fn (Volunteer $record) => view('filament.resources.volunteers.inspect-modal', ['record' => $record])),
+                    ->infolist(VolunteerInspectInfolist::configure()),
 
                 Action::make('approve')
                     ->label('Approve')

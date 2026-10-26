@@ -15,7 +15,7 @@ class PendingVolunteersWidget extends BaseWidget
 {
     protected static ?string $heading = 'Pending Volunteer Applicants';
 
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 7;
 
     protected int|string|array $columnSpan = 'full';
 

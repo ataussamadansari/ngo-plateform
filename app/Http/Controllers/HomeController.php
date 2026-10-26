@@ -23,6 +23,7 @@ class HomeController extends Controller
         $totalDistributed = (float) FundDistribution::where('is_public', true)->sum('amount_spent');
         $volunteerCount = (int) Volunteer::where('status', 'approved')->count();
         $activeCausesCount = (int) Campaign::where('status', 'active')->count();
+        $donorsCount = (int) Donation::where('status', 'verified')->count();
 
         // 2. Urgent Causes & High-Priority Campaigns
         $urgentCampaigns = Campaign::where('status', 'active')
@@ -59,6 +60,7 @@ class HomeController extends Controller
             'totalDistributed',
             'volunteerCount',
             'activeCausesCount',
+            'donorsCount',
             'urgentCampaigns',
             'recentDistributions',
             'upcomingEvents',

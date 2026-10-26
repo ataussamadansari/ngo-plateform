@@ -13,7 +13,7 @@ class CampaignsProgressWidget extends BaseWidget
 {
     protected static ?string $heading = 'Active Campaigns & Financial Progress';
 
-    protected static ?int $sort = 4;
+    protected static ?int $sort = 8;
 
     protected int|string|array $columnSpan = 'full';
 

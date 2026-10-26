@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\SiteSetting;
+use Filament\Actions\Action;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
@@ -12,9 +13,14 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\EmbeddedSchema;
+use Filament\Schemas\Components\Form;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Alignment;
 
 class ManageSiteSettings extends Page implements HasForms
 {
@@ -32,9 +38,44 @@ class ManageSiteSettings extends Page implements HasForms
 
     protected static ?string $title = 'White-Label Platform Settings';
 
-    protected string $view = 'filament.pages.manage-site-settings';
-
     public ?array $data = [];
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('save')
+                ->label('Save Settings')
+                ->action('save')
+                ->color('primary')
+                ->icon('heroicon-o-check'),
+        ];
+    }
+
+    public function content(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                $this->getFormContentComponent(),
+            ]);
+    }
+
+    public function getFormContentComponent(): Component
+    {
+        return Form::make([EmbeddedSchema::make('form')])
+            ->id('form')
+            ->livewireSubmitHandler('save')
+            ->footer([
+                Actions::make([
+                    Action::make('save')
+                        ->label('Save Settings')
+                        ->submit('save')
+                        ->size('lg')
+                        ->color('primary')
+                        ->icon('heroicon-o-check')
+                        ->keyBindings(['mod+s']),
+                ])->alignment(Alignment::End),
+            ]);
+    }
 
     public function mount(): void
     {

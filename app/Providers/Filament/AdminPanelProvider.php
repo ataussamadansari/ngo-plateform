@@ -2,8 +2,12 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\CampaignCategoryAllocationChartWidget;
 use App\Filament\Widgets\CampaignsProgressWidget;
+use App\Filament\Widgets\CommunityEngagementChartWidget;
+use App\Filament\Widgets\DonationPaymentModesChartWidget;
 use App\Filament\Widgets\FinancialOverviewWidget;
+use App\Filament\Widgets\MonthlyActivityChartWidget;
 use App\Filament\Widgets\PendingDonationsQuickActionWidget;
 use App\Filament\Widgets\PendingVolunteersWidget;
 use Filament\Http\Middleware\Authenticate;
@@ -46,6 +50,10 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 FinancialOverviewWidget::class,
+                MonthlyActivityChartWidget::class,
+                DonationPaymentModesChartWidget::class,
+                CommunityEngagementChartWidget::class,
+                CampaignCategoryAllocationChartWidget::class,
                 PendingDonationsQuickActionWidget::class,
                 PendingVolunteersWidget::class,
                 CampaignsProgressWidget::class,

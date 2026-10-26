@@ -17,12 +17,13 @@ Frictionless, fee-free manual donation verification paired with 100% transparent
 
 ## Current State
 
-- **Milestone v1.0 (Core MVP)**: Shipped 2026-10-25. 8 phases, 16 plans, 86 passing feature tests. All public donor, volunteer, event, and transparency interfaces fully operational.
-- **Active Milestone v1.1**: Native FilamentPHP Back-Office Migration & White-Label Administration.
+- **Milestone v1.0 (Core MVP)**: Shipped 2026-10-25. 8 phases, 16 plans, 86 passing feature tests. All public donor, volunteer, event, and transparency interfaces operational.
+- **Milestone v1.1 (FilamentPHP Back-Office)**: Shipped 2026-10-26. 4 phases, 8 plans, 125 passing tests. Native Filament 5 admin, white-label settings, and executive dashboard charts.
+- **Active Milestone v1.2**: Public Frontend UI/UX Polish & Visual Parity with Reference Designs (`docs/ui/`).
 
 ## Requirements
 
-### Validated (v1.0 Milestone)
+### Validated (v1.0 & v1.1 Milestones)
 
 - ✓ Foundation & 10-table database schema with Eloquent models — Phase 1
 - ✓ Dynamic white-label branding, theme colors, and site settings engine with cached global helper — Phase 1
@@ -35,19 +36,24 @@ Frictionless, fee-free manual donation verification paired with 100% transparent
 - ✓ Events management with volunteer and participant registration tracking — Phase 6
 - ✓ Public frontend pages: Home with live impact counters, About Us with legal credentials, Campaigns, Transparency, Events, and Volunteer join — Phase 7
 - ✓ Executive financial overview metrics, quick-action queues, and turnkey client handover (`HANDOVER.md`) — Phase 8
+- ✓ Native FilamentPHP 5 Panel Provider at `/admin` with `FilamentUser` access gating (`FIL-01`, `FIL-10`) — Phase 9
+- ✓ Native Filament `SiteSetting` Management and `PaymentMethodResource` (`FIL-02`, `FIL-03`) — Phase 10
+- ✓ Native Filament Resources for Donations, Distributions, Campaigns, Volunteers, and Events (`FIL-04` through `FIL-08`) — Phase 11
+- ✓ Native Filament Executive Dashboard Widgets with responsive Chart.js line, doughnut, bar, and pie charts (`FIL-09`, `FIL-10`) — Phase 12
 
-### Active (Milestone v1.1: Native FilamentPHP Migration)
+### Active (Milestone v1.2: Public Frontend UI/UX Polish)
 
-- [ ] **FIL-01**: Native FilamentPHP 5 Panel Provider configured at `/admin` with `FilamentUser` access gating (`super_admin`, `manager`) and user profile management.
-- [ ] **FIL-02**: Native Filament `SiteSetting` Management (Page or Resource) providing full UI for NGO legal name, dynamic theme color pickers (`--color-primary`, `--color-secondary`), 80G/12A/PAN/Darpan credentials, logo, and digital signature uploads with automatic cache clearing.
-- [ ] **FIL-03**: Native Filament `PaymentMethodResource` for managing dynamic UPI QR code uploads, UPI IDs, bank accounts, and active status toggles.
-- [ ] **FIL-04**: Native Filament `DonationResource` with status filters, side-by-side payment proof modal, atomic `DB::transaction()` approval, rejection remarks, direct receipt generation action, and manual cash donation entry.
-- [ ] **FIL-05**: Native Filament `FundDistributionResource` with bill/invoice upload, impact photos upload, and atomic campaign `distributed_amount` synchronization.
-- [ ] **FIL-06**: Native Filament `CampaignResource` & `CauseCategoryResource` with cover thumbnail, gallery uploads, and rich story editor.
-- [ ] **FIL-07**: Native Filament `VolunteerResource` with application review, status filters, and sequential ID code issuance (`VOL-YYYY-XXXX`).
-- [ ] **FIL-08**: Native Filament `EventResource` and attendee RSVP RelationManager with attendance check-in toggle.
-- [ ] **FIL-09**: Native Filament Dashboard Widgets: executive financial statistics (`Total Raised`, `Total Distributed`, `Available Treasury`, `Pending Items`) and quick-action triage queues.
-- [ ] **FIL-10**: Deprecation & removal of custom `app/Http/Controllers/Admin/*`, custom Blade views (`resources/views/admin/*`), and custom admin routes from `routes/web.php` to restore clean native Filament routing over `/admin`.
+- [ ] **PUB-01**: Global Header, Navigation Bar, Mobile Drawer & Institutional Footer aligned with `Hope Foundation_ Together for Tomorrow.png`.
+- [ ] **PUB-02**: Flagship Homepage with high-impact hero, live metric counters, urgent causes, and mission pillars.
+- [ ] **PUB-03**: Institutional About Us Page matching `Hope Foundation About Us Mockup.png` with story, leadership profiles, and tax credentials.
+- [ ] **PUB-04**: Contact Us Portal matching `Hope Foundation Contact Us Mockup.png` with direct coordinates, inquiry form, and interactive map.
+- [ ] **PUB-05**: Legal Compliance & Privacy Showcase matching `Hope Foundation Privacy Policy Showcase.png`.
+- [ ] **PUB-06**: Campaigns Directory & Cause Story Portal matching `Hope Foundation Campaigns Page.png` and `Campaign Page.png`.
+- [ ] **PUB-07**: Events & RSVP Registration Portal matching `Hope Foundation Events Page Mockup.png`.
+- [ ] **PUB-08**: Volunteer Onboarding Portal matching `Hope Foundation Volunteer Page Mockup.png`.
+- [ ] **PUB-09**: Manual Donation Experience matching `Hope Foundation Donation UI Mockup.png` with dynamic UPI QR / Bank toggle.
+- [ ] **PUB-10**: Public Donation Status & Instant 80G Receipt Download Portal matching `Hope Foundation Donation Status Portal.png`.
+- [ ] **PUB-11**: Public Transparency Ledger & Proof Viewer matching `Hope Foundation Transparency Dashboard.png`.
 
 ### Out of Scope
 

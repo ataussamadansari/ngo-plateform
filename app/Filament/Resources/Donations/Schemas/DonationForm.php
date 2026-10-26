@@ -85,6 +85,7 @@ class DonationForm
                             ->disabled(fn (?Donation $record): bool => (bool) $record?->isVerified()),
                         FileUpload::make('payment_screenshot')
                             ->label('Payment Screenshot Proof')
+                            ->disk('public')
                             ->directory('donations/proofs')
                             ->image()
                             ->maxSize(2048)

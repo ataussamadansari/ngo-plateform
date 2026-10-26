@@ -2,13 +2,20 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Widgets\CampaignCategoryAllocationChartWidget;
 use App\Filament\Widgets\CampaignsProgressWidget;
+use App\Filament\Widgets\CommunityEngagementChartWidget;
+use App\Filament\Widgets\DonationPaymentModesChartWidget;
 use App\Filament\Widgets\FinancialOverviewWidget;
+use App\Filament\Widgets\MonthlyActivityChartWidget;
 use App\Filament\Widgets\PendingDonationsQuickActionWidget;
 use App\Filament\Widgets\PendingVolunteersWidget;
 use App\Models\Campaign;
 use App\Models\CauseCategory;
+use App\Models\ContactInquiry;
 use App\Models\Donation;
+use App\Models\Event;
+use App\Models\EventRegistration;
 use App\Models\FundDistribution;
 use App\Models\User;
 use App\Models\Volunteer;
@@ -232,5 +239,211 @@ class FilamentDashboardAndWidgetsTest extends TestCase
             ->assertCanSeeTableRecords([$this->campaign])
             ->assertSee('Emergency Relief 2026')
             ->assertSee('50%');
+    }
+
+    public function test_monthly_activity_chart_widget_renders_real_inflow_and_outflow_data(): void
+    {
+        Donation::create([
+            'campaign_id' => $this->campaign->id,
+            'donor_name' => 'Monthly Donor A',
+            'donor_phone' => '9870000001',
+            'amount' => 12500.00,
+            'payment_mode' => 'upi_qr',
+            'utr_number' => 'UTR-MONTHLY-01',
+            'status' => 'verified',
+            'verified_at' => now(),
+            'created_at' => now(),
+        ]);
+
+        FundDistribution::create([
+            'campaign_id' => $this->campaign->id,
+            'title' => 'Direct Ration Kits',
+            'beneficiary_name' => 'Local Vendor',
+            'description' => '50 Ration Kits',
+            'amount_spent' => 4500.00,
+            'distribution_date' => now()->toDateString(),
+            'is_public' => true,
+            'created_by' => $this->admin->id,
+            'created_at' => now(),
+        ]);
+
+        $test = Livewire::actingAs($this->admin)
+            ->test(MonthlyActivityChartWidget::class)
+            ->assertSee('Monthly Activity & Financial Flow')
+            ->assertSee('Verified donations (inflow) vs ground distributions (outflow)');
+
+        $component = $test->instance();
+        $this->assertEquals('line', $component->getType());
+
+        $data = $component->getData();
+        $this->assertCount(2, $data['datasets']);
+        $this->assertEquals('Verified Donations (₹)', $data['datasets'][0]['label']);
+        $this->assertEquals('Funds Distributed (₹)', $data['datasets'][1]['label']);
+
+        // Latest month values match inserted data
+        $latestDonation = end($data['datasets'][0]['data']);
+        $latestDistribution = end($data['datasets'][1]['data']);
+        $this->assertEquals(12500.00, (float) $latestDonation);
+        $this->assertEquals(4500.00, (float) $latestDistribution);
+
+        // Filter switching works
+        $test->set('filter', '12m');
+        $data12 = $test->instance()->getData();
+        $this->assertCount(12, $data12['labels']);
+    }
+
+    public function test_donation_payment_modes_chart_widget_renders_accurate_mode_breakdown(): void
+    {
+        Donation::create([
+            'campaign_id' => $this->campaign->id,
+            'donor_name' => 'UPI Contributor',
+            'donor_phone' => '9870000002',
+            'amount' => 7000.00,
+            'payment_mode' => 'upi_qr',
+            'utr_number' => 'UTR-UPI-01',
+            'status' => 'verified',
+            'verified_at' => now(),
+        ]);
+
+        Donation::create([
+            'campaign_id' => $this->campaign->id,
+            'donor_name' => 'Bank Contributor',
+            'donor_phone' => '9870000003',
+            'amount' => 3000.00,
+            'payment_mode' => 'bank_transfer',
+            'utr_number' => 'UTR-BANK-01',
+            'status' => 'verified',
+            'verified_at' => now(),
+        ]);
+
+        $test = Livewire::actingAs($this->admin)
+            ->test(DonationPaymentModesChartWidget::class)
+            ->assertSee('Donation Channels');
+
+        $component = $test->instance();
+        $this->assertEquals('doughnut', $component->getType());
+
+        $data = $component->getData();
+        $this->assertEquals(['UPI QR', 'Bank Transfer', 'Cash'], $data['labels']);
+        $this->assertEquals([7000.00, 3000.00, 0.0], $data['datasets'][0]['data']);
+
+        // Switch to transaction count filter
+        $test->set('filter', 'count');
+        $dataCount = $test->instance()->getData();
+        $this->assertEquals([1, 1, 0], $dataCount['datasets'][0]['data']);
+    }
+
+    public function test_community_engagement_chart_widget_renders_volunteers_registrations_and_inquiries(): void
+    {
+        Volunteer::create([
+            'full_name' => 'Rahul Verma',
+            'email' => 'rahul@example.com',
+            'phone' => '9822334455',
+            'city' => 'Varanasi',
+            'skills' => ['Teaching', 'Sports'],
+            'status' => 'pending',
+        ]);
+
+        $event = Event::create([
+            'title' => 'Clean Ganga Drive',
+            'slug' => 'clean-ganga-drive',
+            'description' => 'Community riverbank cleaning',
+            'banner_image' => 'events/clean-ganga.jpg',
+            'location_name' => 'Assi Ghat',
+            'address' => 'Ghat Road, Assi, Varanasi',
+            'event_date' => now()->addDays(10)->toDateString(),
+            'start_time' => '08:00:00',
+            'status' => 'upcoming',
+        ]);
+
+        EventRegistration::create([
+            'event_id' => $event->id,
+            'participant_name' => 'Sunil Gupta',
+            'participant_phone' => '9899001122',
+            'role_assigned' => 'Volunteer Participant',
+            'attendance_status' => 'registered',
+        ]);
+
+        ContactInquiry::create([
+            'name' => 'Maya Patel',
+            'email' => 'maya@example.com',
+            'subject' => 'Corporate CSR Collaboration',
+            'message' => 'Looking to sponsor child education kits.',
+            'status' => 'pending',
+        ]);
+
+        $test = Livewire::actingAs($this->admin)
+            ->test(CommunityEngagementChartWidget::class)
+            ->assertSee('Community Growth & Applications Activity');
+
+        $component = $test->instance();
+        $this->assertEquals('bar', $component->getType());
+
+        $data = $component->getData();
+        $this->assertCount(3, $data['datasets']);
+        $this->assertEquals('Volunteer Applicants', $data['datasets'][0]['label']);
+        $this->assertEquals('Event Registrations', $data['datasets'][1]['label']);
+        $this->assertEquals('Public Inquiries', $data['datasets'][2]['label']);
+
+        $latestVolunteer = end($data['datasets'][0]['data']);
+        $latestRegistration = end($data['datasets'][1]['data']);
+        $latestInquiry = end($data['datasets'][2]['data']);
+
+        $this->assertEquals(1, $latestVolunteer);
+        $this->assertEquals(1, $latestRegistration);
+        $this->assertEquals(1, $latestInquiry);
+    }
+
+    public function test_campaign_category_allocation_chart_widget_aggregates_raised_amounts_by_category(): void
+    {
+        $this->campaign->update([
+            'raised_amount' => 45000.00,
+            'status' => 'active',
+        ]);
+
+        $category2 = CauseCategory::where('slug', 'child-education')->first();
+        if ($category2) {
+            Campaign::create([
+                'category_id' => $category2->id,
+                'title' => 'School Kits 2026',
+                'slug' => 'school-kits-2026',
+                'short_description' => 'Providing books and bags.',
+                'full_story' => 'Help students attend school.',
+                'thumbnail_image' => 'campaigns/school-kits.jpg',
+                'goal_amount' => 50000.00,
+                'raised_amount' => 25000.00,
+                'distributed_amount' => 0.00,
+                'start_date' => now(),
+                'status' => 'active',
+            ]);
+        }
+
+        $test = Livewire::actingAs($this->admin)
+            ->test(CampaignCategoryAllocationChartWidget::class)
+            ->assertSee('Funds Raised by Cause Category');
+
+        $component = $test->instance();
+        $this->assertEquals('pie', $component->getType());
+
+        $data = $component->getData();
+        $this->assertContains($this->campaign->category->name, $data['labels']);
+        $this->assertContains(45000.00, $data['datasets'][0]['data']);
+    }
+
+    public function test_filament_dashboard_page_mounts_all_native_widgets_for_authenticated_admin(): void
+    {
+        $response = $this->actingAs($this->admin)->get('/admin');
+        $response->assertOk();
+
+        Livewire::actingAs($this->admin)
+            ->test(Dashboard::class)
+            ->assertSeeLivewire(FinancialOverviewWidget::class)
+            ->assertSeeLivewire(MonthlyActivityChartWidget::class)
+            ->assertSeeLivewire(DonationPaymentModesChartWidget::class)
+            ->assertSeeLivewire(CommunityEngagementChartWidget::class)
+            ->assertSeeLivewire(CampaignCategoryAllocationChartWidget::class)
+            ->assertSeeLivewire(PendingDonationsQuickActionWidget::class)
+            ->assertSeeLivewire(PendingVolunteersWidget::class)
+            ->assertSeeLivewire(CampaignsProgressWidget::class);
     }
 }

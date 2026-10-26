@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Infolists\DonationProofInfolist;
 use App\Models\Donation;
 use App\Services\DonationVerificationService;
 use Filament\Actions\Action;
@@ -15,7 +16,7 @@ class PendingDonationsQuickActionWidget extends BaseWidget
 {
     protected static ?string $heading = 'Pending Donations Awaiting Reconciliation';
 
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 6;
 
     protected int|string|array $columnSpan = 'full';
 
@@ -80,7 +81,7 @@ class PendingDonationsQuickActionWidget extends BaseWidget
                     ->modalHeading('Donation Proof & Bank Matching')
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Close')
-                    ->modalContent(fn (Donation $record) => view('filament.resources.donations.proof-modal', ['record' => $record])),
+                    ->infolist(DonationProofInfolist::configure()),
 
                 Action::make('approve')
                     ->label('Verify')

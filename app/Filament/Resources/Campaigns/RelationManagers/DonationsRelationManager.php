@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Campaigns\RelationManagers;
 
+use App\Filament\Infolists\DonationProofInfolist;
 use App\Models\Donation;
 use App\Services\DonationVerificationService;
 use App\Services\ReceiptPdfService;
@@ -145,7 +146,7 @@ class DonationsRelationManager extends RelationManager
                     ->modalHeading('Donation Proof & Submission Details')
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Close')
-                    ->modalContent(fn (Donation $record) => view('filament.resources.donations.proof-modal', ['record' => $record])),
+                    ->infolist(DonationProofInfolist::configure()),
 
                 Action::make('approve')
                     ->label('Approve')
