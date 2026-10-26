@@ -22,6 +22,12 @@ Route::post('/contact', [ContactController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('contact.store');
 
+// Phase 14: Institutional Legal, Privacy & Compliance Showcase
+Route::get('/legal', [PageController::class, 'legal'])->name('legal.index');
+Route::get('/privacy', [PageController::class, 'privacy'])->name('legal.privacy');
+Route::get('/terms', [PageController::class, 'terms'])->name('legal.terms');
+Route::get('/disclaimer', [PageController::class, 'disclaimer'])->name('legal.disclaimer');
+
 // Phase 6: Public Events Directory & RSVP Registration
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 Route::get('/events/{event:slug}', [EventController::class, 'show'])->name('events.show');

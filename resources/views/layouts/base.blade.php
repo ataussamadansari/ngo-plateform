@@ -395,49 +395,17 @@
 
             </div>
 
-            <!-- Legal Credentials Strip -->
-            <div class="py-6 border-b border-white/10 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-400">
-                <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
-                    @if(setting('ngo_reg_number'))
-                        <div><span class="text-slate-500">Registration:</span> <span class="font-mono text-slate-200">{{ setting('ngo_reg_number') }}</span></div>
-                    @endif
-                    @if(setting('80g_reg_number'))
-                        <div><span class="text-slate-500">80G Reg:</span> <span class="font-mono text-emerald-400 font-bold">{{ setting('80g_reg_number') }}</span></div>
-                    @endif
-                    @if(setting('12a_reg_number'))
-                        <div><span class="text-slate-500">12A Reg:</span> <span class="font-mono text-slate-200">{{ setting('12a_reg_number') }}</span></div>
-                    @endif
-                    @if(setting('ngo_darpan_id'))
-                        <div><span class="text-slate-500">Darpan ID:</span> <span class="font-mono text-slate-200">{{ setting('ngo_darpan_id') }}</span></div>
-                    @endif
-                    @if(setting('ngo_pan_number'))
-                        <div><span class="text-slate-500">PAN:</span> <span class="font-mono text-slate-200">{{ setting('ngo_pan_number') }}</span></div>
-                    @endif
-                </div>
-
-                <div class="flex items-center gap-3 text-emerald-400 font-bold text-xs">
-                    <span class="inline-flex items-center gap-1.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        80G Tax Exemption Certified
-                    </span>
-                    <span>&bull;</span>
-                    <span>Zero Platform Fees</span>
-                    <span>&bull;</span>
-                    <span>Bank Statement Reconciled</span>
-                </div>
-            </div>
-
             <!-- Sub Footer -->
             <div class="pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
                 <div>
                     &copy; {{ date('Y') }} {{ setting('ngo_name', 'Hope Foundation') }}. All rights reserved. 100% Transparent Non-Profit Platform.
                 </div>
                 <div class="flex items-center gap-5 text-slate-400">
-                    <a href="{{ url('/privacy') }}" class="hover:text-emerald-400 transition">Privacy Policy</a>
+                    <a href="{{ route('legal.privacy') }}" class="hover:text-emerald-400 transition">Privacy Policy</a>
                     <span>|</span>
-                    <a href="{{ url('/terms') }}" class="hover:text-emerald-400 transition">Terms & Conditions</a>
+                    <a href="{{ route('legal.terms') }}" class="hover:text-emerald-400 transition">Terms & Conditions</a>
                     <span>|</span>
-                    <a href="{{ url('/disclaimer') }}" class="hover:text-emerald-400 transition">Disclaimer</a>
+                    <a href="{{ route('legal.disclaimer') }}" class="hover:text-emerald-400 transition">Disclaimer</a>
                 </div>
             </div>
         </div>
