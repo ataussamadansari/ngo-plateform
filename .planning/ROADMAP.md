@@ -39,15 +39,15 @@
 ---
 
 ### Phase 14: Institutional About, Contact & Legal Portals
-**Status:** Planned  
+**Status:** Completed  
 **Goal:** Polish the About Us, Contact Us, and Privacy/Legal pages to match `Hope Foundation About Us Mockup.png`, `Hope Foundation Contact Us Mockup.png`, and `Hope Foundation Privacy Policy Showcase.png`.  
 **Mode:** mvp  
 **UI hint:** yes  
 **Requirements:** PUB-03, PUB-04, PUB-05  
 **Plans:**
-- [ ] [14-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/14-institutional-about-contact-legal-portals/14-01-PLAN.md) — Wave 1: About Us Institutional Parity (`about.blade.php`, `TeamMember` leadership grid, impact numbers, journey timeline, and registration credentials) (PUB-03)
-- [ ] [14-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/14-institutional-about-contact-legal-portals/14-02-PLAN.md) — Wave 1: Contact Us Portal & Interactive Inquiries (`contact.blade.php`, 2-column layout, office coordinates, Google Map embed, Alpine FAQ accordion) (PUB-04)
-- [ ] [14-03-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/14-institutional-about-contact-legal-portals/14-03-PLAN.md) — Wave 2: Legal, Privacy & Compliance Showcase (`legal.blade.php`, multi-tab policy sidebar, 80G tax terms, print capability, and footer routing) (PUB-05)
+- [x] [14-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/14-institutional-about-contact-legal-portals/14-01-PLAN.md) — Wave 1: About Us Institutional Parity (`about.blade.php`, `TeamMember` leadership grid, impact numbers, journey timeline, and registration credentials) (PUB-03)
+- [x] [14-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/14-institutional-about-contact-legal-portals/14-02-PLAN.md) — Wave 1: Contact Us Portal & Interactive Inquiries (`contact.blade.php`, 2-column layout, office coordinates, Google Map embed, Alpine FAQ accordion) (PUB-04)
+- [x] [14-03-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/14-institutional-about-contact-legal-portals/14-03-PLAN.md) — Wave 2: Legal, Privacy & Compliance Showcase (`legal.blade.php`, multi-tab policy sidebar, 80G tax terms, print capability, and footer routing) (PUB-05)
 **Success Criteria:**
 1. About Us page displays organizational story, vision/mission, leadership team cards, and verified tax credentials banner.
 2. Contact Us page features clean 2-column layout with direct office address, helpline, email, interactive map, and inquiry submission form.

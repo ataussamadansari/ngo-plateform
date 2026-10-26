@@ -6,21 +6,21 @@ See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_webs
 
 **Core value:** Frictionless, fee-free manual donation verification paired with 100% transparent public fund distribution tracking and automated compliance receipts.  
 **Current focus:** Milestone v1.2 — Public Frontend UI/UX Polish & Visual Parity with Reference Designs (`docs/ui/`)  
-**Next action:** Execute Phase 14 (`/gsd-execute-phase 14`)
+**Next action:** Plan Phase 15 (`/gsd-plan-phase 15`)
 
 ## Current Position
 
 - **Milestone**: v1.2
-- **Phase**: 14 of 17 (Institutional About, Contact & Legal Portals) - PLANNED
-- **Status**: Phase 14 Planned, Ready for Execution
+- **Phase**: 14 of 17 (Institutional About, Contact & Legal Portals) - COMPLETED
+- **Status**: Phase 14 Completed, Ready for Phase 15
 - **Mode**: Vertical MVP (`PROJECT_MODE=mvp`)
 - **Blockers**: None
 
 ## Phase 14 Plans
 
-- [ ] [14-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/14-institutional-about-contact-legal-portals/14-01-PLAN.md) — Wave 1: About Us Institutional Parity (`about.blade.php`, `TeamMember` leadership grid, impact numbers, journey timeline, and registration credentials) (PUB-03)
-- [ ] [14-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/14-institutional-about-contact-legal-portals/14-02-PLAN.md) — Wave 1: Contact Us Portal & Interactive Inquiries (`contact.blade.php`, 2-column layout, office coordinates, Google Map embed, Alpine FAQ accordion) (PUB-04)
-- [ ] [14-03-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/14-institutional-about-contact-legal-portals/14-03-PLAN.md) — Wave 2: Legal, Privacy & Compliance Showcase (`legal.blade.php`, multi-tab policy sidebar, 80G tax terms, print capability, and footer routing) (PUB-05)
+- [x] [14-01-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/14-institutional-about-contact-legal-portals/14-01-PLAN.md) — Wave 1: About Us Institutional Parity (`about.blade.php`, `TeamMember` leadership grid, impact numbers, journey timeline, and registration credentials) (PUB-03)
+- [x] [14-02-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/14-institutional-about-contact-legal-portals/14-02-PLAN.md) — Wave 1: Contact Us Portal & Interactive Inquiries (`contact.blade.php`, 2-column layout, office coordinates, Google Map embed, Alpine FAQ accordion) (PUB-04)
+- [x] [14-03-PLAN.md](file:///d:/Devize%20Technologies%20Projects/ngo_website/.planning/phases/14-institutional-about-contact-legal-portals/14-03-PLAN.md) — Wave 2: Legal, Privacy & Compliance Showcase (`legal.blade.php`, multi-tab policy sidebar, 80G tax terms, print capability, and footer routing) (PUB-05)
 
 ## Phase 13 Plans
 
@@ -30,8 +30,8 @@ See: [.planning/PROJECT.md](file:///d:/Devize%20Technologies%20Projects/ngo_webs
 ## Milestone v1.2 Phases
 
 - [x] **Phase 13**: Global Shell & Flagship Homepage Polish (PUB-01, PUB-02)
-- [ ] **Phase 14**: Institutional About, Contact & Legal Portals (PUB-03, PUB-04, PUB-05) - *Ready to Execute*
-- [ ] **Phase 15**: Campaigns, Events & Volunteer Portals (PUB-06, PUB-07, PUB-08)
+- [x] **Phase 14**: Institutional About, Contact & Legal Portals (PUB-03, PUB-04, PUB-05)
+- [ ] **Phase 15**: Campaigns, Events & Volunteer Portals (PUB-06, PUB-07, PUB-08) - *Ready to Plan*
 - [ ] **Phase 16**: Donation Flow, Status Lookup & Transparency Ledger (PUB-09, PUB-10, PUB-11)
 - [ ] **Phase 17**: End-to-End Browser Audit & Verification (PUB-01 through PUB-11)
 

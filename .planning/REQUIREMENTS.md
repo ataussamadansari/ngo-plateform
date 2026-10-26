@@ -23,15 +23,15 @@ Status: **Active**
   - Urgent cause spotlight cards with live progress bars.
   - Core mission pillars and community photo grid.
   - Upcoming events and volunteer call-to-action banner.
-- [ ] **PUB-03**: About Us Institutional Page (`Hope Foundation About Us Mockup.png`):
+- [x] **PUB-03**: About Us Institutional Page (`Hope Foundation About Us Mockup.png`):
   - Organizational story, vision, and core values.
   - Governance & leadership team profiles.
   - Official tax exemptions and certifications badge showcase (80G, 12A, NGO Darpan).
   - Ground impact statistics and milestones timeline.
-- [ ] **PUB-04**: Contact Us Portal (`Hope Foundation Contact Us Mockup.png`):
+- [x] **PUB-04**: Contact Us Portal (`Hope Foundation Contact Us Mockup.png`):
   - Clean two-column layout with office coordinates, helpline phone, email, and visiting hours.
   - Reactive inquiry form with client-side feedback and rate-limited submission.
-- [ ] **PUB-05**: Legal Compliance & Privacy Showcase (`Hope Foundation Privacy Policy Showcase.png`):
+- [x] **PUB-05**: Legal Compliance & Privacy Showcase (`Hope Foundation Privacy Policy Showcase.png`):
   - Standardized legal layout for Privacy Policy, Terms of Service, and 80G Tax Exemption terms.
   - Formatted typography, clear section anchor navigation, and data security guarantees.
 
