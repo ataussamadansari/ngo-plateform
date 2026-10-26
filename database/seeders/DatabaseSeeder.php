@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             NgoWhiteLabelSeeder::class,
             PaymentMethodSeeder::class,
+            DemoContentSeeder::class,
         ]);
     }
 }
