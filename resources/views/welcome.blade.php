@@ -10,9 +10,9 @@
         <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop" 
              alt="Community Support & Hope" 
              class="w-full h-full object-cover opacity-20 mix-blend-luminosity filter blur-[0.5px]">
-        <div class="absolute inset-0 bg-gradient-to-t from-[#041a12] via-[#052117]/90 to-[#03150e]/95"></div>
+        <!-- <div class="absolute inset-0 bg-gradient-to-t from-[#041a12] via-[#052117]/90 to-[#03150e]/95"></div>
         <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute top-1/2 -right-32 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/2 -right-32 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div> -->
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
