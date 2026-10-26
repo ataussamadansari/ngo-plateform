@@ -2,23 +2,24 @@
 
 Milestone: `v1.1`
 Target: Native FilamentPHP 5 Panel Integration, Full White-Label Admin UI, and Custom Admin Deprecation
+Status: **Completed (2026-10-26)**
 
 ---
 
 ## 1. Filament Panel Foundation & Access Control
 
-- [ ] **FIL-01**: Native FilamentPHP 5 Panel Provider (`AdminPanelProvider`) mounted at `/admin` with custom branding, login, password reset, and `App\Models\User` implementing `FilamentUser` with `canAccessPanel()` gating (`super_admin` and `manager` roles allowed, inactive accounts denied).
+- [x] **FIL-01**: Native FilamentPHP 5 Panel Provider (`AdminPanelProvider`) mounted at `/admin` with custom branding, login, password reset, and `App\Models\User` implementing `FilamentUser` with `canAccessPanel()` gating (`super_admin` and `manager` roles allowed, inactive accounts denied).
 
 ---
 
 ## 2. White-Label & Payment Methods Administration (New Admin UIs)
 
-- [ ] **FIL-02**: Native Filament `SiteSetting` Management (Settings Page or Resource) providing full UI for:
+- [x] **FIL-02**: Native Filament `SiteSetting` Management (Settings Page or Resource) providing full UI for:
   - NGO details: Legal name, tagline, email, phone, address.
   - Theming: Primary color picker (`--color-primary`), Secondary color picker (`--color-secondary`), logo upload, favicon upload, digital stamp/signature upload.
   - Compliance: PAN, 80G registration number & approval date, 12A registration number, NGO Darpan ID.
   - Automatic cache clearing on save to ensure `setting()` reflects changes instantly across public pages.
-- [ ] **FIL-03**: Native Filament `PaymentMethodResource` providing full CRUD for:
+- [x] **FIL-03**: Native Filament `PaymentMethodResource` providing full CRUD for:
   - Payment method name, type (`upi_qr`, `bank_transfer`).
   - Dynamic UPI QR code image upload, UPI ID.
   - Bank account name, account number, IFSC code, branch.
@@ -28,25 +29,25 @@ Target: Native FilamentPHP 5 Panel Integration, Full White-Label Admin UI, and C
 
 ## 3. Core Operational Filament Resources
 
-- [ ] **FIL-04**: Native Filament `DonationResource`:
+- [x] **FIL-04**: Native Filament `DonationResource`:
   - Data table with status badges (pending, verified, rejected), payment mode, campaign, date, and UTR search.
   - Side-by-side proof check modal displaying donor UTR number directly alongside uploaded payment screenshot.
   - Atomic verification action running in `DB::transaction()` to set status to `verified`, issue sequential receipt number (`KSF-YYYY-XXXX`), and increment campaign `raised_amount`.
   - Rejection action modal with mandatory rejection remarks.
   - Direct 80G PDF receipt stream/download action for verified donations.
   - Direct manual cash donation creation by administrators.
-- [ ] **FIL-05**: Native Filament `FundDistributionResource`:
+- [x] **FIL-05**: Native Filament `FundDistributionResource`:
   - Ledger data table with beneficiary name, amount, date, and linked campaign.
   - Creation/edit form with invoice/bill upload, impact photos upload, beneficiary notes, and atomic campaign `distributed_amount` increment inside `DB::transaction()`.
-- [ ] **FIL-06**: Native Filament `CampaignResource` & `CauseCategoryResource`:
+- [x] **FIL-06**: Native Filament `CampaignResource` & `CauseCategoryResource`:
   - Category CRUD with automatic slug generation.
   - Campaign CRUD with goal amount, cover thumbnail upload, photo gallery upload, rich story editor, status toggle (draft, active, completed, paused), and live raised/distributed indicators.
-- [ ] **FIL-07**: Native Filament `VolunteerResource`:
+- [x] **FIL-07**: Native Filament `VolunteerResource`:
   - Screening queue table with filters for status (pending, approved, rejected), skills, and availability.
   - Approval action issuing sequential volunteer ID code (`VOL-YYYY-XXXX`).
   - Rejection action with remarks.
   - Downloadable/viewable applicant government ID proof.
-- [ ] **FIL-08**: Native Filament `EventResource`:
+- [x] **FIL-08**: Native Filament `EventResource`:
   - Event CRUD with date, time, venue, Google Maps link, and banner image.
   - Event registrations RelationManager displaying attendee details and 1-click attendance check-in toggle (`attended`/`absent`).
 
@@ -54,12 +55,12 @@ Target: Native FilamentPHP 5 Panel Integration, Full White-Label Admin UI, and C
 
 ## 4. Executive Dashboard & Legacy Admin Deprecation
 
-- [ ] **FIL-09**: Native Filament Dashboard Widgets:
+- [x] **FIL-09**: Native Filament Dashboard Widgets:
   - `FinancialOverviewWidget`: Live stat cards for Total Verified Raised, Total Distributed on Ground, Net Available Treasury, and Pending Verifications count.
   - `PendingDonationsQuickActionWidget`: Table widget of pending donations directly on dashboard with 1-click verify action.
   - `PendingVolunteersWidget`: Screening table widget on dashboard with 1-click approve & code issuance.
   - `CampaignsProgressWidget`: Active campaigns progress meters.
-- [ ] **FIL-10**: Deprecation & Cleanup:
+- [x] **FIL-10**: Deprecation & Cleanup:
   - Remove custom `app/Http/Controllers/Admin/*` controllers and custom Blade views (`resources/views/admin/*`).
   - Remove custom admin routes from `routes/web.php` so Filament natively controls `/admin`.
   - Update top global layout command bar and feature test suites to verify Filament admin workflows.

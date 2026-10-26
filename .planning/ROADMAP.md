@@ -65,6 +65,7 @@
 ---
 
 ### Phase 12: Executive Dashboard Widgets, Legacy Deprecation & Verification
+**Status:** Completed (2026-10-26)  
 **Goal:** Build native Filament executive summary widgets, delete legacy custom admin controllers and views, and achieve 100% test passing across the migrated platform.  
 **Mode:** mvp  
 **UI hint:** yes  

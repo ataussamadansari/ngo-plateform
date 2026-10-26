@@ -1,14 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminAuthController;
-use App\Http\Controllers\Admin\AdminCampaignController;
-use App\Http\Controllers\Admin\AdminCategoryController;
-use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\AdminDonationController;
-use App\Http\Controllers\Admin\AdminEventController;
-use App\Http\Controllers\Admin\AdminFundDistributionController;
-use App\Http\Controllers\Admin\AdminInquiryController;
-use App\Http\Controllers\Admin\AdminVolunteerController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DonationController;
@@ -62,67 +53,8 @@ Route::get('/donation-status', [DonationStatusController::class, 'index'])->name
 Route::get('/transparency', [TransparencyController::class, 'index'])->name('transparency.index');
 Route::get('/campaigns/{campaign:slug}/transparency', [TransparencyController::class, 'campaignLedger'])->name('campaigns.transparency');
 
-// Phase 9: Native Filament Authentication & Dashboard Integration
+// Native Filament Authentication & Dashboard Integration
 Route::get('/login', fn () => redirect('/admin/login'))->name('login');
-
-// Legacy Admin Endpoints (retained for backward compatibility until Phase 12 deprecation)
-Route::get('/admin/legacy-login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
-Route::post('/admin/legacy-login', [AdminAuthController::class, 'login'])->middleware('throttle:5,1')->name('admin.login.submit');
-Route::post('/admin/legacy-logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-Route::get('/admin/legacy-dashboard', [AdminDashboardController::class, 'index'])->middleware(['admin.role'])->name('admin.dashboard');
-Route::get('/admin/legacy-dashboard-alias', [AdminDashboardController::class, 'index'])->middleware(['admin.role'])->name('admin.dashboard.alias');
-
-// Phase 3, 4, 5, 6 & 7: Operational Administrative Endpoints (Retained until Phase 11 Filament Resource migrations)
-Route::prefix('admin')->name('admin.')->middleware(['admin.role'])->group(function () {
-
-    // Legacy Phase 3: Donation Verification (Retained for backward compatibility until Phase 12)
-    Route::get('/legacy-donations', [AdminDonationController::class, 'index'])->name('donations.index');
-    Route::get('/legacy-donations/create', [AdminDonationController::class, 'create'])->name('donations.create');
-    Route::post('/legacy-donations', [AdminDonationController::class, 'store'])->name('donations.store');
-    Route::post('/legacy-donations/{donation}/approve', [AdminDonationController::class, 'approve'])->name('donations.approve');
-    Route::post('/legacy-donations/{donation}/reject', [AdminDonationController::class, 'reject'])->name('donations.reject');
-
-    // Legacy Phase 4: Fund Distribution Ledger (Retained for backward compatibility until Phase 12)
-    Route::get('/legacy-distributions', [AdminFundDistributionController::class, 'index'])->name('distributions.index');
-    Route::get('/legacy-distributions/create', [AdminFundDistributionController::class, 'create'])->name('distributions.create');
-    Route::post('/legacy-distributions', [AdminFundDistributionController::class, 'store'])->name('distributions.store');
-    Route::get('/legacy-distributions/{distribution}', [AdminFundDistributionController::class, 'show'])->name('distributions.show');
-
-    // Legacy Phase 5: Cause Categories Management (Retained for backward compatibility until Phase 12)
-    Route::get('/legacy-categories', [AdminCategoryController::class, 'index'])->name('categories.index');
-    Route::post('/legacy-categories', [AdminCategoryController::class, 'store'])->name('categories.store');
-    Route::put('/legacy-categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
-    Route::delete('/legacy-categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
-
-    // Legacy Phase 5: Campaigns Management (Retained for backward compatibility until Phase 12)
-    Route::get('/legacy-campaigns', [AdminCampaignController::class, 'index'])->name('campaigns.index');
-    Route::get('/legacy-campaigns/create', [AdminCampaignController::class, 'create'])->name('campaigns.create');
-    Route::post('/legacy-campaigns', [AdminCampaignController::class, 'store'])->name('campaigns.store');
-    Route::get('/legacy-campaigns/{campaign}/edit', [AdminCampaignController::class, 'edit'])->name('campaigns.edit');
-    Route::put('/legacy-campaigns/{campaign}', [AdminCampaignController::class, 'update'])->name('campaigns.update');
-    Route::patch('/legacy-campaigns/{campaign}/status', [AdminCampaignController::class, 'toggleStatus'])->name('campaigns.status');
-
-    // Legacy Phase 6: Volunteer Screening & Code Generation (Retained for backward compatibility until Phase 12)
-    Route::get('/legacy-volunteers', [AdminVolunteerController::class, 'index'])->name('volunteers.index');
-    Route::get('/legacy-volunteers/{volunteer}', [AdminVolunteerController::class, 'show'])->name('volunteers.show');
-    Route::post('/legacy-volunteers/{volunteer}/approve', [AdminVolunteerController::class, 'approve'])->name('volunteers.approve');
-    Route::post('/legacy-volunteers/{volunteer}/reject', [AdminVolunteerController::class, 'reject'])->name('volunteers.reject');
-
-    // Legacy Phase 6: Events Management & Attendance Roster (Retained for backward compatibility until Phase 12)
-    Route::get('/legacy-events', [AdminEventController::class, 'index'])->name('events.index');
-    Route::get('/legacy-events/create', [AdminEventController::class, 'create'])->name('events.create');
-    Route::post('/legacy-events', [AdminEventController::class, 'store'])->name('events.store');
-    Route::get('/legacy-events/{event}/edit', [AdminEventController::class, 'edit'])->name('events.edit');
-    Route::put('/legacy-events/{event}', [AdminEventController::class, 'update'])->name('events.update');
-    Route::get('/legacy-events/{event}/participants', [AdminEventController::class, 'participants'])->name('events.participants');
-    Route::patch('/legacy-events/{event}/registrations/{registration}/attendance', [AdminEventController::class, 'updateAttendance'])->name('events.attendance');
-    Route::post('/legacy-events/{event}/participants', [AdminEventController::class, 'addParticipant'])->name('events.addParticipant');
-
-    // Phase 7: Visitor Contact Inquiries Management
-    Route::get('/inquiries', [AdminInquiryController::class, 'index'])->name('inquiries.index');
-    Route::patch('/inquiries/{inquiry}', [AdminInquiryController::class, 'updateStatus'])->name('inquiries.update');
-    Route::delete('/inquiries/{inquiry}', [AdminInquiryController::class, 'destroy'])->name('inquiries.destroy');
-});
 
 // Phase 3: Official 80G PDF Receipt Download and Preview
 Route::get('/donations/{donation}/receipt', [ReceiptController::class, 'download'])->name('donation.receipt');

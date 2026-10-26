@@ -105,36 +105,4 @@ class AboutAndContactInquiryTest extends TestCase
         $response = $this->post(route('contact.store'), $payload);
         $response->assertStatus(429);
     }
-
-    public function test_admin_can_view_and_update_inquiry_status(): void
-    {
-        $inquiry = ContactInquiry::create([
-            'name' => 'Kavita Singh',
-            'email' => 'kavita@example.com',
-            'phone' => '9123456789',
-            'subject' => 'Donation Receipt Verification Issue',
-            'message' => 'I submitted donation yesterday and wanted to confirm my receipt status.',
-            'status' => 'pending',
-        ]);
-
-        // Admin views inquiries
-        $response = $this->actingAs($this->admin)->get(route('admin.inquiries.index'));
-        $response->assertOk();
-        $response->assertSee('Kavita Singh');
-        $response->assertSee('Donation Receipt Verification Issue');
-
-        // Admin marks as replied
-        $patchResponse = $this->actingAs($this->admin)->patch(
-            route('admin.inquiries.update', $inquiry->id),
-            ['status' => 'replied']
-        );
-
-        $patchResponse->assertRedirect();
-        $patchResponse->assertSessionHas('success');
-
-        $this->assertDatabaseHas('contact_inquiries', [
-            'id' => $inquiry->id,
-            'status' => 'replied',
-        ]);
-    }
 }

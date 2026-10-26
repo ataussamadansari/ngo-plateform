@@ -1,10 +1,10 @@
 # Turnkey White-Label NGO Platform — Deployment & Handover Guide
 
-> **Version:** 1.0.0  
-> **Framework:** Laravel 12.0 (PHP 8.2+)  
+> **Version:** 1.1.0  
+> **Framework:** Laravel 12.0 (PHP 8.2+) with Native FilamentPHP 5 Administration  
 > **Frontend:** Tailwind CSS v4, Blade, Alpine.js  
 > **Database:** SQLite (development/local) / MySQL 8.0+ (production)  
-> **Key Value Proposition:** Frictionless, fee-free manual donation verification paired with 100% transparent public fund distribution tracking and automated 80G tax receipts.
+> **Key Value Proposition:** Frictionless, fee-free manual donation verification paired with 100% transparent public fund distribution tracking, automated 80G tax receipts, and turnkey white-label management via native FilamentPHP 5.
 
 ---
 
@@ -13,13 +13,14 @@
 This platform is engineered as a white-label, single-tenant web application. Non-profit organizations (NGOs) and charitable trusts can deploy this system to completely eliminate third-party payment gateway transaction fees (which consume 2%–4% of donations) by accepting direct bank transfers and instant dynamic UPI QR codes.
 
 ### Core Subsystems:
-1. **White-Label Engine (`site_settings`)**: Dynamic runtime theming with CSS variables (`--color-primary`, `--color-secondary`) and cached organization credentials.
-2. **Direct Fee-Free Donations**: Dynamic UPI QR codes and NEFT/RTGS bank details with donor UTR reference submission.
-3. **Admin Verification Queue**: Side-by-side reconciliation of donor payment screenshots and UTR numbers against official bank statements with atomic balance updates.
-4. **80G PDF Receipt Engine**: Sequentially numbered, audited PDF receipts automatically downloadable by verified donors.
-5. **Ground Distribution Transparency Ledger**: Immutable public ledger detailing every rupee spent with vendor bills and ground impact proof.
-6. **Volunteer & Event Management**: Volunteer onboarding with sequential identification codes and community drive attendance tracking.
-7. **Executive Command Dashboard**: Real-time treasury cards (Verified Raised, Ground Distributed, Net Available Treasury) and 1-click triage queues.
+1. **White-Label Administration (`/admin/settings`)**: Native Filament Settings interface for live branding updates, CSS custom properties (`--color-primary`, `--color-secondary`), logo/favicon/stamp uploads, and statutory credentials (80G, 12A, NGO Darpan, PAN).
+2. **Direct Fee-Free Donations & Verification (`/admin/donations`)**: Dynamic UPI QR codes and NEFT/RTGS bank details with donor UTR reference submission. Back-office features side-by-side reconciliation of donor payment screenshots against bank credits, atomic balance increments inside `DB::transaction()`, and automated 80G PDF receipt generation (`KSF-YYYY-XXXX`).
+3. **Ground Distribution Transparency Ledger (`/admin/fund-distributions`)**: Verified expense management with invoice and impact photo attachments, automatically synchronizing campaign distributed totals and feeding the public transparency portal.
+4. **Campaigns & Causes Management (`/admin/campaigns` & `/admin/cause-categories`)**: Rich cause storytelling with photo galleries, goal amount tracking, status toggles, and live progress indicators.
+5. **Volunteer Screening & Roster (`/admin/volunteers`)**: Applicant screening queue issuing sequential collision-resistant volunteer identification codes (`VOL-YYYY-XXXX`).
+6. **Events & Attendance Management (`/admin/events`)**: Event scheduling with banner uploads and interactive attendance roster RelationManager for 1-click volunteer check-in.
+7. **Contact Inquiries Portal (`/admin/contact-inquiries`)**: Triage visitor inquiries directly in Filament with status badges (pending, read, replied).
+8. **Executive Command Dashboard (`/admin`)**: Real-time treasury cards (Verified Raised, Ground Distributed, Net Available Treasury, Pending Count) and 1-click triaging widgets.
 
 ---
 
@@ -63,10 +64,10 @@ php artisan storage:link
 
 ## 3. Client Customization & White-Label Theming
 
-All client-specific branding is stored in the `site_settings` table and cached in memory.
+All client-specific branding is stored in the `site_settings` table and cached in memory. Administrators can customize everything via the native Filament Admin UI at `/admin/settings` or programmatically:
 
 ### Customizing Organization Identity
-Configure settings via `php artisan tinker` or direct database record updates:
+Configure settings via the admin panel at `/admin/settings` or via `php artisan tinker`:
 ```php
 setting(['ngo_name' => 'Adarsh Sewa Sansthan']);
 setting(['ngo_tagline' => 'Empowering Lives with Complete Transparency']);
@@ -85,49 +86,55 @@ setting(['ngo_darpan_id' => 'UP/2026/0098765']);
 setting(['ngo_pan_number' => 'AADTA9876D']);
 ```
 
-### Configuring Payment Methods & UPI VPA
-Update `payment_methods` table to specify the NGO's official banking details:
-- **UPI QR**: `upi_id = "adarshsewa@sbi"`, `account_name = "Adarsh Sewa Sansthan"`
-- **Bank Transfer**: `bank_name = "State Bank of India"`, `account_number = "30987654321"`, `ifsc_code = "SBIN0001234"`
+### Configuring Payment Methods & Dynamic UPI QR Codes
+Manage banking methods at `/admin/payment-methods`:
+- **UPI QR**: Set UPI ID (`ngo@bank`), account name, and upload dynamic QR code.
+- **Bank Transfer**: Set Bank name, account number, IFSC code, and branch name.
 
 ---
 
 ## 4. Default Credentials & Access Portals
 
-| Portal | URL | Default Username | Default Password | Role |
-|--------|-----|------------------|------------------|------|
+| Portal | URL | Default Username | Default Password | Role / Access |
+|--------|-----|------------------|------------------|---------------|
 | **Public Storefront** | `/` | *Public Access* | *Public Access* | Visitor / Donor |
 | **Causes Directory** | `/campaigns` | *Public Access* | *Public Access* | Visitor / Donor |
 | **Transparency Ledger**| `/transparency` | *Public Access* | *Public Access* | Public Audit |
 | **Volunteer Application** | `/volunteer-join` | *Public Access* | *Public Access* | Applicant |
 | **Track Donation Status** | `/donation-status` | *Public Access* | *Public Access* | Donor |
-| **Back-Office Sign-In** | `/admin/login` | `admin@ksf.org` | `password123` | Super Admin |
-| **Admin Command Center**| `/admin` | *Session Guarded*| *Session Guarded*| Super Admin / Manager |
+| **Back-Office Sign-In** | `/admin/login` | `admin@ksf.org` | `password123` | Super Admin / Staff |
+| **Native Filament Dashboard**| `/admin` | *Session Guarded*| *Session Guarded*| Super Admin / Manager |
 
 > [!IMPORTANT]
 > Immediately change the default super admin password upon initial login in production!
 
 ---
 
-## 5. Administrative Operational Workflows
+## 5. Administrative Operational Workflows (FilamentPHP 5)
 
 ### 1. Reconciling Pending Donations
-1. Navigate to `/admin/donations` or the dashboard quick-action triage widget.
-2. Click on the pending donation thumbnail to inspect the donor-uploaded payment screenshot.
+1. Navigate to `/admin` dashboard or `/admin/donations`.
+2. Inspect the uploaded payment screenshot and donor UTR directly in the side-by-side modal.
 3. Cross-reference the UTR number against official bank statements or UPI business notifications.
-4. Click **Approve** — the system wraps the verification in `DB::transaction()`, increments the campaign balance, and produces an 80G PDF receipt.
-5. If payment cannot be traced, click **Reject** and supply an audit remark.
+4. Click **Verify** — the system wraps the verification in `DB::transaction()`, increments the campaign balance, and produces an 80G PDF receipt (`KSF-YYYY-XXXX`).
+5. Verified donors can immediately download their 80G tax receipt at `/donations/{id}/receipt` or via the public donation tracking portal.
+6. If payment cannot be traced, click **Reject** and supply an audit explanation.
 
-### 2. Disbursing Verified Funds
-1. Navigate to `/admin/distributions/create`.
+### 2. Disbursing Verified Funds & Publishing Proofs
+1. Navigate to `/admin/fund-distributions/create`.
 2. Select target campaign, beneficiary/vendor name, and expenditure amount.
 3. Upload official vendor bill image and ground distribution photos.
-4. Check **Make Public** to publish the entry to the public transparency ledger.
+4. Check **Make Public** to publish the entry to the public transparency ledger. The campaign's distributed balance updates atomically.
 
 ### 3. Screening Volunteer Candidates
 1. Navigate to `/admin/volunteers` or dashboard screening widget.
-2. Review applicant skills, city, and identity proof.
-3. Click **Approve** — the system auto-assigns a formatted volunteer code (e.g. `KSF-VOL-2026-001`).
+2. Review applicant skills, city, and identity proof document.
+3. Click **Approve** — the system auto-assigns a collision-resistant sequential volunteer code (e.g. `KSF-VOL-2026-0001`).
+
+### 4. Event Scheduling & Live Attendance Roster
+1. Navigate to `/admin/events`.
+2. Schedule upcoming drives with location address, Google Maps link, and banner images.
+3. During ground drives, open the event edit page and use the **Registrations** relation manager to toggle volunteer attendance (`attended` / `absent`) or add on-the-spot participants with 1 click.
 
 ---
 
@@ -147,6 +154,3 @@ Update `payment_methods` table to specify the NGO's official banking details:
   ```bash
   php artisan test
   ```
-
----
-*Client handover documentation finalized 2026-10-26.*
