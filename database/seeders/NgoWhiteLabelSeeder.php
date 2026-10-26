@@ -98,6 +98,16 @@ class NgoWhiteLabelSeeder extends Seeder
                 'value' => '#0f172a',
                 'group' => 'branding',
             ],
+            [
+                'key' => 'total_lives_impacted',
+                'value' => '12,500+',
+                'group' => 'branding',
+            ],
+            [
+                'key' => 'total_projects_completed',
+                'value' => '150+',
+                'group' => 'branding',
+            ],
 
             // Group: receipt_legal
             [
@@ -128,6 +138,11 @@ class NgoWhiteLabelSeeder extends Seeder
             [
                 'key' => '80g_reg_number',
                 'value' => 'AABTK1234FF20241',
+                'group' => 'receipt_legal',
+            ],
+            [
+                'key' => 'fcra_number',
+                'value' => '123456789',
                 'group' => 'receipt_legal',
             ],
             [
@@ -162,6 +177,16 @@ class NgoWhiteLabelSeeder extends Seeder
                 'value' => 'Varanasi',
                 'group' => 'contact',
             ],
+            [
+                'key' => 'working_hours',
+                'value' => 'Mon - Sat: 9:00 AM - 6:00 PM',
+                'group' => 'contact',
+            ],
+            [
+                'key' => 'google_map_embed_url',
+                'value' => 'https://maps.google.com/maps?q=Assi+Ghat+Varanasi&t=&z=14&ie=UTF8&iwloc=&output=embed',
+                'group' => 'contact',
+            ],
 
             // Group: hero_cms
             [
@@ -194,6 +219,11 @@ class NgoWhiteLabelSeeder extends Seeder
             [
                 'key' => 'youtube_url',
                 'value' => 'https://youtube.com',
+                'group' => 'social',
+            ],
+            [
+                'key' => 'linkedin_url',
+                'value' => 'https://linkedin.com',
                 'group' => 'social',
             ],
             [

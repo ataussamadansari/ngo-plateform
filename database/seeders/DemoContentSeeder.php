@@ -10,6 +10,7 @@ use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\FundDistribution;
 use App\Models\PaymentMethod;
+use App\Models\TeamMember;
 use App\Models\User;
 use App\Models\Volunteer;
 use Illuminate\Database\Seeder;
@@ -31,6 +32,7 @@ class DemoContentSeeder extends Seeder
             storage_path('app/public/distributions/impact'),
             storage_path('app/public/volunteers/photos'),
             storage_path('app/public/volunteers/id_proofs'),
+            storage_path('app/public/team/members'),
         ];
 
         foreach ($directories as $dir) {
@@ -59,6 +61,11 @@ class DemoContentSeeder extends Seeder
         $defaultImpact = 'distributions/impact/demo_impact.png';
         if (! File::exists(storage_path('app/public/'.$defaultImpact))) {
             File::put(storage_path('app/public/'.$defaultImpact), $dummyPngData);
+        }
+
+        $defaultTeamPhoto = 'team/members/demo_member.png';
+        if (! File::exists(storage_path('app/public/'.$defaultTeamPhoto))) {
+            File::put(storage_path('app/public/'.$defaultTeamPhoto), $dummyPngData);
         }
 
         // 1. Get or Create Admin User
@@ -92,6 +99,29 @@ class DemoContentSeeder extends Seeder
                 'distributed_amount' => 60000.00,
                 'start_date' => now()->subDays(30)->toDateString(),
                 'end_date' => now()->addDays(60)->toDateString(),
+                'location' => 'Varanasi & Mirzapur, Uttar Pradesh',
+                'beneficiary_summary' => '350+ Critical Patients & 4 Primary Health Centers',
+                'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                'key_highlights' => [
+                    '100% Tax Exemption under Sec 80G',
+                    'Direct Manufacturer Procurement',
+                    'Geotagged Delivery Verification',
+                    'Zero Payment Gateway Deductions',
+                ],
+                'faq_items' => [
+                    [
+                        'question' => 'How will my contribution be utilized?',
+                        'answer' => '100% of your funds go directly toward purchasing certified medical oxygen concentrators and flowmeters. All tax invoices and serial numbers are published on our public transparency ledger.',
+                    ],
+                    [
+                        'question' => 'When will I receive my 80G tax receipt?',
+                        'answer' => 'Your 80G compliant donation receipt is generated immediately upon manual verification of your UTR transaction by our accounts team.',
+                    ],
+                    [
+                        'question' => 'Can I visit the beneficiary health centers?',
+                        'answer' => 'Yes, donors are welcome to coordinate field visits with our operations lead to inspect deployed equipment.',
+                    ],
+                ],
                 'is_featured' => true,
                 'is_urgent' => true,
                 'status' => 'active',
@@ -108,6 +138,25 @@ class DemoContentSeeder extends Seeder
                 'distributed_amount' => 80000.00,
                 'start_date' => now()->subDays(45)->toDateString(),
                 'end_date' => now()->addDays(45)->toDateString(),
+                'location' => 'Sevapuri Block, Rural Varanasi',
+                'beneficiary_summary' => '120 Underprivileged Schoolgirls',
+                'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                'key_highlights' => [
+                    'Annual Tuition & School Bag Support',
+                    'Digital Learning Tablet Labs',
+                    'Zero Dropout Monitoring Guarantee',
+                    'Direct Verified Vendor Invoices',
+                ],
+                'faq_items' => [
+                    [
+                        'question' => 'What is included in the digital literacy kit?',
+                        'answer' => 'Each kit includes NCERT syllabus textbooks, notebooks, geometry kits, school uniform sets, and access to shared solar-powered Android learning tablets.',
+                    ],
+                    [
+                        'question' => 'How are beneficiary students selected?',
+                        'answer' => 'We partner directly with village Pradhans and headmasters of government primary schools to identify children at risk of dropping out due to financial distress.',
+                    ],
+                ],
                 'is_featured' => true,
                 'is_urgent' => false,
                 'status' => 'active',
@@ -124,6 +173,25 @@ class DemoContentSeeder extends Seeder
                 'distributed_amount' => 35000.00,
                 'start_date' => now()->subDays(15)->toDateString(),
                 'end_date' => now()->addDays(25)->toDateString(),
+                'location' => 'Assi Ghat, Dashashwamedh & Rajghat Shelters',
+                'beneficiary_summary' => '300+ Homeless Individuals & Pilgrims',
+                'video_url' => null,
+                'key_highlights' => [
+                    'Heavy Double-Layer Wool Blankets',
+                    'Nightly On-Ground Patrol Teams',
+                    'Transparent Handover Documentation',
+                    'Direct Weaver Cooperative Purchase',
+                ],
+                'faq_items' => [
+                    [
+                        'question' => 'Where are the blankets sourced from?',
+                        'answer' => 'We purchase directly from local handloom weaver cooperatives in Bhadohi and Varanasi, supporting artisan livelihoods while reducing middleman markups.',
+                    ],
+                    [
+                        'question' => 'How can I join the night distribution drive?',
+                        'answer' => 'Registered volunteers receive WhatsApp dispatch notifications for scheduled nightly ghat drives from 10:00 PM onwards.',
+                    ],
+                ],
                 'is_featured' => true,
                 'is_urgent' => true,
                 'status' => 'active',
@@ -140,6 +208,21 @@ class DemoContentSeeder extends Seeder
                 'distributed_amount' => 50000.00,
                 'start_date' => now()->subDays(60)->toDateString(),
                 'end_date' => now()->addDays(90)->toDateString(),
+                'location' => 'Kashi Slum Settlements, Varanasi',
+                'beneficiary_summary' => '250+ Children Daily',
+                'video_url' => null,
+                'key_highlights' => [
+                    'FSSAI Certified Community Kitchen',
+                    'High Protein Fresh Mid-Day Meals',
+                    'Clean RO Water Included',
+                    'Daily Attendance Tracking',
+                ],
+                'faq_items' => [
+                    [
+                        'question' => 'Can I sponsor meals for a specific birthday or memorial?',
+                        'answer' => 'Yes, specify your occasion or memorial note in the donor message, and our kitchen team will share a photo update with personalized acknowledgement.',
+                    ],
+                ],
                 'is_featured' => false,
                 'is_urgent' => false,
                 'status' => 'active',
@@ -156,6 +239,21 @@ class DemoContentSeeder extends Seeder
                 'distributed_amount' => 110000.00,
                 'start_date' => now()->subDays(20)->toDateString(),
                 'end_date' => now()->addDays(70)->toDateString(),
+                'location' => 'Chunar Block, Mirzapur, Uttar Pradesh',
+                'beneficiary_summary' => '400+ Rural Households (2,000+ Villagers)',
+                'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                'key_highlights' => [
+                    '500 LPH Solar-Powered RO Plant',
+                    'WHO-Standard Quality Testing',
+                    'Community-Run Maintenance Committee',
+                    '100% Capital Asset Transparency',
+                ],
+                'faq_items' => [
+                    [
+                        'question' => 'How is the RO plant maintained after installation?',
+                        'answer' => 'A Village Water Committee is trained to handle routine membrane flushing, while an annual maintenance contract (AMC) is funded from nominal water dispensing tokens.',
+                    ],
+                ],
                 'is_featured' => true,
                 'is_urgent' => false,
                 'status' => 'active',
@@ -364,12 +462,14 @@ class DemoContentSeeder extends Seeder
             );
         }
 
-        // 7. Seed Upcoming Community Events
+        // 7. Seed Upcoming & Past Community Events
         $eventsData = [
             [
+                'category_id' => $disasterCategory->id,
                 'title' => 'Ganga Riverbank Cleanliness & Eco-Conservation Drive',
                 'slug' => 'ganga-riverbank-cleanliness-drive',
                 'description' => 'Join over 50 dedicated volunteers in cleaning ghat steps, removing floating non-biodegradable waste, and planting indigenous riverbank saplings along Assi Ghat.',
+                'outcome_summary' => null,
                 'banner_image' => $defaultEventBanner,
                 'location_name' => 'Assi Ghat Steps',
                 'address' => 'Assi Ghat, Shivala, Varanasi, Uttar Pradesh - 221005',
@@ -381,9 +481,11 @@ class DemoContentSeeder extends Seeder
                 'status' => 'upcoming',
             ],
             [
+                'category_id' => $medicalCategory->id,
                 'title' => 'Free Community Eye Screening & Cataract Health Camp',
                 'slug' => 'community-eye-screening-camp',
                 'description' => 'Professional ophthalmologists and optometrists providing free comprehensive vision tests, subsidized eyeglasses, and fully sponsored cataract surgical consultations for elderly citizens.',
+                'outcome_summary' => null,
                 'banner_image' => $defaultEventBanner,
                 'location_name' => 'Community Health Center, Kabir Nagar',
                 'address' => 'Kabir Nagar Health Post, Bhelupur, Varanasi, Uttar Pradesh - 221004',
@@ -395,9 +497,11 @@ class DemoContentSeeder extends Seeder
                 'status' => 'upcoming',
             ],
             [
+                'category_id' => $winterCategory->id,
                 'title' => 'Winter Warm Clothing & Nutritious Ration Camp',
                 'slug' => 'winter-warm-clothing-camp',
                 'description' => 'Direct volunteer distribution of warm wool sweaters, thermal caps, and 10kg essential foodgrain dry ration kits to flood-affected families.',
+                'outcome_summary' => null,
                 'banner_image' => $defaultEventBanner,
                 'location_name' => 'Rajghat Primary School Grounds',
                 'address' => 'Near Malviya Bridge, Rajghat, Varanasi - 221001',
@@ -407,6 +511,22 @@ class DemoContentSeeder extends Seeder
                 'end_time' => '14:00:00',
                 'max_participants' => 100,
                 'status' => 'upcoming',
+            ],
+            [
+                'category_id' => $educationCategory->id,
+                'title' => 'Rural Girls Digital Literacy & STEM Workshop',
+                'slug' => 'rural-girls-stem-workshop',
+                'description' => 'Hands-on basic computer science, robotics introduction, and digital literacy workshop conducted for 120 girls across 5 rural schools.',
+                'outcome_summary' => '120 female students successfully certified in foundational digital tools; distributed 40 recycled desktop units and study tablets to rural computer labs.',
+                'banner_image' => $defaultEventBanner,
+                'location_name' => 'Sarvodaya Vidyalaya Auditorium',
+                'address' => 'Badagaon, Varanasi District, Uttar Pradesh - 221204',
+                'google_map_link' => 'https://maps.google.com/?q=Badagaon+Varanasi',
+                'event_date' => now()->subDays(35)->toDateString(),
+                'start_time' => '10:00:00',
+                'end_time' => '16:00:00',
+                'max_participants' => 120,
+                'status' => 'completed',
             ],
         ];
 
@@ -422,10 +542,13 @@ class DemoContentSeeder extends Seeder
                 'full_name' => 'Pooja Tiwari',
                 'email' => 'pooja.tiwari@example.com',
                 'phone' => '9111122222',
+                'date_of_birth' => '1995-06-14',
                 'city' => 'Varanasi',
                 'address' => 'Lane 4, Assi, Varanasi, UP',
                 'occupation' => 'College Lecturer',
                 'skills' => ['first_aid', 'event_management'],
+                'area_of_interest' => 'Child Education & Literacy',
+                'about_volunteer' => 'Assistant professor passionate about grassroots child literacy, library setups, and weekend student mentorship.',
                 'availability' => 'weekends',
                 'profile_photo' => null,
                 'id_proof_path' => null,
@@ -437,10 +560,13 @@ class DemoContentSeeder extends Seeder
                 'full_name' => 'Rohan Verma',
                 'email' => 'rohan.verma@example.com',
                 'phone' => '9222233333',
+                'date_of_birth' => '1998-10-22',
                 'city' => 'Lucknow',
                 'address' => 'Gomti Nagar, Lucknow, UP',
                 'occupation' => 'Software Engineer',
                 'skills' => ['teaching', 'digital_marketing'],
+                'area_of_interest' => 'Digital Literacy & Media',
+                'about_volunteer' => 'Software engineer eager to build digital tools for ground volunteer dispatch and train children in basic IT skills.',
                 'availability' => 'flexible',
                 'profile_photo' => null,
                 'id_proof_path' => null,
@@ -452,10 +578,13 @@ class DemoContentSeeder extends Seeder
                 'full_name' => 'Meera Sen',
                 'email' => 'meera.sen@example.com',
                 'phone' => '9333344444',
+                'date_of_birth' => '1992-03-18',
                 'city' => 'Varanasi',
                 'address' => 'Sigra, Varanasi, UP',
                 'occupation' => 'Social Worker',
                 'skills' => ['photography', 'counseling'],
+                'area_of_interest' => 'Community Health & Sanitation',
+                'about_volunteer' => 'Certified social worker with over 7 years of community field work managing mother-and-child nutrition programs.',
                 'availability' => 'weekdays',
                 'profile_photo' => null,
                 'id_proof_path' => null,
@@ -467,10 +596,13 @@ class DemoContentSeeder extends Seeder
                 'full_name' => 'Kavita Reddy',
                 'email' => 'kavita.reddy@example.com',
                 'phone' => '9444455555',
+                'date_of_birth' => '1989-11-05',
                 'city' => 'Kanpur',
                 'address' => 'Swaroop Nagar, Kanpur, UP',
                 'occupation' => 'Doctor (MBBS)',
                 'skills' => ['logistics', 'first_aid'],
+                'area_of_interest' => 'Medical Camps & Emergency Aid',
+                'about_volunteer' => 'Medical doctor offering voluntary weekend general check-ups, diagnostic guidance, and emergency response training.',
                 'availability' => 'weekends',
                 'profile_photo' => null,
                 'id_proof_path' => null,
@@ -482,10 +614,13 @@ class DemoContentSeeder extends Seeder
                 'full_name' => 'Arun Joshi',
                 'email' => 'arun.joshi@example.com',
                 'phone' => '9555566666',
+                'date_of_birth' => '2003-08-12',
                 'city' => 'Varanasi',
                 'address' => 'Lanka, Varanasi, UP',
                 'occupation' => 'Student',
                 'skills' => ['teaching', 'community_outreach'],
+                'area_of_interest' => 'Environmental Conservation & Drives',
+                'about_volunteer' => 'Banaras Hindu University student passionate about the Ganga cleanliness movement and zero-plastic riverbanks.',
                 'availability' => 'weekends',
                 'profile_photo' => null,
                 'id_proof_path' => null,
@@ -556,6 +691,63 @@ class DemoContentSeeder extends Seeder
             ContactInquiry::updateOrCreate(
                 ['email' => $inq['email'], 'subject' => $inq['subject']],
                 $inq
+            );
+        }
+
+        // 11. Seed Dynamic Team Members (About Us Leadership & Operations)
+        $teamMembersData = [
+            [
+                'name' => 'Amit Sharma',
+                'role' => 'Founder & Executive Director',
+                'bio' => 'Social entrepreneur and grassroots activist with over 15 years of dedicated community development experience across Northern India.',
+                'photo' => $defaultTeamPhoto,
+                'social_links' => [
+                    'linkedin' => 'https://linkedin.com/in/amit-sharma-ksf',
+                    'twitter' => 'https://x.com/amit_ksf',
+                ],
+                'sort_order' => 1,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Priya Verma',
+                'role' => 'Head of Programs & Impact',
+                'bio' => 'Development economist specializing in rural child education, women self-help cooperatives, and educational curriculum frameworks.',
+                'photo' => $defaultTeamPhoto,
+                'social_links' => [
+                    'linkedin' => 'https://linkedin.com/in/priya-verma-ksf',
+                ],
+                'sort_order' => 2,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Rahul Singh',
+                'role' => 'Operations & Field Director',
+                'bio' => 'Logistics veteran overseeing emergency medical relief distribution, supply chain integrity, and volunteer ground deployments.',
+                'photo' => $defaultTeamPhoto,
+                'social_links' => [
+                    'linkedin' => 'https://linkedin.com/in/rahul-singh-ksf',
+                    'twitter' => 'https://x.com/rahul_ksf',
+                ],
+                'sort_order' => 3,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Neha Khan',
+                'role' => 'Community Outreach & Volunteer Lead',
+                'bio' => 'Passionate community organizer managing volunteer engagement, youth mobilization drives, and donor communication.',
+                'photo' => $defaultTeamPhoto,
+                'social_links' => [
+                    'linkedin' => 'https://linkedin.com/in/neha-khan-ksf',
+                ],
+                'sort_order' => 4,
+                'is_active' => true,
+            ],
+        ];
+
+        foreach ($teamMembersData as $member) {
+            TeamMember::updateOrCreate(
+                ['name' => $member['name']],
+                $member
             );
         }
     }

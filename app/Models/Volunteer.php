@@ -16,10 +16,13 @@ class Volunteer extends Model
         'full_name',
         'email',
         'phone',
+        'date_of_birth',
         'city',
         'address',
         'occupation',
         'skills',
+        'area_of_interest',
+        'about_volunteer',
         'availability',
         'profile_photo',
         'id_proof_path',
@@ -31,6 +34,7 @@ class Volunteer extends Model
     {
         return [
             'skills' => 'array',
+            'date_of_birth' => 'date',
             'joined_at' => 'date',
         ];
     }

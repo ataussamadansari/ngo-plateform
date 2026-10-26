@@ -26,6 +26,11 @@ class Campaign extends Model
         'distributed_amount',
         'start_date',
         'end_date',
+        'location',
+        'beneficiary_summary',
+        'video_url',
+        'key_highlights',
+        'faq_items',
         'is_featured',
         'is_urgent',
         'status',
@@ -35,6 +40,8 @@ class Campaign extends Model
     {
         return [
             'gallery_images' => 'array',
+            'key_highlights' => 'array',
+            'faq_items' => 'array',
             'goal_amount' => 'decimal:2',
             'raised_amount' => 'decimal:2',
             'distributed_amount' => 'decimal:2',

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Event extends Model
@@ -12,9 +13,11 @@ class Event extends Model
     use HasFactory;
 
     protected $fillable = [
+        'category_id',
         'title',
         'slug',
         'description',
+        'outcome_summary',
         'banner_image',
         'location_name',
         'address',
@@ -32,6 +35,11 @@ class Event extends Model
             'event_date' => 'date',
             'max_participants' => 'integer',
         ];
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(CauseCategory::class, 'category_id');
     }
 
     public function registrations(): HasMany
