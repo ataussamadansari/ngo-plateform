@@ -277,4 +277,41 @@ class PublicCampaignsTest extends TestCase
 
         $response->assertNotFound();
     }
+
+    public function test_campaign_detail_renders_all_rich_editor_html_formatting_tags(): void
+    {
+        $richStoryHtml = '<h3>Ground Reality & Needs</h3>'
+            .'<p class="lead">Rural district hospitals often face sudden shortages of life-saving oxygen during seasonal surges.</p>'
+            .'<p><strong>Hope Foundation</strong> is deploying 10L medical concentrators with complete maintenance backup directly to grassroots medical clinics.</p>'
+            .'<ul><li>10L Medical Oxygen Concentrators</li><li>Dual Flow Splitters</li></ul>'
+            .'<blockquote>Every rupee contributed is verified against bank statements and tracked through public GST tax invoices.</blockquote>'
+            .'<table><thead><tr><th>Asset</th><th>Qty</th></tr></thead><tbody><tr><td>Concentrator</td><td>20</td></tr></tbody></table>'
+            .'<p>Please support this <mark>urgent appeal</mark> immediately.</p>';
+
+        $campaign = Campaign::create([
+            'category_id' => $this->medicalCategory->id,
+            'title' => 'Rural Oxygen Relief Drive',
+            'slug' => 'rural-oxygen-relief-drive',
+            'short_description' => 'Supplying 10L oxygen concentrators to district hospitals.',
+            'full_story' => $richStoryHtml,
+            'thumbnail_image' => 'campaigns/oxygen-drive.jpg',
+            'goal_amount' => 500000.00,
+            'raised_amount' => 125000.00,
+            'start_date' => now(),
+            'status' => 'active',
+        ]);
+
+        $response = $this->get('/campaigns/'.$campaign->slug);
+
+        $response->assertOk();
+        $response->assertSee('rich-story-content');
+        $response->assertSee('<h3>Ground Reality & Needs</h3>', false);
+        $response->assertSee('<strong>Hope Foundation</strong>', false);
+        $response->assertSee('<li>10L Medical Oxygen Concentrators</li>', false);
+        $response->assertSee('<blockquote>Every rupee contributed is verified', false);
+        $response->assertSee('<table><thead><tr><th>Asset</th>', false);
+        $response->assertSee('<mark>urgent appeal</mark>', false);
+        // Ensure no raw HTML is escaped into literal &lt;p&gt; entities
+        $response->assertDontSee('&lt;p&gt;&lt;strong&gt;Hope Foundation&lt;/strong&gt;');
+    }
 }

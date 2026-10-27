@@ -4,8 +4,10 @@ namespace App\Filament\Resources\Campaigns\Schemas;
 
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -64,6 +66,19 @@ class CampaignForm
                             ->required(),
                         DatePicker::make('end_date')
                             ->label('Target Deadline Date'),
+                        TextInput::make('location')
+                            ->label('Field Location / District')
+                            ->placeholder('e.g. Varanasi & Mirzapur, Uttar Pradesh')
+                            ->maxLength(150),
+                        TextInput::make('beneficiary_summary')
+                            ->label('Beneficiary Target Summary')
+                            ->placeholder('e.g. 350+ Critical Patients & 4 Primary Health Centers')
+                            ->maxLength(150),
+                        TextInput::make('video_url')
+                            ->label('Cause Video Embed URL (YouTube/Vimeo)')
+                            ->url()
+                            ->placeholder('https://www.youtube.com/watch?v=...')
+                            ->maxLength(500),
                         Toggle::make('is_urgent')
                             ->label('Mark as Urgent Cause')
                             ->default(false),
@@ -83,7 +98,18 @@ class CampaignForm
                             ->columnSpanFull(),
                         RichEditor::make('full_story')
                             ->label('Detailed Cause Story')
-                            ->helperText('Full narrative of the situation, emergency, and expected ground impact.')
+                            ->helperText('Full narrative of the situation, emergency, and expected ground impact. Supports rich headings, formatted lists, tables, quotes, and media attachments.')
+                            ->toolbarButtons([
+                                ['bold', 'italic', 'underline', 'strike', 'subscript', 'superscript', 'highlight', 'clearFormatting'],
+                                ['h2', 'h3', 'lead', 'small'],
+                                ['blockquote', 'codeBlock', 'bulletList', 'orderedList', 'horizontalRule', 'details'],
+                                ['alignStart', 'alignCenter', 'alignEnd', 'alignJustify'],
+                                ['table', 'attachFiles', 'link'],
+                                ['undo', 'redo'],
+                            ])
+                            ->fileAttachmentsDisk('public')
+                            ->fileAttachmentsDirectory('campaigns/story-attachments')
+                            ->fileAttachmentsVisibility('public')
                             ->required()
                             ->columnSpanFull(),
                         FileUpload::make('thumbnail_image')
@@ -101,6 +127,47 @@ class CampaignForm
                             ->multiple()
                             ->image()
                             ->maxSize(2048),
+                        TagsInput::make('key_highlights')
+                            ->label('Key Highlights / Guarantees')
+                            ->placeholder('e.g. 100% Tax Exemption, Direct Manufacturer Procurement')
+                            ->columnSpanFull(),
+                        Repeater::make('faq_items')
+                            ->label('Frequently Asked Questions (FAQs)')
+                            ->defaultItems(0)
+                            ->schema([
+                                TextInput::make('question')
+                                    ->label('Question')
+                                    ->required(),
+                                Textarea::make('answer')
+                                    ->label('Answer')
+                                    ->rows(2)
+                                    ->required(),
+                            ])
+                            ->columns(1)
+                            ->collapsible()
+                            ->columnSpanFull(),
+                        Repeater::make('impact_stories')
+                            ->label('Beneficiary Impact Stories')
+                            ->defaultItems(0)
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label('Beneficiary Name & Role')
+                                    ->placeholder('e.g. Ayesha, 10th Grade')
+                                    ->required(),
+                                Textarea::make('quote')
+                                    ->label('Quote / Testimonial')
+                                    ->rows(2)
+                                    ->required(),
+                                FileUpload::make('photo')
+                                    ->label('Photo')
+                                    ->disk('public')
+                                    ->directory('campaigns/impact')
+                                    ->image()
+                                    ->maxSize(2048),
+                            ])
+                            ->columns(1)
+                            ->collapsible()
+                            ->columnSpanFull(),
                     ])->columns(2),
             ]);
     }
