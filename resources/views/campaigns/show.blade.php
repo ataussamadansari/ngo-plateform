@@ -31,14 +31,53 @@
     // Preset amounts for donation card
     $presetAmounts = [500, 1000, 2000, 5000, 10000];
 
-    // Key Highlights (JSON from campaign or default 4 pillars)
-    $keyHighlights = $campaign->key_highlights ?? [
-        'School Admission Support',
-        'Books & Learning Materials',
-        'Uniforms & School Facilities',
-        'Mentoring & Career Guidance',
+    // Key Highlights (Supports preset icons, custom uploaded image, and legacy strings)
+    $rawHighlights = $campaign->key_highlights ?? [
+        ['title' => 'School Admission Support', 'icon' => 'graduation-cap'],
+        ['title' => 'Books & Learning Materials', 'icon' => 'book-open'],
+        ['title' => 'Uniforms & School Facilities', 'icon' => 'shirt'],
+        ['title' => 'Mentoring & Career Guidance', 'icon' => 'users'],
     ];
-    $highlightIcons = ['🎓', '📖', '👕', '👥'];
+
+    $keyHighlights = collect($rawHighlights)->map(function ($item, $index) {
+        if (is_string($item)) {
+            $lower = strtolower($item);
+            $icon = 'graduation-cap';
+            if (str_contains($lower, 'book') || str_contains($lower, 'study') || str_contains($lower, 'material')) {
+                $icon = 'book-open';
+            } elseif (str_contains($lower, 'uniform') || str_contains($lower, 'cloth') || str_contains($lower, 'dress') || str_contains($lower, 'facilit')) {
+                $icon = 'shirt';
+            } elseif (str_contains($lower, 'mentor') || str_contains($lower, 'guid') || str_contains($lower, 'team') || str_contains($lower, 'career')) {
+                $icon = 'users';
+            } elseif (str_contains($lower, 'health') || str_contains($lower, 'medic') || str_contains($lower, 'doctor') || str_contains($lower, 'oxygen') || str_contains($lower, 'patient')) {
+                $icon = 'heart';
+            } elseif (str_contains($lower, 'water') || str_contains($lower, 'clean')) {
+                $icon = 'droplet';
+            } elseif (str_contains($lower, 'tax') || str_contains($lower, 'exemption') || str_contains($lower, '80g') || str_contains($lower, 'audit') || str_contains($lower, 'verif')) {
+                $icon = 'shield-check';
+            } elseif ($index === 1) {
+                $icon = 'book-open';
+            } elseif ($index === 2) {
+                $icon = 'shirt';
+            } elseif ($index === 3) {
+                $icon = 'users';
+            }
+
+            return [
+                'title' => $item,
+                'icon' => $icon,
+                'custom_icon' => null,
+                'description' => null,
+            ];
+        }
+
+        return [
+            'title' => $item['title'] ?? $item['text'] ?? '',
+            'icon' => $item['icon'] ?? 'graduation-cap',
+            'custom_icon' => $item['custom_icon'] ?? null,
+            'description' => $item['description'] ?? $item['subtitle'] ?? null,
+        ];
+    });
 
     // Impact Stories (JSON from campaign or default stories matching mockup)
     $impactStories = $campaign->impact_stories ?? [
@@ -147,40 +186,74 @@
 </section>
 
 <!-- ================= MAIN CONTENT + FLOATING DONATION CARD ================= -->
-<div class="bg-[#f8fafc] py-6 sm:py-8 lg:py-10">
+<div class="bg-[#f8fafc] py-6 sm:py-8 lg:py-10"
+     x-data="{
+        activeTab: 'overview',
+        showAll: false
+     }">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
 
             <!-- ================= LEFT COLUMN: NARRATIVE & CONTENT ================= -->
             <div class="space-y-8 lg:col-span-8">
 
-                <!-- Sticky Anchor Navigation Bar -->
+                <!-- Sticky Dynamic Navigation Bar (Tabs Mode to eliminate long scroll fatigue) -->
                 <nav aria-label="Campaign sections"
-                     class="sticky top-20 z-30 -mx-4 sm:mx-0 flex items-center gap-2 overflow-x-auto bg-[#f8fafc]/95 backdrop-blur-md px-4 sm:px-0 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-slate-200/80">
-                    <a href="#overview" class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl bg-[#16a34a] px-4 text-xs font-bold text-white shadow-xs">
-                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span>Overview</span>
-                    </a>
-                    <a href="#impact" class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-4 text-xs font-bold text-slate-700 hover:border-emerald-500 hover:text-emerald-700 transition shadow-xs">
-                        <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                        <span>Our Impact</span>
-                    </a>
-                    <a href="#updates" class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-4 text-xs font-bold text-slate-700 hover:border-emerald-500 hover:text-emerald-700 transition shadow-xs">
-                        <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-                        <span>Updates</span>
-                    </a>
-                    <a href="#gallery" class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-4 text-xs font-bold text-slate-700 hover:border-emerald-500 hover:text-emerald-700 transition shadow-xs">
-                        <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <span>Gallery</span>
-                    </a>
-                    <a href="#faqs" class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-4 text-xs font-bold text-slate-700 hover:border-emerald-500 hover:text-emerald-700 transition shadow-xs">
-                        <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span>FAQs</span>
-                    </a>
+                     class="sticky top-20 z-30 -mx-4 sm:mx-0 flex items-center justify-between gap-2 overflow-x-auto bg-[#f8fafc]/95 backdrop-blur-md px-4 sm:px-0 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-slate-200/80">
+                    <div class="flex items-center gap-1.5 sm:gap-2">
+                        <button type="button"
+                                @click="activeTab = 'overview'"
+                                :class="activeTab === 'overview' ? 'bg-[#16a34a] text-white shadow-xs border-[#16a34a]' : 'bg-white border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-300'"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3 sm:px-4 text-xs font-bold transition cursor-pointer">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Overview</span>
+                        </button>
+                        <button type="button"
+                                @click="activeTab = 'impact'"
+                                :class="activeTab === 'impact' ? 'bg-[#16a34a] text-white shadow-xs border-[#16a34a]' : 'bg-white border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-300'"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3 sm:px-4 text-xs font-bold transition cursor-pointer">
+                            <svg class="h-3.5 w-3.5 text-emerald-600" :class="{ 'text-white': activeTab === 'impact' }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                            <span>Our Impact</span>
+                        </button>
+                        <button type="button"
+                                @click="activeTab = 'updates'"
+                                :class="activeTab === 'updates' ? 'bg-[#16a34a] text-white shadow-xs border-[#16a34a]' : 'bg-white border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-300'"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3 sm:px-4 text-xs font-bold transition cursor-pointer">
+                            <svg class="h-3.5 w-3.5 text-emerald-600" :class="{ 'text-white': activeTab === 'updates' }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                            <span>Updates</span>
+                        </button>
+                        <button type="button"
+                                @click="activeTab = 'gallery'"
+                                :class="activeTab === 'gallery' ? 'bg-[#16a34a] text-white shadow-xs border-[#16a34a]' : 'bg-white border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-300'"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3 sm:px-4 text-xs font-bold transition cursor-pointer">
+                            <svg class="h-3.5 w-3.5 text-emerald-600" :class="{ 'text-white': activeTab === 'gallery' }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>Gallery</span>
+                        </button>
+                        <button type="button"
+                                @click="activeTab = 'faqs'"
+                                :class="activeTab === 'faqs' ? 'bg-[#16a34a] text-white shadow-xs border-[#16a34a]' : 'bg-white border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-300'"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3 sm:px-4 text-xs font-bold transition cursor-pointer">
+                            <svg class="h-3.5 w-3.5 text-emerald-600" :class="{ 'text-white': activeTab === 'faqs' }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>FAQs</span>
+                        </button>
+                    </div>
+
+                    <!-- View Mode Toggle: Tabbed vs View All -->
+                    <button type="button"
+                            @click="showAll = !showAll"
+                            class="hidden md:inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-emerald-700 bg-white border border-slate-200 rounded-xl px-3 py-1.5 shadow-2xs transition cursor-pointer shrink-0">
+                        <span x-text="showAll ? '📑 Tabbed View' : '📜 View Full Page'"></span>
+                    </button>
                 </nav>
 
                 <!-- 1. About This Campaign Section (#overview) -->
-                <section id="overview" aria-labelledby="overview-heading" class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
+                <section id="overview"
+                         x-show="showAll || activeTab === 'overview'"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         aria-labelledby="overview-heading"
+                         class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                         <!-- Left Story (Takes 7 Cols on Desktop) -->
                         <div class="md:col-span-7">
@@ -228,20 +301,52 @@
                         </div>
                     </div>
 
-                    <!-- Key Highlights (4 Pillars matching Mockup) -->
-                    <div class="mt-8 rounded-2xl bg-[#ecfdf5]/70 border border-emerald-100 p-4 sm:p-5">
-                        <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-emerald-900 mb-3">
-                            Key Highlights
-                        </h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                            @foreach($keyHighlights as $index => $highlight)
-                                @php
-                                    $highlightTitle = is_array($highlight) ? ($highlight['title'] ?? $highlight['text'] ?? '') : $highlight;
-                                    $icon = $highlightIcons[$index % count($highlightIcons)];
-                                @endphp
-                                <div class="flex items-center gap-3 rounded-xl bg-white p-3 border border-slate-100 shadow-2xs">
-                                    <span class="text-2xl shrink-0">{{ $icon }}</span>
-                                    <span class="text-xs font-bold text-slate-800 leading-snug">{{ $highlightTitle }}</span>
+                    <!-- Key Highlights (4 Pillars matching Mockup with Icon/Image + Text) -->
+                    <div class="mt-8 rounded-2xl bg-[#ecfdf5]/80 border border-emerald-100/90 p-4 sm:p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-emerald-950 flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                                <span>Key Highlights</span>
+                            </h3>
+                            <span class="text-[11px] font-bold text-emerald-700 bg-white px-2.5 py-0.5 rounded-full border border-emerald-200/80 shadow-2xs">
+                                4 Core Pillars
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                            @foreach($keyHighlights as $hl)
+                                <div class="flex items-center gap-3.5 rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs hover:border-emerald-400 hover:shadow-xs transition-all duration-200 group">
+                                    <div class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100/90 group-hover:bg-[#16a34a] group-hover:text-white transition-all duration-200">
+                                        @if(!empty($hl['custom_icon']))
+                                            <img src="{{ str_starts_with($hl['custom_icon'], 'http') ? $hl['custom_icon'] : asset('storage/' . $hl['custom_icon']) }}"
+                                                 alt="{{ $hl['title'] }}"
+                                                 class="h-6 w-6 object-contain">
+                                        @elseif($hl['icon'] === 'graduation-cap')
+                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                                        @elseif($hl['icon'] === 'book-open')
+                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                        @elseif($hl['icon'] === 'shirt')
+                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 3l4 4-2 2-2-1v13H8V8L6 9 4 7l4-4h2a2 2 0 004 0h2z"/></svg>
+                                        @elseif($hl['icon'] === 'users')
+                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                        @elseif($hl['icon'] === 'heart')
+                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                                        @elseif($hl['icon'] === 'droplet')
+                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                                        @elseif($hl['icon'] === 'shield-check')
+                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                        @else
+                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                                        @endif
+                                    </div>
+                                    <div class="min-w-0">
+                                        <span class="block text-xs sm:text-[13px] font-bold text-slate-900 group-hover:text-emerald-950 leading-snug">
+                                            {{ $hl['title'] }}
+                                        </span>
+                                        @if(!empty($hl['description']))
+                                            <span class="block text-[11px] text-slate-500 mt-0.5 line-clamp-1 leading-tight">{{ $hl['description'] }}</span>
+                                        @endif
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
@@ -250,7 +355,11 @@
 
                 <!-- 2. Audited Ground Relief Section (Public Ledger & Bills) -->
                 @if(isset($fundDistributions) && $fundDistributions->count())
-                    <section class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)]">
+                    <section x-show="showAll || activeTab === 'impact'"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 translate-y-1"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)]">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                             <div>
                                 <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 block mb-0.5">Audited Financials</span>
@@ -278,7 +387,13 @@
                 @endif
 
                 <!-- 3. Impact Stories Section (#impact) -->
-                <section id="impact" aria-labelledby="impact-heading" class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
+                <section id="impact"
+                         x-show="showAll || activeTab === 'impact'"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         aria-labelledby="impact-heading"
+                         class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
                     <h2 id="impact-heading" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mb-4">
                         Impact Stories
                     </h2>
@@ -305,7 +420,11 @@
 
                 <!-- 4. Recent Verified Donors Stream -->
                 @if(isset($recentDonations) && $recentDonations->count())
-                    <section class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)]">
+                    <section x-show="showAll || activeTab === 'updates'"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 translate-y-1"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)]">
                         <div class="flex items-center justify-between pb-4 border-b border-slate-100">
                             <div>
                                 <h3 class="text-base sm:text-lg font-bold text-slate-900">Recent Verified Donors ({{ $donorsCount ?? $recentDonations->count() }})</h3>
@@ -343,7 +462,13 @@
                 @endif
 
                 <!-- 5. Campaign Updates Section (#updates) -->
-                <section id="updates" aria-labelledby="updates-heading" class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
+                <section id="updates"
+                         x-show="showAll || activeTab === 'updates'"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         aria-labelledby="updates-heading"
+                         class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
                     <h2 id="updates-heading" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mb-3">
                         Campaign Updates
                     </h2>
@@ -354,7 +479,13 @@
                 </section>
 
                 <!-- 6. Gallery Section (#gallery) -->
-                <section id="gallery" aria-labelledby="gallery-heading" class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
+                <section id="gallery"
+                         x-show="showAll || activeTab === 'gallery'"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         aria-labelledby="gallery-heading"
+                         class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
                     <div class="flex items-center justify-between mb-4">
                         <h2 id="gallery-heading" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                             Gallery
@@ -377,7 +508,13 @@
                 </section>
 
                 <!-- 7. Frequently Asked Questions (#faqs) -->
-                <section id="faqs" aria-labelledby="faqs-heading" class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
+                <section id="faqs"
+                         x-show="showAll || activeTab === 'faqs'"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         aria-labelledby="faqs-heading"
+                         class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
                     <h2 id="faqs-heading" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mb-4">
                         Frequently Asked Questions
                     </h2>

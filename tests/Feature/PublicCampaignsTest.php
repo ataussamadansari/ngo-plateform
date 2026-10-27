@@ -314,4 +314,56 @@ class PublicCampaignsTest extends TestCase
         // Ensure no raw HTML is escaped into literal &lt;p&gt; entities
         $response->assertDontSee('&lt;p&gt;&lt;strong&gt;Hope Foundation&lt;/strong&gt;');
     }
+
+    public function test_campaign_detail_renders_structured_key_highlights_with_icons_and_custom_images(): void
+    {
+        $campaign = Campaign::create([
+            'category_id' => $this->medicalCategory->id,
+            'title' => 'Child Health & Nutrition Mission',
+            'slug' => 'child-health-nutrition-mission',
+            'short_description' => 'Comprehensive wellness and dietary support for rural children.',
+            'full_story' => '<p>Every child deserves access to quality nutrition and medical care.</p>',
+            'thumbnail_image' => 'campaigns/nutrition.jpg',
+            'goal_amount' => 400000.00,
+            'raised_amount' => 150000.00,
+            'start_date' => now(),
+            'status' => 'active',
+            'key_highlights' => [
+                [
+                    'title' => 'School Admission Support',
+                    'icon' => 'graduation-cap',
+                    'subtitle' => 'Annual fee and enrollment aid',
+                ],
+                [
+                    'title' => 'Books & Learning Materials',
+                    'icon' => 'book-open',
+                    'subtitle' => 'Curriculum textbooks and stationery',
+                ],
+                [
+                    'title' => 'Specialized Health Monitoring',
+                    'icon' => 'custom',
+                    'custom_icon' => 'campaigns/icons/health-badge.png',
+                    'subtitle' => 'Quarterly pediatric checkups',
+                ],
+            ],
+        ]);
+
+        $response = $this->get('/campaigns/'.$campaign->slug);
+
+        $response->assertOk();
+        $response->assertSee('Key Highlights');
+        $response->assertSee('School Admission Support');
+        $response->assertSee('Annual fee and enrollment aid');
+        $response->assertSee('Books & Learning Materials');
+        $response->assertSee('Curriculum textbooks and stationery');
+        $response->assertSee('Specialized Health Monitoring');
+        $response->assertSee('Quarterly pediatric checkups');
+        $response->assertSee('storage/campaigns/icons/health-badge.png');
+        // Assert sticky navigation tabs are present
+        $response->assertSee('Overview');
+        $response->assertSee('Our Impact');
+        $response->assertSee('Updates');
+        $response->assertSee('Gallery');
+        $response->assertSee('FAQs');
+    }
 }
