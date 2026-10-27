@@ -4,14 +4,14 @@
 
 @section('content')
 @php
-    $title = $campaign->title ?? 'Education for Every Child';
-    $categoryName = $campaign->category ? $campaign->category->name : 'Education';
+    $title = $campaign->title;
+    $categoryName = $campaign->category ? $campaign->category->name : null;
     $raised = (float) ($campaign->raised_amount ?? 0);
-    $goal = (float) ($campaign->goal_amount ?? 100000);
+    $goal = (float) ($campaign->goal_amount ?? 0);
     $progress = (float) ($campaign->progress_percentage ?? ($goal > 0 ? min(100, round(($raised / $goal) * 100, 1)) : 0));
 
-    // Calculate days left
-    $daysLeft = 42;
+    // Calculate days left only if end_date exists
+    $daysLeft = null;
     if (!empty($campaign->end_date)) {
         $days = (int) now()->diffInDays(\Carbon\Carbon::parse($campaign->end_date), false);
         $daysLeft = max(0, $days);
@@ -19,25 +19,18 @@
 
     $heroImage = !empty($campaign->thumbnail_image)
         ? (str_starts_with($campaign->thumbnail_image, 'http') ? $campaign->thumbnail_image : asset('storage/' . $campaign->thumbnail_image))
-        : 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=2200&q=90';
+        : null;
 
-    $galleryPhotos = collect($campaign->gallery_images ?? [
-        'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=900&q=85',
-        'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=900&q=85',
-        'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=900&q=85',
-        'https://images.unsplash.com/photo-1472162072942-cd5147eb3902?auto=format&fit=crop&w=900&q=85',
-    ])->map(fn ($img) => is_string($img) && str_starts_with($img, 'http') ? $img : asset('storage/' . $img));
+    // Gallery Photos: strictly from campaign gallery_images without hardcoded dummy fallbacks
+    $galleryPhotos = collect($campaign->gallery_images ?? [])
+        ->filter()
+        ->map(fn ($img) => is_string($img) && str_starts_with($img, 'http') ? $img : asset('storage/' . $img));
 
     // Preset amounts for donation card
     $presetAmounts = [500, 1000, 2000, 5000, 10000];
 
-    // Key Highlights (Supports preset icons, custom uploaded image, and legacy strings)
-    $rawHighlights = $campaign->key_highlights ?? [
-        ['title' => 'School Admission Support', 'icon' => 'graduation-cap'],
-        ['title' => 'Books & Learning Materials', 'icon' => 'book-open'],
-        ['title' => 'Uniforms & School Facilities', 'icon' => 'shirt'],
-        ['title' => 'Mentoring & Career Guidance', 'icon' => 'users'],
-    ];
+    // Key Highlights: strictly from campaign key_highlights without hardcoded dummy fallbacks
+    $rawHighlights = $campaign->key_highlights ?? [];
 
     $keyHighlights = collect($rawHighlights)->map(function ($item, $index) {
         if (is_string($item)) {
@@ -77,57 +70,43 @@
             'custom_icon' => $item['custom_icon'] ?? null,
             'description' => $item['description'] ?? $item['subtitle'] ?? null,
         ];
-    });
+    })->filter(fn ($hl) => !empty($hl['title']));
 
-    // Impact Stories (JSON from campaign or default stories matching mockup)
-    $impactStories = $campaign->impact_stories ?? [
-        [
-            'name' => 'Ayesha, 10th Grade',
-            'quote' => 'Because of this support, I can continue my education and dream of becoming a doctor one day. Thank you!',
-            'photo' => 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=300&q=80',
-        ],
-        [
-            'name' => 'Rahul, 8th Grade',
-            'quote' => 'I received school books and a uniform. Now I can attend school regularly and focus on my studies.',
-            'photo' => 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=300&q=80',
-        ],
-    ];
+    // Impact Stories: strictly from campaign impact_stories without hardcoded dummy fallbacks
+    $impactStories = collect($campaign->impact_stories ?? [])->filter(fn ($story) => !empty($story['quote']) || !empty($story['name']));
 
-    // FAQ Items (JSON or default questions)
-    $faqs = $campaign->faq_items ?? [
-        [
-            'question' => 'Is my donation tax exempt?',
-            'answer' => 'Yes, donations to this campaign are 100% tax exempt under Section 80G of the Indian Income Tax Act. An official digital receipt is issued immediately upon verification.',
-        ],
-        [
-            'question' => 'How can I track the utilization of my donation?',
-            'answer' => 'We maintain a 100% transparent public ledger with scanned GST vendor bills, utilization dates, and geotagged impact photos under the Transparency section.',
-        ],
-        [
-            'question' => 'What payment methods are supported without fees?',
-            'answer' => 'You can donate via Dynamic UPI QR code (Google Pay, PhonePe, Paytm, BHIM) or Direct Bank NEFT/RTGS with zero gateway deduction fees.',
-        ],
-    ];
+    // FAQ Items: strictly from campaign faq_items without hardcoded dummy fallbacks
+    $faqs = collect($campaign->faq_items ?? [])->filter(fn ($faq) => !empty($faq['question']));
 
-    // Content HTML handling (fixes raw <p><strong> tags issue)
+    // Content HTML handling
     $storyHtml = $campaign->full_story ?? $campaign->short_description ?? '';
     $hasHtmlTags = strip_tags($storyHtml) !== $storyHtml;
+
+    // Existence checks for sections
+    $hasFundDistributions = isset($fundDistributions) && $fundDistributions->count() > 0;
+    $hasImpactStories = $impactStories->isNotEmpty();
+    $hasRecentDonations = isset($recentDonations) && $recentDonations->count() > 0;
+    $hasGallery = $galleryPhotos->isNotEmpty();
+    $hasFaqs = $faqs->isNotEmpty();
+    $hasVideo = !empty($campaign->video_url);
 @endphp
 
-<!-- ================= HERO SECTION ================= -->
+{{-- ================= HERO SECTION ================= --}}
 <section class="relative isolate overflow-hidden bg-[#041f13] text-white">
-    <!-- Background Image with Forest Depth Gradient Overlay -->
+    {{-- Background Image with Forest Depth Gradient Overlay --}}
     <div class="absolute inset-0 -z-10 overflow-hidden">
-        <img src="{{ $heroImage }}"
-             alt="{{ $title }}"
-             class="h-full w-full object-cover object-[center_35%] opacity-40 mix-blend-luminosity brightness-110 contrast-105 sm:opacity-50">
-        <!-- Dual Layer Gradient -->
+        @if($heroImage)
+            <img src="{{ $heroImage }}"
+                 alt="{{ $title }}"
+                 class="h-full w-full object-cover object-[center_35%] opacity-40 mix-blend-luminosity brightness-110 contrast-105 sm:opacity-50">
+        @endif
+        {{-- Dual Layer Gradient --}}
         <div class="absolute inset-0 bg-gradient-to-r from-[#031b10] via-[#052819]/90 to-[#041f13]/40"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-[#031b10] via-transparent to-transparent opacity-80"></div>
     </div>
 
     <div class="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:pb-28 lg:pt-14">
-        <!-- Breadcrumbs Navigation -->
+        {{-- Breadcrumbs Navigation --}}
         <nav aria-label="Breadcrumb" class="mb-4 flex flex-wrap items-center gap-1.5 text-xs font-medium text-emerald-100/80">
             <a href="{{ url('/') }}" class="hover:text-white transition">Home</a>
             <span aria-hidden="true">›</span>
@@ -137,47 +116,58 @@
         </nav>
 
         <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
-            <!-- Left: Hero Headline, Eyebrow & Badges -->
+            {{-- Left: Hero Headline, Eyebrow & Badges --}}
             <div class="lg:col-span-8">
-                <!-- Category Pill -->
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-xs px-3.5 py-1 text-xs font-bold text-emerald-800 shadow-sm border border-white/20">
-                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-600"></span>
-                    {{ $categoryName }}
-                </span>
+                @if($categoryName)
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-xs px-3.5 py-1 text-xs font-bold text-emerald-800 shadow-sm border border-white/20">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-600"></span>
+                        {{ $categoryName }}
+                    </span>
+                @endif
 
                 <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl leading-[1.15]">
                     {{ $title }}
                 </h1>
 
-                <p class="mt-3 max-w-xl text-sm leading-relaxed text-emerald-50/90 sm:text-base">
-                    {{ $campaign->short_description ?? 'Help provide quality education, books and school facilities to underprivileged children.' }}
-                </p>
+                @if(!empty($campaign->short_description))
+                    <p class="mt-3 max-w-xl text-sm leading-relaxed text-emerald-50/90 sm:text-base">
+                        {{ $campaign->short_description }}
+                    </p>
+                @endif
 
-                <!-- 3 Trust Accreditations -->
+                {{-- Trust Accreditations (Rendered only when applicable) --}}
                 <div class="mt-4 flex flex-wrap items-center gap-3 text-xs font-semibold text-white/95">
-                    <span class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1">
-                        <svg class="h-3.5 w-3.5 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                        <span>Verified Campaign</span>
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1">
-                        <svg class="h-3.5 w-3.5 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        <span>80G Eligible</span>
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1">
-                        <span class="text-[#4ade80] font-bold">₹</span>
-                        <span>Tax Benefit Available</span>
-                    </span>
+                    @if($campaign->status === 'active' || $campaign->is_featured)
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1">
+                            <svg class="h-3.5 w-3.5 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            <span>Verified Campaign</span>
+                        </span>
+                    @endif
+
+                    @if(function_exists('setting') ? setting('tax_exemption_80g', true) : true)
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1">
+                            <svg class="h-3.5 w-3.5 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span>80G Eligible</span>
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1">
+                            <span class="text-[#4ade80] font-bold">₹</span>
+                            <span>Tax Benefit Available</span>
+                        </span>
+                    @endif
                 </div>
             </div>
 
-            <!-- Right: Handwritten Script Badge (Desktop Only per Mockup) -->
+            {{-- Right: Handwritten Script Badge (Desktop Only per Mockup) --}}
             <div class="hidden lg:flex lg:col-span-4 justify-end">
                 <div class="transform -rotate-6 text-center select-none pointer-events-none pr-8 pt-2">
                     <p class="font-script text-3xl xl:text-4xl font-normal leading-tight text-white drop-shadow-md">
-                        Every<br>
-                        Child<br>
-                        Deserves<br>
-                        a Chance <span class="inline-block text-2xl xl:text-3xl text-[#4ade80]">💚</span>
+                        @if($categoryName && str_contains(strtolower($categoryName), 'education'))
+                            Every<br>Child<br>Deserves<br>a Chance <span class="inline-block text-2xl xl:text-3xl text-[#4ade80]">💚</span>
+                        @elseif($categoryName && (str_contains(strtolower($categoryName), 'medic') || str_contains(strtolower($categoryName), 'health')))
+                            Every<br>Life<br>Matters<br>Deeply <span class="inline-block text-2xl xl:text-3xl text-[#4ade80]">❤️</span>
+                        @else
+                            Every<br>Rupee<br>Makes<br>Impact <span class="inline-block text-2xl xl:text-3xl text-[#4ade80]">✨</span>
+                        @endif
                     </p>
                 </div>
             </div>
@@ -185,83 +175,68 @@
     </div>
 </section>
 
-<!-- ================= MAIN CONTENT + FLOATING DONATION CARD ================= -->
-<div class="bg-[#f8fafc] py-6 sm:py-8 lg:py-10"
-     x-data="{
-        activeTab: 'overview',
-        showAll: false
-     }">
+{{-- ================= MAIN CONTENT + FLOATING DONATION CARD ================= --}}
+<div class="bg-[#f8fafc] py-6 sm:py-8 lg:py-10" x-data="{ videoModalOpen: false }">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
 
-            <!-- ================= LEFT COLUMN: NARRATIVE & CONTENT ================= -->
+            {{-- ================= LEFT COLUMN: NARRATIVE & CONTENT ================= --}}
             <div class="space-y-8 lg:col-span-8">
 
-                <!-- Sticky Dynamic Navigation Bar (Tabs Mode to eliminate long scroll fatigue) -->
+                {{-- Smooth Sticky Sub-Navigation Bar (Anchor jump links without hiding sections) --}}
                 <nav aria-label="Campaign sections"
-                     class="sticky top-20 z-30 -mx-4 sm:mx-0 flex items-center justify-between gap-2 overflow-x-auto bg-[#f8fafc]/95 backdrop-blur-md px-4 sm:px-0 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-slate-200/80">
-                    <div class="flex items-center gap-1.5 sm:gap-2">
-                        <button type="button"
-                                @click="activeTab = 'overview'"
-                                :class="activeTab === 'overview' ? 'bg-[#16a34a] text-white shadow-xs border-[#16a34a]' : 'bg-white border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-300'"
-                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3 sm:px-4 text-xs font-bold transition cursor-pointer">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <span>Overview</span>
-                        </button>
-                        <button type="button"
-                                @click="activeTab = 'impact'"
-                                :class="activeTab === 'impact' ? 'bg-[#16a34a] text-white shadow-xs border-[#16a34a]' : 'bg-white border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-300'"
-                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3 sm:px-4 text-xs font-bold transition cursor-pointer">
-                            <svg class="h-3.5 w-3.5 text-emerald-600" :class="{ 'text-white': activeTab === 'impact' }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                            <span>Our Impact</span>
-                        </button>
-                        <button type="button"
-                                @click="activeTab = 'updates'"
-                                :class="activeTab === 'updates' ? 'bg-[#16a34a] text-white shadow-xs border-[#16a34a]' : 'bg-white border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-300'"
-                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3 sm:px-4 text-xs font-bold transition cursor-pointer">
-                            <svg class="h-3.5 w-3.5 text-emerald-600" :class="{ 'text-white': activeTab === 'updates' }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-                            <span>Updates</span>
-                        </button>
-                        <button type="button"
-                                @click="activeTab = 'gallery'"
-                                :class="activeTab === 'gallery' ? 'bg-[#16a34a] text-white shadow-xs border-[#16a34a]' : 'bg-white border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-300'"
-                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3 sm:px-4 text-xs font-bold transition cursor-pointer">
-                            <svg class="h-3.5 w-3.5 text-emerald-600" :class="{ 'text-white': activeTab === 'gallery' }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            <span>Gallery</span>
-                        </button>
-                        <button type="button"
-                                @click="activeTab = 'faqs'"
-                                :class="activeTab === 'faqs' ? 'bg-[#16a34a] text-white shadow-xs border-[#16a34a]' : 'bg-white border-slate-200/90 text-slate-700 hover:text-emerald-700 hover:border-emerald-300'"
-                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3 sm:px-4 text-xs font-bold transition cursor-pointer">
-                            <svg class="h-3.5 w-3.5 text-emerald-600" :class="{ 'text-white': activeTab === 'faqs' }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <span>FAQs</span>
-                        </button>
-                    </div>
+                     class="sticky top-20 z-30 -mx-4 sm:mx-0 flex items-center gap-2 overflow-x-auto bg-[#f8fafc]/95 backdrop-blur-md px-4 sm:px-0 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-slate-200/80 scroll-smooth">
+                    <a href="#overview"
+                       class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-[#16a34a] bg-[#16a34a] px-3.5 sm:px-4 text-xs font-bold text-white shadow-xs transition hover:bg-[#15803d]">
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>Overview</span>
+                    </a>
 
-                    <!-- View Mode Toggle: Tabbed vs View All -->
-                    <button type="button"
-                            @click="showAll = !showAll"
-                            class="hidden md:inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-emerald-700 bg-white border border-slate-200 rounded-xl px-3 py-1.5 shadow-2xs transition cursor-pointer shrink-0">
-                        <span x-text="showAll ? '📑 Tabbed View' : '📜 View Full Page'"></span>
-                    </button>
+                    @if($hasFundDistributions || $hasImpactStories)
+                        <a href="#impact"
+                           class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
+                            <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                            <span>Our Impact</span>
+                        </a>
+                    @endif
+
+                    @if($hasRecentDonations)
+                        <a href="#donors"
+                           class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
+                            <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            <span>Donors</span>
+                        </a>
+                    @endif
+
+                    @if($hasGallery)
+                        <a href="#gallery"
+                           class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
+                            <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>Gallery</span>
+                        </a>
+                    @endif
+
+                    @if($hasFaqs)
+                        <a href="#faqs"
+                           class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
+                            <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>FAQs</span>
+                        </a>
+                    @endif
                 </nav>
 
-                <!-- 1. About This Campaign Section (#overview) -->
+                {{-- 1. About This Campaign Section (#overview) --}}
                 <section id="overview"
-                         x-show="showAll || activeTab === 'overview'"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 translate-y-1"
-                         x-transition:enter-end="opacity-100 translate-y-0"
                          aria-labelledby="overview-heading"
                          class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-                        <!-- Left Story (Takes 7 Cols on Desktop) -->
-                        <div class="md:col-span-7">
+                        {{-- Story Narrative (Full width if no video, 7 cols if video exists) --}}
+                        <div class="{{ $hasVideo ? 'md:col-span-7' : 'md:col-span-12' }}">
                             <h2 id="overview-heading" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                                 About This Campaign
                             </h2>
 
-                            <!-- Dynamic Story Narrative (Supports ALL Filament RichEditor formats: headings, lists, tables, images, blockquotes, code, highlights, links) -->
+                            {{-- Dynamic Story Narrative (Supports RichEditor HTML tags) --}}
                             <div class="mt-3 leading-relaxed">
                                 @if($hasHtmlTags)
                                     <div class="rich-story-content prose prose-slate max-w-none text-slate-700">
@@ -275,91 +250,94 @@
                             </div>
                         </div>
 
-                        <!-- Right: Story Video Card (Takes 5 Cols on Desktop) -->
-                        <div class="md:col-span-5">
-                            <div class="relative h-48 sm:h-56 w-full overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-900 shadow-sm group">
-                                <img src="{{ $heroImage }}"
-                                     alt="Video story thumbnail"
-                                     class="h-full w-full object-cover transition duration-500 group-hover:scale-105 opacity-85">
-                                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent"></div>
+                        {{-- Right: Story Video Card (Rendered ONLY if video_url is present) --}}
+                        @if($hasVideo)
+                            <div class="md:col-span-5">
+                                <div class="relative h-48 sm:h-56 w-full overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-900 shadow-sm group">
+                                    @if($heroImage)
+                                        <img src="{{ $heroImage }}"
+                                             alt="Video story thumbnail"
+                                             class="h-full w-full object-cover transition duration-500 group-hover:scale-105 opacity-85">
+                                    @endif
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent"></div>
 
-                                <!-- Center Play Button -->
-                                <button type="button"
-                                        @click="videoModalOpen = true"
-                                        class="absolute inset-0 m-auto h-12 w-12 rounded-full bg-white/90 backdrop-blur-xs text-emerald-600 flex items-center justify-center shadow-lg hover:scale-110 transition cursor-pointer"
-                                        aria-label="Play Campaign Video">
-                                    <svg class="h-6 w-6 ml-0.5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </button>
+                                    {{-- Center Play Button --}}
+                                    <button type="button"
+                                            @click="videoModalOpen = true"
+                                            class="absolute inset-0 m-auto h-12 w-12 rounded-full bg-white/90 backdrop-blur-xs text-emerald-600 flex items-center justify-center shadow-lg hover:scale-110 transition cursor-pointer"
+                                            aria-label="Play Campaign Video">
+                                        <svg class="h-6 w-6 ml-0.5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                    </button>
 
-                                <!-- Bottom Badge CTA -->
-                                <button type="button"
-                                        @click="videoModalOpen = true"
-                                        class="absolute bottom-3 right-3 rounded-xl bg-[#16a34a] hover:bg-[#15803d] text-white text-xs font-bold px-3 py-2 flex items-center gap-1.5 shadow-sm transition">
-                                    <span>▶ Watch Our Story</span>
-                                </button>
+                                    {{-- Bottom Badge CTA --}}
+                                    <button type="button"
+                                            @click="videoModalOpen = true"
+                                            class="absolute bottom-3 right-3 rounded-xl bg-[#16a34a] hover:bg-[#15803d] text-white text-xs font-bold px-3 py-2 flex items-center gap-1.5 shadow-sm transition">
+                                        <span>▶ Watch Our Story</span>
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Key Highlights (Rendered ONLY if key_highlights exists and not empty) --}}
+                    @if($keyHighlights->isNotEmpty())
+                        <div class="mt-8 rounded-2xl bg-[#ecfdf5]/80 border border-emerald-100/90 p-4 sm:p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-emerald-950 flex items-center gap-2">
+                                    <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                                    <span>Key Highlights</span>
+                                </h3>
+                                <span class="text-[11px] font-bold text-emerald-700 bg-white px-2.5 py-0.5 rounded-full border border-emerald-200/80 shadow-2xs">
+                                    {{ $keyHighlights->count() }} Key {{ \Illuminate\Support\Str::plural('Point', $keyHighlights->count()) }}
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                                @foreach($keyHighlights as $hl)
+                                    <div class="flex items-center gap-3.5 rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs hover:border-emerald-400 hover:shadow-xs transition-all duration-200 group">
+                                        <div class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100/90 group-hover:bg-[#16a34a] group-hover:text-white transition-all duration-200">
+                                            @if(!empty($hl['custom_icon']))
+                                                <img src="{{ str_starts_with($hl['custom_icon'], 'http') ? $hl['custom_icon'] : asset('storage/' . $hl['custom_icon']) }}"
+                                                     alt="{{ $hl['title'] }}"
+                                                     class="h-6 w-6 object-contain">
+                                            @elseif($hl['icon'] === 'graduation-cap')
+                                                <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                                            @elseif($hl['icon'] === 'book-open')
+                                                <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                            @elseif($hl['icon'] === 'shirt')
+                                                <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 3l4 4-2 2-2-1v13H8V8L6 9 4 7l4-4h2a2 2 0 004 0h2z"/></svg>
+                                            @elseif($hl['icon'] === 'users')
+                                                <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                            @elseif($hl['icon'] === 'heart')
+                                                <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                                            @elseif($hl['icon'] === 'droplet')
+                                                <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                                            @elseif($hl['icon'] === 'shield-check')
+                                                <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                            @else
+                                                <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                                            @endif
+                                        </div>
+                                        <div class="min-w-0">
+                                            <span class="block text-xs sm:text-[13px] font-bold text-slate-900 group-hover:text-emerald-950 leading-snug">
+                                                {{ $hl['title'] }}
+                                            </span>
+                                            @if(!empty($hl['description']))
+                                                <span class="block text-[11px] text-slate-500 mt-0.5 line-clamp-1 leading-tight">{{ $hl['description'] }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Key Highlights (4 Pillars matching Mockup with Icon/Image + Text) -->
-                    <div class="mt-8 rounded-2xl bg-[#ecfdf5]/80 border border-emerald-100/90 p-4 sm:p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-emerald-950 flex items-center gap-2">
-                                <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-                                <span>Key Highlights</span>
-                            </h3>
-                            <span class="text-[11px] font-bold text-emerald-700 bg-white px-2.5 py-0.5 rounded-full border border-emerald-200/80 shadow-2xs">
-                                4 Core Pillars
-                            </span>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                            @foreach($keyHighlights as $hl)
-                                <div class="flex items-center gap-3.5 rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs hover:border-emerald-400 hover:shadow-xs transition-all duration-200 group">
-                                    <div class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100/90 group-hover:bg-[#16a34a] group-hover:text-white transition-all duration-200">
-                                        @if(!empty($hl['custom_icon']))
-                                            <img src="{{ str_starts_with($hl['custom_icon'], 'http') ? $hl['custom_icon'] : asset('storage/' . $hl['custom_icon']) }}"
-                                                 alt="{{ $hl['title'] }}"
-                                                 class="h-6 w-6 object-contain">
-                                        @elseif($hl['icon'] === 'graduation-cap')
-                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
-                                        @elseif($hl['icon'] === 'book-open')
-                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                                        @elseif($hl['icon'] === 'shirt')
-                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 3l4 4-2 2-2-1v13H8V8L6 9 4 7l4-4h2a2 2 0 004 0h2z"/></svg>
-                                        @elseif($hl['icon'] === 'users')
-                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                                        @elseif($hl['icon'] === 'heart')
-                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                                        @elseif($hl['icon'] === 'droplet')
-                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-                                        @elseif($hl['icon'] === 'shield-check')
-                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                                        @else
-                                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-                                        @endif
-                                    </div>
-                                    <div class="min-w-0">
-                                        <span class="block text-xs sm:text-[13px] font-bold text-slate-900 group-hover:text-emerald-950 leading-snug">
-                                            {{ $hl['title'] }}
-                                        </span>
-                                        @if(!empty($hl['description']))
-                                            <span class="block text-[11px] text-slate-500 mt-0.5 line-clamp-1 leading-tight">{{ $hl['description'] }}</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
+                    @endif
                 </section>
 
-                <!-- 2. Audited Ground Relief Section (Public Ledger & Bills) -->
-                @if(isset($fundDistributions) && $fundDistributions->count())
-                    <section x-show="showAll || activeTab === 'impact'"
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 translate-y-1"
-                             x-transition:enter-end="opacity-100 translate-y-0"
-                             class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)]">
+                {{-- 2. Audited Ground Relief Section (Public Ledger & Bills - Rendered ONLY if fund distributions exist) --}}
+                @if($hasFundDistributions)
+                    <section id="impact"
+                             class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                             <div>
                                 <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 block mb-0.5">Audited Financials</span>
@@ -377,7 +355,12 @@
                                 <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50/60 text-xs">
                                     <div>
                                         <span class="font-bold text-slate-800 block text-sm">{{ $dist->title }}</span>
-                                        <span class="text-[11px] text-slate-500">{{ $dist->beneficiary_name }} &bull; {{ $dist->distribution_date ? $dist->distribution_date->format('d M Y') : '' }}</span>
+                                        <span class="text-[11px] text-slate-500">
+                                            {{ $dist->beneficiary_name }}
+                                            @if($dist->distribution_date)
+                                                &bull; {{ $dist->distribution_date->format('d M Y') }}
+                                            @endif
+                                        </span>
                                     </div>
                                     <span class="font-mono font-bold text-slate-900 text-sm">₹{{ number_format($dist->amount_spent, 2) }}</span>
                                 </div>
@@ -386,45 +369,44 @@
                     </section>
                 @endif
 
-                <!-- 3. Impact Stories Section (#impact) -->
-                <section id="impact"
-                         x-show="showAll || activeTab === 'impact'"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 translate-y-1"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         aria-labelledby="impact-heading"
-                         class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
-                    <h2 id="impact-heading" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mb-4">
-                        Impact Stories
-                    </h2>
+                {{-- 3. Beneficiary Impact Stories Section (Rendered ONLY if impact_stories exist) --}}
+                @if($hasImpactStories)
+                    <section class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mb-4">
+                            Impact Stories
+                        </h2>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        @foreach($impactStories as $story)
-                            <article class="flex gap-4 items-start rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 hover:bg-slate-50 transition">
-                                <img src="{{ !empty($story['photo']) ? (str_starts_with($story['photo'], 'http') ? $story['photo'] : asset('storage/' . $story['photo'])) : 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=200&q=80' }}"
-                                     alt="{{ $story['name'] }}"
-                                     loading="lazy"
-                                     class="h-20 w-20 sm:h-22 sm:w-22 rounded-xl object-cover shrink-0 border border-slate-200 bg-slate-200 shadow-2xs">
-                                <div class="min-w-0">
-                                    <p class="text-xs sm:text-[13px] text-slate-600 leading-relaxed italic">
-                                        “{{ $story['quote'] }}”
-                                    </p>
-                                    <p class="mt-2 text-xs font-extrabold text-slate-900">
-                                        — {{ $story['name'] }}
-                                    </p>
-                                </div>
-                            </article>
-                        @endforeach
-                    </div>
-                </section>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            @foreach($impactStories as $story)
+                                <article class="flex gap-4 items-start rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 hover:bg-slate-50 transition">
+                                    @if(!empty($story['photo']))
+                                        <img src="{{ str_starts_with($story['photo'], 'http') ? $story['photo'] : asset('storage/' . $story['photo']) }}"
+                                             alt="{{ $story['name'] ?? 'Beneficiary' }}"
+                                             loading="lazy"
+                                             class="h-20 w-20 sm:h-22 sm:w-22 rounded-xl object-cover shrink-0 border border-slate-200 bg-slate-200 shadow-2xs">
+                                    @endif
+                                    <div class="min-w-0">
+                                        @if(!empty($story['quote']))
+                                            <p class="text-xs sm:text-[13px] text-slate-600 leading-relaxed italic">
+                                                “{{ $story['quote'] }}”
+                                            </p>
+                                        @endif
+                                        @if(!empty($story['name']))
+                                            <p class="mt-2 text-xs font-extrabold text-slate-900">
+                                                — {{ $story['name'] }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
 
-                <!-- 4. Recent Verified Donors Stream -->
-                @if(isset($recentDonations) && $recentDonations->count())
-                    <section x-show="showAll || activeTab === 'updates'"
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 translate-y-1"
-                             x-transition:enter-end="opacity-100 translate-y-0"
-                             class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)]">
+                {{-- 4. Recent Verified Donors Stream (Rendered ONLY if verified donations exist) --}}
+                @if($hasRecentDonations)
+                    <section id="donors"
+                             class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
                         <div class="flex items-center justify-between pb-4 border-b border-slate-100">
                             <div>
                                 <h3 class="text-base sm:text-lg font-bold text-slate-900">Recent Verified Donors ({{ $donorsCount ?? $recentDonations->count() }})</h3>
@@ -461,80 +443,59 @@
                     </section>
                 @endif
 
-                <!-- 5. Campaign Updates Section (#updates) -->
-                <section id="updates"
-                         x-show="showAll || activeTab === 'updates'"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 translate-y-1"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         aria-labelledby="updates-heading"
-                         class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
-                    <h2 id="updates-heading" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mb-3">
-                        Campaign Updates
-                    </h2>
-                    <div class="rounded-xl border border-slate-200/80 bg-slate-50/60 p-4 text-xs sm:text-sm leading-relaxed text-slate-600">
-                        <p class="font-semibold text-slate-800 mb-1">Latest Field Verification Report</p>
-                        Your contribution helps us provide essential learning materials, school supplies and ongoing educational support directly to children in verified need. Check back for real-time field receipts and utilization entries.
-                    </div>
-                </section>
+                {{-- 5. Gallery Section (Rendered ONLY if gallery_images exist and not empty) --}}
+                @if($hasGallery)
+                    <section id="gallery"
+                             aria-labelledby="gallery-heading"
+                             class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 id="gallery-heading" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+                                Gallery
+                            </h2>
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg">
+                                {{ $galleryPhotos->count() }} {{ \Illuminate\Support\Str::plural('Photo', $galleryPhotos->count()) }}
+                            </span>
+                        </div>
 
-                <!-- 6. Gallery Section (#gallery) -->
-                <section id="gallery"
-                         x-show="showAll || activeTab === 'gallery'"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 translate-y-1"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         aria-labelledby="gallery-heading"
-                         class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 id="gallery-heading" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-                            Gallery
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            @foreach($galleryPhotos->take(8) as $photoUrl)
+                                <a href="{{ $photoUrl }}" target="_blank" rel="noopener" class="group h-32 sm:h-36 overflow-hidden rounded-2xl bg-slate-100 shadow-2xs block">
+                                    <img src="{{ $photoUrl }}"
+                                         alt="Campaign field photo"
+                                         loading="lazy"
+                                         class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                                </a>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
+
+                {{-- 6. Frequently Asked Questions (Rendered ONLY if faq_items exist and not empty) --}}
+                @if($hasFaqs)
+                    <section id="faqs"
+                             aria-labelledby="faqs-heading"
+                             class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
+                        <h2 id="faqs-heading" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mb-4">
+                            Frequently Asked Questions
                         </h2>
-                        <a href="#gallery" class="text-xs sm:text-sm font-bold text-[#16a34a] hover:text-[#15803d] transition">
-                            View All Photos →
-                        </a>
-                    </div>
 
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        @foreach($galleryPhotos->take(4) as $photoUrl)
-                            <a href="{{ $photoUrl }}" target="_blank" rel="noopener" class="group h-32 sm:h-36 overflow-hidden rounded-2xl bg-slate-100 shadow-2xs block">
-                                <img src="{{ $photoUrl }}"
-                                     alt="Campaign field photo"
-                                     loading="lazy"
-                                     class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
-                            </a>
-                        @endforeach
-                    </div>
-                </section>
+                        <div class="divide-y divide-slate-100">
+                            @foreach($faqs as $faq)
+                                <details class="group py-3.5" @if($loop->first) open @endif>
+                                    <summary class="flex items-center justify-between cursor-pointer font-bold text-xs sm:text-sm text-slate-900 list-none">
+                                        <span>{{ $faq['question'] }}</span>
+                                        <span class="transition group-open:rotate-180 text-slate-400">▾</span>
+                                    </summary>
+                                    <p class="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed pr-4">
+                                        {{ $faq['answer'] ?? '' }}
+                                    </p>
+                                </details>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
 
-                <!-- 7. Frequently Asked Questions (#faqs) -->
-                <section id="faqs"
-                         x-show="showAll || activeTab === 'faqs'"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 translate-y-1"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         aria-labelledby="faqs-heading"
-                         class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
-                    <h2 id="faqs-heading" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mb-4">
-                        Frequently Asked Questions
-                    </h2>
-
-                    <div class="divide-y divide-slate-100">
-                        @foreach($faqs as $faq)
-                            <details class="group py-3.5" @if($loop->first) open @endif>
-                                <summary class="flex items-center justify-between cursor-pointer font-bold text-xs sm:text-sm text-slate-900 list-none">
-                                    <span>{{ $faq['question'] }}</span>
-                                    <span class="transition group-open:rotate-180 text-slate-400">▾</span>
-                                </summary>
-                                <p class="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed pr-4">
-                                    {{ $faq['answer'] }}
-                                </p>
-                            </details>
-                        @endforeach
-                    </div>
-                </section>
-
-                <!-- 8. More Campaigns You Might Like -->
+                {{-- 7. More Campaigns You Might Like (Rendered ONLY if related campaigns exist) --}}
                 @if(isset($relatedCampaigns) && $relatedCampaigns->isNotEmpty())
                     <section aria-labelledby="related-heading" class="pt-2">
                         <div class="flex items-center justify-between mb-4">
@@ -550,23 +511,27 @@
                             @foreach($relatedCampaigns->take(3) as $related)
                                 @php
                                     $relRaised = (float) ($related->raised_amount ?? 0);
-                                    $relGoal = (float) ($related->goal_amount ?? 100000);
+                                    $relGoal = (float) ($related->goal_amount ?? 0);
                                     $relProg = $relGoal > 0 ? min(100, round(($relRaised / $relGoal) * 100)) : 0;
                                     $relImage = !empty($related->thumbnail_image)
                                         ? (str_starts_with($related->thumbnail_image, 'http') ? $related->thumbnail_image : asset('storage/' . $related->thumbnail_image))
-                                        : 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=400&q=80';
+                                        : null;
                                 @endphp
                                 <article class="flex flex-col rounded-2xl border border-slate-200/90 bg-white p-3 shadow-xs hover:shadow-md transition">
-                                    <img src="{{ $relImage }}"
-                                         alt="{{ $related->title }}"
-                                         loading="lazy"
-                                         class="h-28 w-full rounded-xl object-cover mb-2.5">
+                                    @if($relImage)
+                                        <img src="{{ $relImage }}"
+                                             alt="{{ $related->title }}"
+                                             loading="lazy"
+                                             class="h-28 w-full rounded-xl object-cover mb-2.5">
+                                    @endif
                                     <h3 class="text-xs font-bold text-slate-900 line-clamp-1 hover:text-emerald-700">
                                         <a href="{{ route('campaigns.show', $related->slug) }}">{{ $related->title }}</a>
                                     </h3>
-                                    <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5 leading-snug">
-                                        {{ $related->short_description }}
-                                    </p>
+                                    @if(!empty($related->short_description))
+                                        <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5 leading-snug">
+                                            {{ $related->short_description }}
+                                        </p>
+                                    @endif
                                     <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
                                         <span class="font-extrabold text-slate-900">₹{{ number_format($relRaised, 0) }}</span>
                                         <span class="text-slate-500 font-bold">{{ $relProg }}%</span>
@@ -582,12 +547,12 @@
 
             </div>
 
-            <!-- ================= RIGHT COLUMN: OVERLAPPING STICKY DONATION CARD & INFO ================= -->
+            {{-- ================= RIGHT COLUMN: OVERLAPPING STICKY DONATION CARD & INFO ================= --}}
             <aside class="space-y-6 lg:col-span-4 lg:-mt-44 z-20 sticky top-24" aria-label="Donation checkout and campaign information">
 
-                <!-- 1. Floating Donation Checkout Card (Matches Mockup) -->
+                {{-- 1. Floating Donation Checkout Card --}}
                 <div id="donate" class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-[0_12px_40px_rgba(15,23,42,0.12)]">
-                    <!-- Raised Amount & Percentage Header -->
+                    {{-- Raised Amount & Percentage Header --}}
                     <div class="flex items-baseline justify-between gap-2">
                         <div>
                             <p class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
@@ -603,20 +568,24 @@
                         </span>
                     </div>
 
-                    <!-- Progress Bar -->
+                    {{-- Progress Bar --}}
                     <div class="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-valuenow="{{ (int)$progress }}" aria-valuemin="0" aria-valuemax="100">
                         <div class="h-full rounded-full bg-[#16a34a] transition-all duration-700 ease-out" style="width: {{ $progress }}%"></div>
                     </div>
 
-                    <!-- 3-Column Stats Row -->
+                    {{-- 3-Column Stats Row (Only display Days Left if end_date exists) --}}
                     <div class="mt-4 grid grid-cols-3 divide-x divide-emerald-200/60 rounded-xl bg-[#ecfdf5]/80 border border-emerald-100/80 py-2.5 text-center">
                         <div>
-                            <p class="text-base font-extrabold text-slate-900">{{ number_format($donorsCount ?? 245) }}</p>
+                            <p class="text-base font-extrabold text-slate-900">{{ number_format($donorsCount ?? 0) }}</p>
                             <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Donors</p>
                         </div>
                         <div>
-                            <p class="text-base font-extrabold text-slate-900">{{ $daysLeft }}</p>
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Days Left</p>
+                            <p class="text-base font-extrabold text-slate-900">
+                                {{ $daysLeft !== null ? $daysLeft : 'Ongoing' }}
+                            </p>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                                {{ $daysLeft !== null ? 'Days Left' : 'Schedule' }}
+                            </p>
                         </div>
                         <div>
                             <p class="text-base font-extrabold text-slate-900">₹{{ number_format(max(0, $goal - $raised), 0) }}</p>
@@ -624,12 +593,12 @@
                         </div>
                     </div>
 
-                    <!-- Make a Donation Form with Preset Amount Buttons -->
+                    {{-- Make a Donation Form with Preset Amount Buttons --}}
                     <form action="{{ route('donate.index') }}" method="GET" class="mt-5" x-data="{ selectedAmount: 1000, isCustom: false }">
                         <input type="hidden" name="campaign_id" value="{{ $campaign->id }}">
                         <p class="text-sm font-bold text-slate-900 mb-2.5">Make a Donation</p>
 
-                        <!-- 6 Presets in 2x3 Grid -->
+                        {{-- Presets in 2x3 Grid --}}
                         <div class="grid grid-cols-3 gap-2">
                             @foreach($presetAmounts as $amt)
                                 <button type="button"
@@ -647,7 +616,7 @@
                             </button>
                         </div>
 
-                        <!-- Amount Input -->
+                        {{-- Amount Input --}}
                         <div class="mt-3">
                             <label for="donation-amount-input" class="sr-only">Donation Amount in INR</label>
                             <div class="relative rounded-xl border border-slate-200 bg-slate-50/50 overflow-hidden focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600/10">
@@ -665,7 +634,7 @@
                             </div>
                         </div>
 
-                        <!-- Primary CTA Button -->
+                        {{-- Primary CTA Button --}}
                         <button type="submit"
                                 class="mt-3.5 inline-flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#16a34a] hover:bg-[#15803d] active:scale-[0.99] px-4 py-3 text-sm font-bold text-white shadow-sm hover:shadow transition cursor-pointer">
                             <span>Donate Now</span>
@@ -673,7 +642,7 @@
                         </button>
                     </form>
 
-                    <!-- Trust Accreditations List -->
+                    {{-- Trust Accreditations List --}}
                     <div class="mt-5 space-y-3 border-t border-slate-100 pt-4">
                         <div class="flex items-center gap-3">
                             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
@@ -685,15 +654,17 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        @if(function_exists('setting') ? setting('tax_exemption_80g', true) : true)
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-900">80G Tax Benefit</p>
+                                    <p class="text-[11px] text-slate-500">Get instant receipt for tax exemption</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-xs font-bold text-slate-900">80G Tax Benefit</p>
-                                <p class="text-[11px] text-slate-500">Get instant receipt for tax exemption</p>
-                            </div>
-                        </div>
+                        @endif
 
                         <div class="flex items-center gap-3">
                             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
@@ -707,79 +678,93 @@
                     </div>
                 </div>
 
-                <!-- 2. Campaign Information Card -->
+                {{-- 2. Campaign Information Card (Strictly conditional rows - no dummy fallbacks) --}}
                 <div class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-[0_4px_25px_rgba(15,23,42,0.04)]">
                     <h4 class="text-sm sm:text-base font-bold text-slate-900 mb-3.5 pb-2.5 border-b border-slate-100">
                         Campaign Information
                     </h4>
 
                     <dl class="space-y-3 text-xs sm:text-[13px]">
-                        <div class="flex items-center justify-between">
-                            <dt class="flex items-center gap-2 text-slate-500">
-                                <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                                <span>Category</span>
-                            </dt>
-                            <dd class="font-bold text-slate-800">{{ $categoryName }}</dd>
-                        </div>
+                        @if($categoryName)
+                            <div class="flex items-center justify-between">
+                                <dt class="flex items-center gap-2 text-slate-500">
+                                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                                    <span>Category</span>
+                                </dt>
+                                <dd class="font-bold text-slate-800">{{ $categoryName }}</dd>
+                            </div>
+                        @endif
 
-                        <div class="flex items-center justify-between">
-                            <dt class="flex items-center gap-2 text-slate-500">
-                                <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                <span>Started On</span>
-                            </dt>
-                            <dd class="font-medium text-slate-700">{{ $campaign->start_date ? $campaign->start_date->format('d M Y') : '15 Aug 2025' }}</dd>
-                        </div>
+                        @if($campaign->start_date)
+                            <div class="flex items-center justify-between">
+                                <dt class="flex items-center gap-2 text-slate-500">
+                                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    <span>Started On</span>
+                                </dt>
+                                <dd class="font-medium text-slate-700">{{ $campaign->start_date->format('d M Y') }}</dd>
+                            </div>
+                        @endif
 
-                        <div class="flex items-center justify-between">
-                            <dt class="flex items-center gap-2 text-slate-500">
-                                <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                <span>Last Date</span>
-                            </dt>
-                            <dd class="font-medium text-slate-700">{{ $campaign->end_date ? $campaign->end_date->format('d M Y') : '31 Dec 2026' }}</dd>
-                        </div>
+                        @if($campaign->end_date)
+                            <div class="flex items-center justify-between">
+                                <dt class="flex items-center gap-2 text-slate-500">
+                                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>Last Date</span>
+                                </dt>
+                                <dd class="font-medium text-slate-700">{{ $campaign->end_date->format('d M Y') }}</dd>
+                            </div>
+                        @endif
 
-                        <div class="flex items-center justify-between">
-                            <dt class="flex items-center gap-2 text-slate-500">
-                                <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                <span>Location</span>
-                            </dt>
-                            <dd class="font-medium text-slate-700">{{ $campaign->location ?? 'Uttar Pradesh, India' }}</dd>
-                        </div>
+                        @if(!empty($campaign->location))
+                            <div class="flex items-center justify-between">
+                                <dt class="flex items-center gap-2 text-slate-500">
+                                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    <span>Location</span>
+                                </dt>
+                                <dd class="font-medium text-slate-700">{{ $campaign->location }}</dd>
+                            </div>
+                        @endif
 
-                        <div class="flex items-center justify-between">
-                            <dt class="flex items-center gap-2 text-slate-500">
-                                <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                                <span>Beneficiaries</span>
-                            </dt>
-                            <dd class="font-medium text-slate-700">{{ $campaign->beneficiary_summary ?? '500+ Children' }}</dd>
-                        </div>
+                        @if(!empty($campaign->beneficiary_summary))
+                            <div class="flex items-center justify-between">
+                                <dt class="flex items-center gap-2 text-slate-500">
+                                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                    <span>Beneficiaries</span>
+                                </dt>
+                                <dd class="font-medium text-slate-700">{{ $campaign->beneficiary_summary }}</dd>
+                            </div>
+                        @endif
 
-                        <div class="flex items-center justify-between">
-                            <dt class="flex items-center gap-2 text-slate-500">
-                                <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                <span>Campaign By</span>
-                            </dt>
-                            <dd class="font-medium text-slate-700">{{ setting('ngo_name', 'Hope Foundation') }}</dd>
-                        </div>
+                        @if(function_exists('setting') && setting('ngo_name'))
+                            <div class="flex items-center justify-between">
+                                <dt class="flex items-center gap-2 text-slate-500">
+                                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                    <span>Campaign By</span>
+                                </dt>
+                                <dd class="font-medium text-slate-700">{{ setting('ngo_name') }}</dd>
+                            </div>
+                        @endif
 
-                        <div class="flex items-center justify-between pt-1">
-                            <dt class="flex items-center gap-2 text-slate-500">
-                                <svg class="h-4 w-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                <span>Verified</span>
-                            </dt>
-                            <dd class="font-bold text-emerald-700">Yes</dd>
-                        </div>
+                        @if($campaign->status === 'active' || $campaign->is_featured)
+                            <div class="flex items-center justify-between pt-1">
+                                <dt class="flex items-center gap-2 text-slate-500">
+                                    <svg class="h-4 w-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>Verified</span>
+                                </dt>
+                                <dd class="font-bold text-emerald-700">Yes</dd>
+                            </div>
+                        @endif
                     </dl>
                 </div>
 
-                <!-- 3. Share This Campaign Card -->
+                {{-- 3. Share This Campaign Card --}}
                 <div class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-[0_4px_25px_rgba(15,23,42,0.04)]">
                     <h4 class="text-sm sm:text-base font-bold text-slate-900 mb-3">
                         Share This Campaign
                     </h4>
 
                     <div class="flex items-center gap-2.5">
-                        <!-- WhatsApp -->
+                        {{-- WhatsApp --}}
                         <a href="https://api.whatsapp.com/send?text={{ urlencode($title . ' - Support here: ' . url()->current()) }}"
                            target="_blank" rel="noopener noreferrer"
                            class="flex h-9 w-9 items-center justify-center rounded-full bg-[#25D366] text-white hover:scale-105 transition shadow-2xs"
@@ -787,7 +772,7 @@
                             <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.007c.106.005.249-.04.39.299.144.347.491 1.2.534 1.287.043.087.072.188.014.303-.058.116-.087.188-.173.289l-.26.303c-.087.087-.179.182-.077.357.101.174.449.741.964 1.201.662.591 1.221.774 1.394.861.173.087.275.072.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.043.073.043.419-.101.824z"/></svg>
                         </a>
 
-                        <!-- Facebook -->
+                        {{-- Facebook --}}
                         <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}"
                            target="_blank" rel="noopener noreferrer"
                            class="flex h-9 w-9 items-center justify-center rounded-full bg-[#1877F2] text-white hover:scale-105 transition shadow-2xs"
@@ -795,52 +780,70 @@
                             <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                         </a>
 
-                        <!-- Twitter / X -->
-                        <a href="https://twitter.com/intent/tweet?text={{ urlencode($title) }}&url={{ urlencode(url()->current()) }}"
+                        {{-- X / Twitter --}}
+                        <a href="https://twitter.com/intent/tweet?text={{ urlencode($title . ' ' . url()->current()) }}"
                            target="_blank" rel="noopener noreferrer"
                            class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white hover:scale-105 transition shadow-2xs"
-                           title="Share on Twitter / X">
+                           title="Share on X">
                             <svg class="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                         </a>
 
-                        <!-- LinkedIn -->
+                        {{-- LinkedIn --}}
                         <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(url()->current()) }}"
                            target="_blank" rel="noopener noreferrer"
                            class="flex h-9 w-9 items-center justify-center rounded-full bg-[#0A66C2] text-white hover:scale-105 transition shadow-2xs"
                            title="Share on LinkedIn">
-                            <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                            <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.738-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                         </a>
 
-                        <!-- Copy Link -->
+                        {{-- Copy Link --}}
                         <button type="button"
-                                onclick="navigator.clipboard.writeText(window.location.href); alert('Campaign link copied to clipboard!');"
-                                class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 transition shadow-2xs cursor-pointer"
+                                @click="navigator.clipboard.writeText(window.location.href); alert('Link copied to clipboard!')"
+                                class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 transition shadow-2xs"
                                 title="Copy Campaign Link">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                         </button>
                     </div>
 
-                    <p class="mt-2 text-xs text-slate-500">
+                    <p class="text-[11px] text-slate-400 mt-3">
                         Help us spread the word and reach more people.
                     </p>
                 </div>
-
             </aside>
-
         </div>
     </div>
-</div>
 
-<!-- ================= STICKY MOBILE DONATE FOOTER BAR ================= -->
-<div class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 z-40 sm:hidden flex items-center justify-between gap-3 shadow-lg">
-    <div>
-        <p class="text-[11px] text-slate-500 font-medium">Raised of ₹{{ number_format($goal, 0) }}</p>
-        <p class="text-sm font-extrabold text-slate-900">₹{{ number_format($raised, 0) }} ({{ $progress }}%)</p>
-    </div>
-    <a href="#donate" class="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-xl bg-[#16a34a] hover:bg-[#15803d] px-6 py-2.5 text-xs font-bold text-white shadow-sm transition">
-        <span>Donate Now</span>
-        <span aria-hidden="true">→</span>
-    </a>
+    {{-- ================= STORY VIDEO LIGHTBOX MODAL (Rendered ONLY if video_url exists) ================= --}}
+    @if($hasVideo)
+        <div x-show="videoModalOpen"
+             x-cloak
+             @keydown.escape.window="videoModalOpen = false"
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <div @click.away="videoModalOpen = false"
+                 class="relative w-full max-w-3xl bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-white/15 p-6 text-center text-white">
+                <button @click="videoModalOpen = false"
+                        class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer">
+                    ✕
+                </button>
+                <div class="py-12 space-y-4">
+                    <div class="w-16 h-16 rounded-full bg-[#16a34a]/20 border border-[#16a34a] text-[#4ade80] flex items-center justify-center mx-auto">
+                        <svg class="h-8 w-8 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold">{{ $title }}</h3>
+                    <p class="text-sm text-slate-300 max-w-md mx-auto">
+                        Watch ground relief progress, beneficiary interviews, and verifiable milestone deliveries.
+                    </p>
+                    <div class="pt-4 flex items-center justify-center gap-3">
+                        <a href="{{ $campaign->video_url }}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 rounded-xl bg-[#16a34a] px-6 py-3 text-sm font-bold text-white hover:bg-[#15803d] transition">
+                            <span>Watch Video on External Player</span>
+                            <span aria-hidden="true">→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
-
 @endsection
+

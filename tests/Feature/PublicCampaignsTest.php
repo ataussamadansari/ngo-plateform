@@ -346,6 +346,19 @@ class PublicCampaignsTest extends TestCase
                     'subtitle' => 'Quarterly pediatric checkups',
                 ],
             ],
+            'impact_stories' => [
+                [
+                    'name' => 'Meera, 5th Grade',
+                    'quote' => 'I love the healthy meals and books provided to us every day.',
+                ],
+            ],
+            'gallery_images' => ['campaigns/gallery1.jpg'],
+            'faq_items' => [
+                [
+                    'question' => 'How are nutrition kits prepared?',
+                    'answer' => 'Under strict clinical guidelines with certified nutritionists.',
+                ],
+            ],
         ]);
 
         $response = $this->get('/campaigns/'.$campaign->slug);
@@ -359,11 +372,71 @@ class PublicCampaignsTest extends TestCase
         $response->assertSee('Specialized Health Monitoring');
         $response->assertSee('Quarterly pediatric checkups');
         $response->assertSee('storage/campaigns/icons/health-badge.png');
-        // Assert sticky navigation tabs are present
-        $response->assertSee('Overview');
-        $response->assertSee('Our Impact');
-        $response->assertSee('Updates');
+        $response->assertSee('Impact Stories');
+        $response->assertSee('Meera, 5th Grade');
         $response->assertSee('Gallery');
-        $response->assertSee('FAQs');
+        $response->assertSee('Frequently Asked Questions');
+        $response->assertSee('How are nutrition kits prepared?');
+        // Assert sub-navigation jump links
+        $response->assertSee('href="#overview"', false);
+        $response->assertSee('href="#impact"', false);
+        $response->assertSee('href="#gallery"', false);
+        $response->assertSee('href="#faqs"', false);
+    }
+
+    public function test_campaign_detail_omits_empty_sections_and_fields(): void
+    {
+        $campaign = Campaign::create([
+            'category_id' => $this->medicalCategory->id,
+            'title' => 'Bare Minimum Campaign',
+            'slug' => 'bare-minimum-campaign',
+            'short_description' => 'A basic emergency fund campaign.',
+            'full_story' => '<p>Direct assistance fund without media or extra stories.</p>',
+            'thumbnail_image' => 'campaigns/minimal.jpg',
+            'goal_amount' => 50000.00,
+            'raised_amount' => 0.00,
+            'start_date' => now(),
+            'end_date' => null,
+            'location' => null,
+            'beneficiary_summary' => null,
+            'video_url' => null,
+            'key_highlights' => null,
+            'impact_stories' => null,
+            'gallery_images' => null,
+            'faq_items' => null,
+            'status' => 'active',
+        ]);
+
+        $response = $this->get('/campaigns/'.$campaign->slug);
+
+        $response->assertOk();
+        $response->assertSee('Bare Minimum Campaign');
+        $response->assertSee('A basic emergency fund campaign.');
+        $response->assertSee('Ongoing'); // Schedule should show Ongoing when end_date is null
+        $response->assertSee('Started On'); // Started on is present
+
+        // Null fields and empty sections MUST NOT render
+        $response->assertDontSee('Key Highlights');
+        $response->assertDontSee('▶ Watch Our Story');
+        $response->assertDontSee('Impact Stories');
+        $response->assertDontSee('Gallery');
+        $response->assertDontSee('Frequently Asked Questions');
+        $response->assertDontSee('Last Date');
+        $response->assertDontSee('Location');
+        $response->assertDontSee('Beneficiaries');
+
+        // Sub-navigation bar should only contain Overview and omit empty section anchors
+        $response->assertSee('href="#overview"', false);
+        $response->assertDontSee('href="#impact"', false);
+        $response->assertDontSee('href="#gallery"', false);
+        $response->assertDontSee('href="#faqs"', false);
+
+        // No dummy data fallbacks should appear
+        $response->assertDontSee('Ayesha, 10th Grade');
+        $response->assertDontSee('Rahul, 8th Grade');
+        $response->assertDontSee('500+ Children');
+        $response->assertDontSee('15 Aug 2025');
+        $response->assertDontSee('31 Dec 2026');
+        $response->assertDontSee('Uttar Pradesh, India');
     }
 }

@@ -11,6 +11,7 @@ use App\Models\EventRegistration;
 use App\Models\FundDistribution;
 use App\Models\PaymentMethod;
 use App\Models\TeamMember;
+use App\Models\Testimonial;
 use App\Models\User;
 use App\Models\Volunteer;
 use Illuminate\Database\Seeder;
@@ -142,10 +143,42 @@ class DemoContentSeeder extends Seeder
                 'beneficiary_summary' => '120 Underprivileged Schoolgirls',
                 'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                 'key_highlights' => [
-                    'Annual Tuition & School Bag Support',
-                    'Digital Learning Tablet Labs',
-                    'Zero Dropout Monitoring Guarantee',
-                    'Direct Verified Vendor Invoices',
+                    [
+                        'title' => 'School Admission Support',
+                        'icon' => 'graduation-cap',
+                        'subtitle' => 'Annual enrollment and fee assistance',
+                    ],
+                    [
+                        'title' => 'Books & Learning Materials',
+                        'icon' => 'book-open',
+                        'subtitle' => 'Curriculum textbooks and stationery',
+                    ],
+                    [
+                        'title' => 'Uniforms & School Facilities',
+                        'icon' => 'shirt',
+                        'subtitle' => 'Clean attire and sanitary facilities',
+                    ],
+                    [
+                        'title' => 'Mentoring & Career Guidance',
+                        'icon' => 'users',
+                        'subtitle' => 'Weekly motivational sessions',
+                    ],
+                ],
+                'impact_stories' => [
+                    [
+                        'name' => 'Ayesha, 10th Grade',
+                        'quote' => 'Because of this support, I can continue my education and dream of becoming a doctor one day. Thank you!',
+                        'photo' => $defaultImpact,
+                    ],
+                    [
+                        'name' => 'Rahul, 8th Grade',
+                        'quote' => 'I received school books and a uniform. Now I can attend school regularly and focus on my studies.',
+                        'photo' => $defaultImpact,
+                    ],
+                ],
+                'gallery_images' => [
+                    $defaultThumbnail,
+                    $defaultImpact,
                 ],
                 'faq_items' => [
                     [
@@ -748,6 +781,44 @@ class DemoContentSeeder extends Seeder
             TeamMember::updateOrCreate(
                 ['name' => $member['name']],
                 $member
+            );
+        }
+
+        // 12. Seed Impact Testimonials
+        $testimonialsData = [
+            [
+                'name' => 'Ritika Sharma',
+                'role' => 'Parent & Beneficiary',
+                'quote' => 'Hope Foundation changed my child\'s life. Today she is in school and dreams of becoming a doctor.',
+                'avatar' => 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
+                'rating' => 5,
+                'sort_order' => 1,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Suresh Kumar',
+                'role' => 'Community Member',
+                'quote' => 'Their medical camps are a blessing for our village. We got proper treatment and support without any bias or fees.',
+                'avatar' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+                'rating' => 5,
+                'sort_order' => 2,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Anjali Verma',
+                'role' => 'Volunteer & Student',
+                'quote' => 'I volunteer with Hope Foundation and it has been the most rewarding experience of my life. 100% transparency gives complete trust.',
+                'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+                'rating' => 5,
+                'sort_order' => 3,
+                'is_active' => true,
+            ],
+        ];
+
+        foreach ($testimonialsData as $testi) {
+            Testimonial::updateOrCreate(
+                ['name' => $testi['name']],
+                $testi
             );
         }
     }
