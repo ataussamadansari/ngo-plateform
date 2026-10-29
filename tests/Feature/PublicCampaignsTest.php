@@ -451,4 +451,67 @@ class PublicCampaignsTest extends TestCase
         $response->assertDontSee('31 Dec 2026');
         $response->assertDontSee('Uttar Pradesh, India');
     }
+
+    public function test_campaign_detail_renders_dynamic_highlights_grid_impact_card_slider_and_nav_scrollspy(): void
+    {
+        $campaign = Campaign::create([
+            'category_id' => $this->medicalCategory->id,
+            'title' => 'Emergency Oxygen Supplies Drive',
+            'slug' => 'emergency-oxygen-supplies-drive',
+            'short_description' => 'Providing high quality oxygen concentrators.',
+            'full_story' => '<p>Emergency supplies for rural clinics.</p>',
+            'thumbnail_image' => 'campaigns/oxygen.jpg',
+            'goal_amount' => 500000.00,
+            'raised_amount' => 250000.00,
+            'start_date' => now(),
+            'status' => 'active',
+            'key_highlights' => [
+                'Geotagged Delivery Verification',
+                'Direct Manufacturer Procurement',
+            ],
+            'impact_stories' => [
+                [
+                    'name' => 'Dr. Sharma, Primary Health Centre',
+                    'quote' => 'The oxygen concentrators saved critical lives in our remote clinic during the seasonal crisis.',
+                ],
+                [
+                    'name' => 'Nurse Anita, Community Health Clinic',
+                    'quote' => 'Reliable medical oxygen machines arrived exactly when our supply chain was disrupted.',
+                ],
+            ],
+            'gallery_images' => ['campaigns/gallery1.jpg', 'campaigns/gallery2.jpg'],
+            'faq_items' => [
+                [
+                    'question' => 'How are machines procured?',
+                    'answer' => 'Directly from ISO-certified medical manufacturers with manufacturer warranty.',
+                ],
+            ],
+        ]);
+
+        $response = $this->get('/campaigns/'.$campaign->slug);
+
+        $response->assertOk();
+
+        // 1. Dynamic Key Highlights: exactly 2 items -> grid-cols-1 sm:grid-cols-2 (not 4 cols causing clipping)
+        $response->assertSee('grid grid-cols-1 sm:grid-cols-2 gap-3.5', false);
+        $response->assertSee('Geotagged Delivery Verification');
+        $response->assertSee('Direct Manufacturer Procurement');
+        $response->assertSee('break-words');
+
+        // 2. Impact Stories Card Slider: responsive cards (md:w-1/2) with touch gestures and dynamic maxSlide
+        $response->assertSee('Impact Stories');
+        $response->assertSee('isDesktop: window.innerWidth >= 768', false);
+        $response->assertSee('maxSlide()', false);
+        $response->assertSee('md:w-1/2', false);
+        $response->assertSee('Dr. Sharma, Primary Health Centre');
+        $response->assertSee('Nurse Anita, Community Health Clinic');
+
+        // 3. Sub-Navigation Scroll Spy & Active States
+        $response->assertSee("activeNav: 'overview'", false);
+        $response->assertSee('initScrollSpy()', false);
+        $response->assertSee("activeNav === 'overview'", false);
+        $response->assertSee("activeNav === 'impact'", false);
+        $response->assertSee("activeNav === 'gallery'", false);
+        $response->assertSee("activeNav === 'faqs'", false);
+    }
 }

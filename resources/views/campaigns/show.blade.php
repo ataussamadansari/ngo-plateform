@@ -179,13 +179,50 @@
 <div class="bg-[#f8fafc] py-6 sm:py-8 lg:py-10"
      x-data="{
         videoModalOpen: false,
+        activeNav: 'overview',
+        isScrolling: false,
         scrollToSection(id) {
+            this.activeNav = id;
+            this.isScrolling = true;
             const el = document.getElementById(id);
             if (el) {
-                el.scrollIntoView({ behavior: 'smooth' });
+                const yOffset = -120;
+                const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+                setTimeout(() => {
+                    this.isScrolling = false;
+                }, 800);
             }
+        },
+        initScrollSpy() {
+            const sectionIds = ['overview', 'impact', 'donors', 'gallery', 'faqs'];
+            const onScroll = () => {
+                if (this.isScrolling) return;
+                const scrollPos = window.pageYOffset || document.documentElement.scrollTop;
+                const offset = 140;
+                let current = this.activeNav;
+                for (let i = 0; i < sectionIds.length; i++) {
+                    const el = document.getElementById(sectionIds[i]);
+                    if (el) {
+                        const top = el.offsetTop - offset;
+                        const bottom = top + el.offsetHeight;
+                        if (scrollPos >= top && scrollPos < bottom) {
+                            current = sectionIds[i];
+                            break;
+                        } else if (scrollPos >= top) {
+                            current = sectionIds[i];
+                        }
+                    }
+                }
+                if (current && this.activeNav !== current) {
+                    this.activeNav = current;
+                }
+            };
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
         }
-     }">
+     }"
+     x-init="initScrollSpy()">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
 
@@ -197,16 +234,18 @@
                      class="sticky top-20 z-30 -mx-4 sm:mx-0 flex items-center gap-2 overflow-x-auto bg-[#f8fafc]/95 backdrop-blur-md px-4 sm:px-0 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-slate-200/80">
                     <button type="button"
                             @click="scrollToSection('overview')"
-                            class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-[#16a34a] bg-[#16a34a] px-3.5 sm:px-4 text-xs font-bold text-white shadow-xs transition hover:bg-[#15803d] cursor-pointer">
-                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            :class="activeNav === 'overview' ? 'bg-[#16a34a] text-white border-[#16a34a] shadow-xs' : 'bg-white border-slate-200/90 text-slate-700 hover:border-emerald-300 hover:text-emerald-700'"
+                            class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3.5 sm:px-4 text-xs font-bold transition-all duration-200 cursor-pointer">
+                        <svg :class="activeNav === 'overview' ? 'text-white' : 'text-emerald-600'" class="h-3.5 w-3.5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span>Overview</span>
                     </button>
 
                     @if($hasFundDistributions || $hasImpactStories)
                         <button type="button"
                                 @click="scrollToSection('impact')"
-                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700 cursor-pointer">
-                            <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                                :class="activeNav === 'impact' ? 'bg-[#16a34a] text-white border-[#16a34a] shadow-xs' : 'bg-white border-slate-200/90 text-slate-700 hover:border-emerald-300 hover:text-emerald-700'"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3.5 sm:px-4 text-xs font-bold transition-all duration-200 cursor-pointer">
+                            <svg :class="activeNav === 'impact' ? 'text-white' : 'text-emerald-600'" class="h-3.5 w-3.5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
                             <span>Our Impact</span>
                         </button>
                     @endif
@@ -214,8 +253,9 @@
                     @if($hasRecentDonations)
                         <button type="button"
                                 @click="scrollToSection('donors')"
-                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700 cursor-pointer">
-                            <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                :class="activeNav === 'donors' ? 'bg-[#16a34a] text-white border-[#16a34a] shadow-xs' : 'bg-white border-slate-200/90 text-slate-700 hover:border-emerald-300 hover:text-emerald-700'"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3.5 sm:px-4 text-xs font-bold transition-all duration-200 cursor-pointer">
+                            <svg :class="activeNav === 'donors' ? 'text-white' : 'text-emerald-600'" class="h-3.5 w-3.5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                             <span>Donors</span>
                         </button>
                     @endif
@@ -223,8 +263,9 @@
                     @if($hasGallery)
                         <button type="button"
                                 @click="scrollToSection('gallery')"
-                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700 cursor-pointer">
-                            <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                :class="activeNav === 'gallery' ? 'bg-[#16a34a] text-white border-[#16a34a] shadow-xs' : 'bg-white border-slate-200/90 text-slate-700 hover:border-emerald-300 hover:text-emerald-700'"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3.5 sm:px-4 text-xs font-bold transition-all duration-200 cursor-pointer">
+                            <svg :class="activeNav === 'gallery' ? 'text-white' : 'text-emerald-600'" class="h-3.5 w-3.5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             <span>Gallery</span>
                         </button>
                     @endif
@@ -232,8 +273,9 @@
                     @if($hasFaqs)
                         <button type="button"
                                 @click="scrollToSection('faqs')"
-                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700 cursor-pointer">
-                            <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                :class="activeNav === 'faqs' ? 'bg-[#16a34a] text-white border-[#16a34a] shadow-xs' : 'bg-white border-slate-200/90 text-slate-700 hover:border-emerald-300 hover:text-emerald-700'"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3.5 sm:px-4 text-xs font-bold transition-all duration-200 cursor-pointer">
+                            <svg :class="activeNav === 'faqs' ? 'text-white' : 'text-emerald-600'" class="h-3.5 w-3.5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             <span>FAQs</span>
                         </button>
                     @endif
@@ -296,6 +338,15 @@
 
                     {{-- Key Highlights (Rendered ONLY if key_highlights exists and not empty) --}}
                     @if($keyHighlights->isNotEmpty())
+                        @php
+                            $hlCount = $keyHighlights->count();
+                            $gridColsClass = match(true) {
+                                $hlCount === 1 => 'grid-cols-1',
+                                $hlCount === 2 => 'grid-cols-1 sm:grid-cols-2',
+                                $hlCount === 3 => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+                                default => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+                            };
+                        @endphp
                         <div class="mt-8 rounded-2xl bg-[#ecfdf5]/80 border border-emerald-100/90 p-4 sm:p-6">
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-emerald-950 flex items-center gap-2">
@@ -307,7 +358,7 @@
                                 </span>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                            <div class="grid {{ $gridColsClass }} gap-3.5">
                                 @foreach($keyHighlights as $hl)
                                     <div class="flex items-center gap-3.5 rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs hover:border-emerald-400 hover:shadow-xs transition-all duration-200 group">
                                         <div class="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100/90 group-hover:bg-[#16a34a] group-hover:text-white transition-all duration-200">
@@ -333,12 +384,12 @@
                                                 <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
                                             @endif
                                         </div>
-                                        <div class="min-w-0">
-                                            <span class="block text-xs sm:text-[13px] font-bold text-slate-900 group-hover:text-emerald-950 leading-snug">
+                                        <div class="min-w-0 flex-1">
+                                            <span class="block text-xs sm:text-[13px] font-bold text-slate-900 group-hover:text-emerald-950 leading-snug break-words">
                                                 {{ $hl['title'] }}
                                             </span>
                                             @if(!empty($hl['description']))
-                                                <span class="block text-[11px] text-slate-500 mt-0.5 line-clamp-1 leading-tight">{{ $hl['description'] }}</span>
+                                                <span class="block text-[11px] text-slate-500 mt-0.5 line-clamp-2 leading-tight break-words">{{ $hl['description'] }}</span>
                                             @endif
                                         </div>
                                     </div>
@@ -389,14 +440,22 @@
                              x-data="{
                                 activeSlide: 0,
                                 total: {{ $impactStories->count() }},
+                                isDesktop: window.innerWidth >= 768,
                                 touchStartX: 0,
+                                maxSlide() {
+                                    return this.isDesktop ? Math.max(0, this.total - 2) : Math.max(0, this.total - 1);
+                                },
                                 prev() {
-                                    this.activeSlide = (this.activeSlide === 0) ? this.total - 1 : this.activeSlide - 1;
+                                    this.activeSlide = (this.activeSlide <= 0) ? this.maxSlide() : this.activeSlide - 1;
                                 },
                                 next() {
-                                    this.activeSlide = (this.activeSlide === this.total - 1) ? 0 : this.activeSlide + 1;
+                                    this.activeSlide = (this.activeSlide >= this.maxSlide()) ? 0 : this.activeSlide + 1;
+                                },
+                                slidesList() {
+                                    return Array.from({ length: this.maxSlide() + 1 }, (_, i) => i);
                                 }
                              }"
+                             @resize.window="isDesktop = window.innerWidth >= 768; if (activeSlide > maxSlide()) activeSlide = maxSlide()"
                              class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
 
                         {{-- Carousel Header with Title, Status & Navigation Arrows --}}
@@ -413,7 +472,7 @@
                                 <p class="text-xs text-slate-500 mt-0.5">Real voices and journeys transformed by your contribution</p>
                             </div>
 
-                            @if($impactStories->count() > 1)
+                            <template x-if="maxSlide() > 0">
                                 {{-- Arrow Navigation Buttons --}}
                                 <div class="flex items-center gap-1.5 shrink-0">
                                     <button type="button"
@@ -429,7 +488,7 @@
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                                     </button>
                                 </div>
-                            @endif
+                            </template>
                         </div>
 
                         {{-- Carousel Slider Viewport --}}
@@ -438,27 +497,27 @@
                              @touchend="if (touchStartX - $event.changedTouches[0].clientX > 40) next(); if ($event.changedTouches[0].clientX - touchStartX > 40) prev();">
 
                             {{-- Slider Track --}}
-                            <div class="flex transition-transform duration-500 ease-out"
-                                 :style="'transform: translateX(-' + (activeSlide * 100) + '%)'">
+                            <div class="flex transition-transform duration-500 ease-out -mx-2"
+                                 :style="'transform: translateX(-' + (activeSlide * (isDesktop ? 50 : 100)) + '%)'">
                                 @foreach($impactStories as $index => $story)
-                                    <div class="w-full shrink-0">
-                                        <article class="flex flex-col sm:flex-row gap-4 sm:gap-5 items-start rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5 sm:p-6 hover:bg-slate-50 hover:border-emerald-300 transition-all duration-300 shadow-2xs">
+                                    <div class="w-full shrink-0 px-2 flex {{ $impactStories->count() > 1 ? 'md:w-1/2' : 'w-full' }}">
+                                        <article class="flex flex-col sm:flex-row gap-3.5 sm:gap-4 items-start rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4 sm:p-5 hover:bg-slate-50 hover:border-emerald-300 transition-all duration-300 shadow-2xs w-full">
                                             @if(!empty($story['photo']))
                                                 <img src="{{ str_starts_with($story['photo'], 'http') ? $story['photo'] : asset('storage/' . $story['photo']) }}"
                                                      alt="{{ $story['name'] ?? 'Beneficiary' }}"
                                                      loading="lazy"
-                                                     class="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl object-cover shrink-0 border border-slate-200 bg-slate-200 shadow-sm">
+                                                     class="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl object-cover shrink-0 border border-slate-200 bg-slate-200 shadow-sm">
                                             @endif
                                             <div class="min-w-0 flex-1">
                                                 @if(!empty($story['quote']))
-                                                    <p class="text-xs sm:text-[14px] text-slate-700 leading-relaxed italic">
+                                                    <p class="text-xs sm:text-[13px] text-slate-700 leading-relaxed italic line-clamp-4">
                                                         “{{ $story['quote'] }}”
                                                     </p>
                                                 @endif
                                                 @if(!empty($story['name']))
-                                                    <div class="mt-3 flex items-center gap-2">
-                                                        <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-                                                        <p class="text-xs sm:text-sm font-extrabold text-slate-900">
+                                                    <div class="mt-2.5 flex items-center gap-1.5">
+                                                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                                        <p class="text-xs font-extrabold text-slate-900 truncate">
                                                             {{ $story['name'] }}
                                                         </p>
                                                     </div>
@@ -471,18 +530,18 @@
                         </div>
 
                         {{-- Dots Pagination Indicator --}}
-                        @if($impactStories->count() > 1)
+                        <template x-if="maxSlide() > 0">
                             <div class="mt-4 flex items-center justify-center gap-1.5">
-                                @foreach($impactStories as $index => $story)
+                                <template x-for="slideIdx in slidesList()" :key="slideIdx">
                                     <button type="button"
-                                            @click="activeSlide = {{ $index }}"
-                                            :class="activeSlide === {{ $index }} ? 'w-6 bg-[#16a34a]' : 'w-2 bg-slate-300 hover:bg-slate-400'"
+                                            @click="activeSlide = slideIdx"
+                                            :class="activeSlide === slideIdx ? 'w-6 bg-[#16a34a]' : 'w-2 bg-slate-300 hover:bg-slate-400'"
                                             class="h-2 rounded-full transition-all duration-300 cursor-pointer"
-                                            aria-label="Go to story {{ $index + 1 }}">
+                                            :aria-label="'Go to story slide ' + (slideIdx + 1)">
                                     </button>
-                                @endforeach
+                                </template>
                             </div>
-                        @endif
+                        </template>
                     </section>
                 @endif
 
