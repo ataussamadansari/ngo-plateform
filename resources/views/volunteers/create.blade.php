@@ -89,50 +89,51 @@
     </section>
 
     {{-- ================= 4 VALUE PROPOSITION PILLARS STRIP ================= --}}
+    {{-- Matches Desktop 4-col horizontal layout and Mobile 4-col centered icon layout --}}
     <div class="bg-white border-b border-slate-200/80 shadow-2xs">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            <div class="grid grid-cols-4 gap-2 sm:gap-6">
                 {{-- 1. Make an Impact --}}
-                <div class="flex items-center gap-3">
-                    <div class="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-emerald-50 text-[#16a34a] border border-emerald-100 flex items-center justify-center shrink-0">
-                        <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                <div class="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-3">
+                    <div class="h-9 w-9 sm:h-11 sm:w-11 rounded-full sm:rounded-2xl bg-emerald-50 text-[#16a34a] border border-emerald-100 flex items-center justify-center shrink-0">
+                        <svg class="h-4 w-4 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                     </div>
                     <div class="min-w-0">
-                        <h3 class="text-xs sm:text-sm font-bold text-slate-900 truncate">Make an Impact</h3>
-                        <p class="text-[11px] text-slate-500 truncate mt-0.5">Support real causes</p>
+                        <h3 class="text-[10px] sm:text-sm font-bold text-slate-900 leading-tight truncate sm:whitespace-normal">Make an Impact</h3>
+                        <p class="hidden sm:block text-[11px] text-slate-500 truncate mt-0.5">Support real causes</p>
                     </div>
                 </div>
 
                 {{-- 2. Build Communities --}}
-                <div class="flex items-center gap-3">
-                    <div class="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-emerald-50 text-[#16a34a] border border-emerald-100 flex items-center justify-center shrink-0">
-                        <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                <div class="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-3">
+                    <div class="h-9 w-9 sm:h-11 sm:w-11 rounded-full sm:rounded-2xl bg-emerald-50 text-[#16a34a] border border-emerald-100 flex items-center justify-center shrink-0">
+                        <svg class="h-4 w-4 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                     </div>
                     <div class="min-w-0">
-                        <h3 class="text-xs sm:text-sm font-bold text-slate-900 truncate">Build Communities</h3>
-                        <p class="text-[11px] text-slate-500 truncate mt-0.5">Create lasting change</p>
+                        <h3 class="text-[10px] sm:text-sm font-bold text-slate-900 leading-tight truncate sm:whitespace-normal">Build Communities</h3>
+                        <p class="hidden sm:block text-[11px] text-slate-500 truncate mt-0.5">Create lasting change</p>
                     </div>
                 </div>
 
                 {{-- 3. Gain Experience --}}
-                <div class="flex items-center gap-3">
-                    <div class="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-emerald-50 text-[#16a34a] border border-emerald-100 flex items-center justify-center shrink-0">
-                        <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                <div class="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-3">
+                    <div class="h-9 w-9 sm:h-11 sm:w-11 rounded-full sm:rounded-2xl bg-emerald-50 text-[#16a34a] border border-emerald-100 flex items-center justify-center shrink-0">
+                        <svg class="h-4 w-4 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                     </div>
                     <div class="min-w-0">
-                        <h3 class="text-xs sm:text-sm font-bold text-slate-900 truncate">Gain Experience</h3>
-                        <p class="text-[11px] text-slate-500 truncate mt-0.5">Develop new skills</p>
+                        <h3 class="text-[10px] sm:text-sm font-bold text-slate-900 leading-tight truncate sm:whitespace-normal">Gain Experience</h3>
+                        <p class="hidden sm:block text-[11px] text-slate-500 truncate mt-0.5">Develop new skills</p>
                     </div>
                 </div>
 
                 {{-- 4. Be Part of a Family --}}
-                <div class="flex items-center gap-3">
-                    <div class="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-emerald-50 text-[#16a34a] border border-emerald-100 flex items-center justify-center shrink-0">
-                        <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                <div class="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-3">
+                    <div class="h-9 w-9 sm:h-11 sm:w-11 rounded-full sm:rounded-2xl bg-emerald-50 text-[#16a34a] border border-emerald-100 flex items-center justify-center shrink-0">
+                        <svg class="h-4 w-4 sm:h-6 sm:w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
                     </div>
                     <div class="min-w-0">
-                        <h3 class="text-xs sm:text-sm font-bold text-slate-900 truncate">Be Part of a Family</h3>
-                        <p class="text-[11px] text-slate-500 truncate mt-0.5">Work with like-minded people</p>
+                        <h3 class="text-[10px] sm:text-sm font-bold text-slate-900 leading-tight truncate sm:whitespace-normal">Be Part of a Family</h3>
+                        <p class="hidden sm:block text-[11px] text-slate-500 truncate mt-0.5">Work with like-minded people</p>
                     </div>
                 </div>
             </div>
@@ -147,7 +148,7 @@
                 {{-- ================= LEFT COLUMN: OPPORTUNITIES + STATS + STORIES ================= --}}
                 <div class="lg:col-span-7 space-y-6 sm:space-y-8">
 
-                    {{-- 1. Volunteering Opportunities Header & Grid --}}
+                    {{-- 1. Volunteering Opportunities Header & Responsive Views --}}
                     <div>
                         <div class="flex items-center justify-between pb-4">
                             <div>
@@ -165,21 +166,23 @@
                             </button>
                         </div>
 
-                        {{-- 6 Opportunities Cards (3x2 Grid) --}}
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4">
+                        {{-- Desktop & Tablet: 3x2 Grid Cards --}}
+                        <div class="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4">
                             @foreach($opportunities as $opp)
-                                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs hover:border-emerald-300 transition-all duration-200 flex flex-col justify-between overflow-hidden group">
+                                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs hover:border-emerald-300 transition-all duration-200 flex flex-col justify-between group">
                                     <div>
-                                        {{-- Image with Floating Icon --}}
-                                        <div class="relative h-32 sm:h-36 w-full overflow-hidden bg-slate-100">
-                                            <img src="{{ $opp['image'] }}"
-                                                 alt="{{ $opp['title'] }}"
-                                                 loading="lazy"
-                                                 class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/30 to-transparent"></div>
+                                        {{-- Image Container (overflow-hidden strictly on image, NOT clipping the icon) --}}
+                                        <div class="relative">
+                                            <div class="h-32 sm:h-36 w-full overflow-hidden rounded-t-2xl bg-slate-100">
+                                                <img src="{{ $opp['image'] }}"
+                                                     alt="{{ $opp['title'] }}"
+                                                     loading="lazy"
+                                                     class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/30 to-transparent"></div>
+                                            </div>
 
-                                            {{-- Floating Colored Category Icon overlapping bottom-left --}}
-                                            <div class="absolute -bottom-3.5 left-3 h-8 w-8 sm:h-9 sm:w-9 rounded-xl {{ $opp['icon_color'] }} text-white shadow-md flex items-center justify-center border-2 border-white">
+                                            {{-- Floating Colored Category Icon placed OUTSIDE overflow-hidden, overlapping boundary --}}
+                                            <div class="absolute -bottom-4 left-3.5 h-9 w-9 rounded-xl {{ $opp['icon_color'] }} text-white shadow-md flex items-center justify-center border-2 border-white z-20">
                                                 @if($opp['icon_name'] === 'book')
                                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                                                 @elseif($opp['icon_name'] === 'heart')
@@ -196,8 +199,8 @@
                                             </div>
                                         </div>
 
-                                        {{-- Body --}}
-                                        <div class="p-3.5 pt-5">
+                                        {{-- Body with top padding accommodating floating icon --}}
+                                        <div class="p-3.5 pt-6">
                                             <h3 class="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors truncate">
                                                 {{ $opp['title'] }}
                                             </h3>
@@ -216,6 +219,47 @@
                                             <span aria-hidden="true">→</span>
                                         </button>
                                     </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        {{-- Mobile View: Compact Horizontal Cards matching Mobile Mockup --}}
+                        <div class="sm:hidden space-y-2.5">
+                            @foreach($opportunities as $opp)
+                                <div class="bg-white rounded-2xl border border-slate-200/90 p-2.5 shadow-2xs flex items-center justify-between gap-3 group cursor-pointer"
+                                     @click="openOpportunityModal({{ json_encode($opp) }})">
+                                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                                        <img src="{{ $opp['image'] }}"
+                                             alt="{{ $opp['title'] }}"
+                                             loading="lazy"
+                                             class="h-14 w-14 rounded-xl object-cover shrink-0 border border-slate-200">
+                                        <div class="min-w-0 flex-1">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="h-4 w-4 rounded-md {{ $opp['icon_color'] }} text-white flex items-center justify-center shrink-0">
+                                                    @if($opp['icon_name'] === 'book')
+                                                        <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                                    @elseif($opp['icon_name'] === 'heart')
+                                                        <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                                                    @elseif($opp['icon_name'] === 'food')
+                                                        <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                                    @elseif($opp['icon_name'] === 'leaf')
+                                                        <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                                                    @elseif($opp['icon_name'] === 'users')
+                                                        <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                                    @else
+                                                        <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                    @endif
+                                                </span>
+                                                <h3 class="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition truncate">
+                                                    {{ $opp['title'] }}
+                                                </h3>
+                                            </div>
+                                            <p class="text-[10px] text-slate-500 line-clamp-1 mt-0.5">
+                                                {{ $opp['description'] }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <span class="text-slate-400 group-hover:text-emerald-600 transition text-sm">›</span>
                                 </div>
                             @endforeach
                         </div>
