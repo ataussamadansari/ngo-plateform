@@ -144,4 +144,97 @@ class VolunteerRegistrationAndScreeningTest extends TestCase
 
         $response->assertStatus(429);
     }
+
+    public function test_volunteer_screen_matches_new_ui_ux_specification(): void
+    {
+        $response = $this->get('/volunteer-join');
+
+        $response->assertOk();
+
+        // 1. Hero Section
+        $response->assertSee('BE A VOLUNTEER');
+        $response->assertSee('Give Your Time');
+        $response->assertSee('Create Real Change');
+        $response->assertSee('Join as a Volunteer');
+        $response->assertSee('People');
+        $response->assertSee('Brighter');
+        $response->assertSee('Tomorrows');
+
+        // 2. 4 Value Proposition Pillars
+        $response->assertSee('Make an Impact');
+        $response->assertSee('Support real causes');
+        $response->assertSee('Build Communities');
+        $response->assertSee('Create lasting change');
+        $response->assertSee('Gain Experience');
+        $response->assertSee('Develop new skills');
+        $response->assertSee('Be Part of a Family');
+        $response->assertSee('Work with like-minded people');
+
+        // 3. Volunteering Opportunities
+        $response->assertSee('Volunteering Opportunities');
+        $response->assertSee('Education Support');
+        $response->assertSee('Health Camp Support');
+        $response->assertSee('Food Distribution');
+        $response->assertSee('Environment Initiatives');
+        $response->assertSee('Community Outreach');
+        $response->assertSee('Event Support');
+
+        // 4. Stats Strip
+        $response->assertSee('Active Volunteers');
+        $response->assertSee('Community Programs');
+        $response->assertSee('Cities Covered');
+        $response->assertSee('Lives Impacted');
+
+        // 5. Volunteer Stories
+        $response->assertSee('Volunteer Stories');
+        $response->assertSee('Real people. Real stories. Real impact.');
+        $response->assertSee('Sara Khan');
+        $response->assertSee('Amit Verma');
+        $response->assertSee('Riya Sharma');
+
+        // 6. Registration Form Card
+        $response->assertSee('Volunteer Registration');
+        $response->assertSee('Fill out the form below to join our volunteer community.');
+        $response->assertSee('Full Name');
+        $response->assertSee('Email Address');
+        $response->assertSee('Mobile Number');
+        $response->assertSee('Date of Birth');
+        $response->assertSee('Area of Interest');
+        $response->assertSee('Availability');
+        $response->assertSee('Tell Us About Yourself');
+        $response->assertSee('Submit Application');
+        $response->assertSee('Your information is safe and will only be used for volunteering purposes.');
+
+        // 7. Frequently Asked Questions
+        $response->assertSee('Frequently Asked Questions');
+        $response->assertSee('Who can become a volunteer?');
+        $response->assertSee('Do I need any prior experience?');
+        $response->assertSee('How much time do I need to commit?');
+        $response->assertSee('Will I receive a certificate?');
+    }
+
+    public function test_applicant_can_submit_via_new_form_fields(): void
+    {
+        $payload = [
+            'full_name' => 'Pooja Kashyap',
+            'email' => 'pooja.kashyap@example.com',
+            'phone' => '9871122334',
+            'date_of_birth' => '1998-05-14',
+            'area_of_interest' => 'Education Support',
+            'availability' => 'weekends',
+            'about_yourself' => 'I want to teach underprivileged kids during my free weekend hours.',
+        ];
+
+        $response = $this->post('/volunteer-join', $payload);
+
+        $response->assertRedirect(route('volunteers.success'));
+        $this->assertDatabaseHas('volunteers', [
+            'full_name' => 'Pooja Kashyap',
+            'email' => 'pooja.kashyap@example.com',
+            'phone' => '9871122334',
+            'area_of_interest' => 'Education Support',
+            'availability' => 'weekends',
+            'status' => 'pending',
+        ]);
+    }
 }

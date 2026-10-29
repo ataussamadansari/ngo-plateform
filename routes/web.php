@@ -37,9 +37,12 @@ Route::post('/events/{event:slug}/register', [EventController::class, 'register'
 
 // Phase 6: Public Volunteer Registration Portal
 Route::get('/volunteer-join', [VolunteerController::class, 'create'])->name('volunteers.create');
+Route::get('/volunteer', [VolunteerController::class, 'create'])->name('volunteers.index');
 Route::post('/volunteer-join', [VolunteerController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('volunteers.store');
+Route::post('/volunteer', [VolunteerController::class, 'store'])
+    ->middleware('throttle:5,1');
 Route::get('/volunteer-join/success', [VolunteerController::class, 'success'])->name('volunteers.success');
 
 // Phase 5: Public Campaigns Directory & High-Conversion Cause Story Portal
