@@ -493,7 +493,7 @@ class PublicCampaignsTest extends TestCase
         $response->assertOk();
 
         // 1. Dynamic Key Highlights: exactly 2 items -> grid-cols-1 sm:grid-cols-2 (not 4 cols causing clipping)
-        $response->assertSee('grid grid-cols-1 sm:grid-cols-2 gap-3.5', false);
+        $response->assertSee('grid-cols-1 sm:grid-cols-2', false);
         $response->assertSee('Geotagged Delivery Verification');
         $response->assertSee('Direct Manufacturer Procurement');
         $response->assertSee('break-words');

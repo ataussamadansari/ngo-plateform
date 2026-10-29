@@ -188,4 +188,59 @@ class PublicTransparencyTest extends TestCase
         $response->assertSee('Water Unit Distribution');
         $response->assertDontSee('School Books Distribution');
     }
+
+    public function test_transparency_screen_matches_new_ui_ux_specification(): void
+    {
+        $response = $this->get('/transparency');
+
+        $response->assertStatus(200);
+
+        // 1. Hero Title & Accents
+        $response->assertSee('Your Trust');
+        $response->assertSee('Creates Real Change');
+        $response->assertSee('Transparent');
+        $response->assertSee('Accountable');
+        $response->assertSee('Greater Impact');
+
+        // 2. The 4 Metric Cards
+        $response->assertSee('Total Donations Received');
+        $response->assertSee('Total Funds Utilized');
+        $response->assertSee('Active Projects');
+        $response->assertSee('Beneficiaries Impacted');
+
+        // 3. Sub-Navigation Filter Tabs & Year Selector
+        $response->assertSee('Overview');
+        $response->assertSee('Income');
+        $response->assertSee('Expenses');
+        $response->assertSee('Fund Utilization');
+        $response->assertSee('Campaign Wise');
+        $response->assertSee('Bills &amp; Receipts', false);
+        $response->assertSee('Impact Gallery');
+
+        // 4. Charts & Quick Facts
+        $response->assertSee('Income vs Expense Overview');
+        $response->assertSee('Fund Utilization');
+        $response->assertSee('Quick Facts');
+        $response->assertSee('100% Verified Donations');
+        $response->assertSee('Bills &amp; Receipts Uploaded', false);
+        $response->assertSee('Regular Updates');
+        $response->assertSee('Field Photos &amp; Reports', false);
+
+        // 5. Utilization Categories
+        $response->assertSee('Education');
+        $response->assertSee('Healthcare');
+        $response->assertSee('Clean Water');
+        $response->assertSee('Food &amp; Nutrition', false);
+        $response->assertSee('Environment');
+        $response->assertSee('Community');
+
+        // 6. Recent Fund Utilization & Proof Sections
+        $response->assertSee('Recent Fund Utilization');
+        $response->assertSee('Latest Bills &amp; Receipts', false);
+        $response->assertSee('Impact from the Ground');
+
+        // 7. Call To Action Banner
+        $response->assertSee('Be a Part of Transparent Change');
+        $response->assertSee('Donate Now');
+    }
 }
