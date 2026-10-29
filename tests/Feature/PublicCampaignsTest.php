@@ -377,11 +377,19 @@ class PublicCampaignsTest extends TestCase
         $response->assertSee('Gallery');
         $response->assertSee('Frequently Asked Questions');
         $response->assertSee('How are nutrition kits prepared?');
-        // Assert sub-navigation jump links
-        $response->assertSee('href="#overview"', false);
-        $response->assertSee('href="#impact"', false);
-        $response->assertSee('href="#gallery"', false);
-        $response->assertSee('href="#faqs"', false);
+        // Assert sub-navigation buttons without URL hash fragments
+        $response->assertSee("scrollToSection('overview')", false);
+        $response->assertSee("scrollToSection('impact')", false);
+        $response->assertSee("scrollToSection('gallery')", false);
+        $response->assertSee("scrollToSection('faqs')", false);
+        $response->assertDontSee('href="#overview"', false);
+        $response->assertDontSee('href="#impact"', false);
+        $response->assertDontSee('href="#gallery"', false);
+        $response->assertDontSee('href="#faqs"', false);
+
+        // Assert carousel slider controls for impact stories
+        $response->assertSee('activeSlide', false);
+        $response->assertSee('transition-transform duration-500', false);
     }
 
     public function test_campaign_detail_omits_empty_sections_and_fields(): void
@@ -425,8 +433,12 @@ class PublicCampaignsTest extends TestCase
         $response->assertDontSee('Location');
         $response->assertDontSee('Beneficiaries');
 
-        // Sub-navigation bar should only contain Overview and omit empty section anchors
-        $response->assertSee('href="#overview"', false);
+        // Sub-navigation bar should only contain Overview and omit empty section buttons
+        $response->assertSee("scrollToSection('overview')", false);
+        $response->assertDontSee("scrollToSection('impact')", false);
+        $response->assertDontSee("scrollToSection('gallery')", false);
+        $response->assertDontSee("scrollToSection('faqs')", false);
+        $response->assertDontSee('href="#overview"', false);
         $response->assertDontSee('href="#impact"', false);
         $response->assertDontSee('href="#gallery"', false);
         $response->assertDontSee('href="#faqs"', false);

@@ -176,52 +176,66 @@
 </section>
 
 {{-- ================= MAIN CONTENT + FLOATING DONATION CARD ================= --}}
-<div class="bg-[#f8fafc] py-6 sm:py-8 lg:py-10" x-data="{ videoModalOpen: false }">
+<div class="bg-[#f8fafc] py-6 sm:py-8 lg:py-10"
+     x-data="{
+        videoModalOpen: false,
+        scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+     }">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
 
             {{-- ================= LEFT COLUMN: NARRATIVE & CONTENT ================= --}}
             <div class="space-y-8 lg:col-span-8">
 
-                {{-- Smooth Sticky Sub-Navigation Bar (Anchor jump links without hiding sections) --}}
+                {{-- Smooth Sticky Sub-Navigation Bar (Scrolls without creating #hash in URL) --}}
                 <nav aria-label="Campaign sections"
-                     class="sticky top-20 z-30 -mx-4 sm:mx-0 flex items-center gap-2 overflow-x-auto bg-[#f8fafc]/95 backdrop-blur-md px-4 sm:px-0 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-slate-200/80 scroll-smooth">
-                    <a href="#overview"
-                       class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-[#16a34a] bg-[#16a34a] px-3.5 sm:px-4 text-xs font-bold text-white shadow-xs transition hover:bg-[#15803d]">
+                     class="sticky top-20 z-30 -mx-4 sm:mx-0 flex items-center gap-2 overflow-x-auto bg-[#f8fafc]/95 backdrop-blur-md px-4 sm:px-0 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-slate-200/80">
+                    <button type="button"
+                            @click="scrollToSection('overview')"
+                            class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-[#16a34a] bg-[#16a34a] px-3.5 sm:px-4 text-xs font-bold text-white shadow-xs transition hover:bg-[#15803d] cursor-pointer">
                         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span>Overview</span>
-                    </a>
+                    </button>
 
                     @if($hasFundDistributions || $hasImpactStories)
-                        <a href="#impact"
-                           class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
+                        <button type="button"
+                                @click="scrollToSection('impact')"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700 cursor-pointer">
                             <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
                             <span>Our Impact</span>
-                        </a>
+                        </button>
                     @endif
 
                     @if($hasRecentDonations)
-                        <a href="#donors"
-                           class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
+                        <button type="button"
+                                @click="scrollToSection('donors')"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700 cursor-pointer">
                             <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                             <span>Donors</span>
-                        </a>
+                        </button>
                     @endif
 
                     @if($hasGallery)
-                        <a href="#gallery"
-                           class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
+                        <button type="button"
+                                @click="scrollToSection('gallery')"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700 cursor-pointer">
                             <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             <span>Gallery</span>
-                        </a>
+                        </button>
                     @endif
 
                     @if($hasFaqs)
-                        <a href="#faqs"
-                           class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
+                        <button type="button"
+                                @click="scrollToSection('faqs')"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3.5 sm:px-4 text-xs font-bold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700 cursor-pointer">
                             <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             <span>FAQs</span>
-                        </a>
+                        </button>
                     @endif
                 </nav>
 
@@ -369,37 +383,106 @@
                     </section>
                 @endif
 
-                {{-- 3. Beneficiary Impact Stories Section (Rendered ONLY if impact_stories exist) --}}
+                {{-- 3. Beneficiary Impact Stories Section (Carousel Slider) --}}
                 @if($hasImpactStories)
-                    <section class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
-                        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mb-4">
-                            Impact Stories
-                        </h2>
+                    <section @if(!$hasFundDistributions) id="impact" @endif
+                             x-data="{
+                                activeSlide: 0,
+                                total: {{ $impactStories->count() }},
+                                touchStartX: 0,
+                                prev() {
+                                    this.activeSlide = (this.activeSlide === 0) ? this.total - 1 : this.activeSlide - 1;
+                                },
+                                next() {
+                                    this.activeSlide = (this.activeSlide === this.total - 1) ? 0 : this.activeSlide + 1;
+                                }
+                             }"
+                             class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-[0_4px_25px_rgba(15,23,42,0.04)] scroll-mt-28">
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            @foreach($impactStories as $story)
-                                <article class="flex gap-4 items-start rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 hover:bg-slate-50 transition">
-                                    @if(!empty($story['photo']))
-                                        <img src="{{ str_starts_with($story['photo'], 'http') ? $story['photo'] : asset('storage/' . $story['photo']) }}"
-                                             alt="{{ $story['name'] ?? 'Beneficiary' }}"
-                                             loading="lazy"
-                                             class="h-20 w-20 sm:h-22 sm:w-22 rounded-xl object-cover shrink-0 border border-slate-200 bg-slate-200 shadow-2xs">
+                        {{-- Carousel Header with Title, Status & Navigation Arrows --}}
+                        <div class="flex items-center justify-between mb-5">
+                            <div>
+                                <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                                    <span>Impact Stories</span>
+                                    @if($impactStories->count() > 1)
+                                        <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80">
+                                            <span x-text="activeSlide + 1"></span> of {{ $impactStories->count() }}
+                                        </span>
                                     @endif
-                                    <div class="min-w-0">
-                                        @if(!empty($story['quote']))
-                                            <p class="text-xs sm:text-[13px] text-slate-600 leading-relaxed italic">
-                                                “{{ $story['quote'] }}”
-                                            </p>
-                                        @endif
-                                        @if(!empty($story['name']))
-                                            <p class="mt-2 text-xs font-extrabold text-slate-900">
-                                                — {{ $story['name'] }}
-                                            </p>
-                                        @endif
-                                    </div>
-                                </article>
-                            @endforeach
+                                </h2>
+                                <p class="text-xs text-slate-500 mt-0.5">Real voices and journeys transformed by your contribution</p>
+                            </div>
+
+                            @if($impactStories->count() > 1)
+                                {{-- Arrow Navigation Buttons --}}
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <button type="button"
+                                            @click="prev()"
+                                            aria-label="Previous story"
+                                            class="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-slate-700 shadow-2xs hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 active:scale-95 transition-all duration-200 cursor-pointer">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                                    </button>
+                                    <button type="button"
+                                            @click="next()"
+                                            aria-label="Next story"
+                                            class="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-slate-700 shadow-2xs hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 active:scale-95 transition-all duration-200 cursor-pointer">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                    </button>
+                                </div>
+                            @endif
                         </div>
+
+                        {{-- Carousel Slider Viewport --}}
+                        <div class="relative overflow-hidden rounded-2xl"
+                             @touchstart="touchStartX = $event.touches[0].clientX"
+                             @touchend="if (touchStartX - $event.changedTouches[0].clientX > 40) next(); if ($event.changedTouches[0].clientX - touchStartX > 40) prev();">
+
+                            {{-- Slider Track --}}
+                            <div class="flex transition-transform duration-500 ease-out"
+                                 :style="'transform: translateX(-' + (activeSlide * 100) + '%)'">
+                                @foreach($impactStories as $index => $story)
+                                    <div class="w-full shrink-0">
+                                        <article class="flex flex-col sm:flex-row gap-4 sm:gap-5 items-start rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5 sm:p-6 hover:bg-slate-50 hover:border-emerald-300 transition-all duration-300 shadow-2xs">
+                                            @if(!empty($story['photo']))
+                                                <img src="{{ str_starts_with($story['photo'], 'http') ? $story['photo'] : asset('storage/' . $story['photo']) }}"
+                                                     alt="{{ $story['name'] ?? 'Beneficiary' }}"
+                                                     loading="lazy"
+                                                     class="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl object-cover shrink-0 border border-slate-200 bg-slate-200 shadow-sm">
+                                            @endif
+                                            <div class="min-w-0 flex-1">
+                                                @if(!empty($story['quote']))
+                                                    <p class="text-xs sm:text-[14px] text-slate-700 leading-relaxed italic">
+                                                        “{{ $story['quote'] }}”
+                                                    </p>
+                                                @endif
+                                                @if(!empty($story['name']))
+                                                    <div class="mt-3 flex items-center gap-2">
+                                                        <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                                                        <p class="text-xs sm:text-sm font-extrabold text-slate-900">
+                                                            {{ $story['name'] }}
+                                                        </p>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </article>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Dots Pagination Indicator --}}
+                        @if($impactStories->count() > 1)
+                            <div class="mt-4 flex items-center justify-center gap-1.5">
+                                @foreach($impactStories as $index => $story)
+                                    <button type="button"
+                                            @click="activeSlide = {{ $index }}"
+                                            :class="activeSlide === {{ $index }} ? 'w-6 bg-[#16a34a]' : 'w-2 bg-slate-300 hover:bg-slate-400'"
+                                            class="h-2 rounded-full transition-all duration-300 cursor-pointer"
+                                            aria-label="Go to story {{ $index + 1 }}">
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
                     </section>
                 @endif
 
