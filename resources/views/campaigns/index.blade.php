@@ -4,7 +4,9 @@
 
 @section('content')
     @php
-        $heroImage = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=2200&q=90';
+        $heroImage = function_exists('setting') && setting('campaigns_banner_image')
+            ? asset('storage/' . setting('campaigns_banner_image'))
+            : 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=2200&q=90';
         $currentCategory = request('category');
         $currentSort = request('sort', 'latest');
     @endphp

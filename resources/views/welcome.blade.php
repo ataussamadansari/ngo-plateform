@@ -52,7 +52,15 @@
 <section class="relative min-h-[500px] lg:min-h-[540px] flex items-center overflow-hidden bg-[#0a2617]">
     <!-- Background Image + Warm Dark Left-to-Right Gradient -->
     <div class="absolute inset-0 z-0">
-        <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1920&q=85"
+        @php
+            $heroBanner = function_exists('setting') && setting('hero_banner_image')
+                ? asset('storage/' . setting('hero_banner_image'))
+                : 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1920&q=85';
+            $heroScript = function_exists('setting') ? setting('hero_script_tag', 'Together') : 'Together';
+            $heroCta = function_exists('setting') ? setting('hero_cta_text', 'Donate Now') : 'Donate Now';
+            $videoTitle = function_exists('setting') ? setting('home_video_title', 'Watch Our Story') : 'Watch Our Story';
+        @endphp
+        <img src="{{ $heroBanner }}"
              alt="Smiling children"
              class="w-full h-full object-cover object-center">
         <div class="absolute inset-0 bg-gradient-to-r from-[#071f12]/95 via-[#0a2617]/75 to-black/25"></div>
@@ -64,7 +72,7 @@
             <!-- Left Column: Handwritten "Together" + Headline + CTAs -->
             <div class="lg:col-span-7 space-y-4" data-reveal>
                 <span class="block font-script text-4xl sm:text-5xl text-[#86efac] leading-none -mb-2">
-                    Together
+                    {{ $heroScript }}
                 </span>
                 <h1 class="text-3xl sm:text-5xl lg:text-[54px] font-extrabold text-white tracking-tight leading-[1.12]">
                     {{ function_exists('setting') ? setting('hero_title', 'Direct Impact, Zero Deductions, 100% Transparency') : 'Direct Impact, Zero Deductions, 100% Transparency' }}
@@ -79,7 +87,7 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
-                        <span>Donate Now</span>
+                        <span>{{ $heroCta }}</span>
                     </a>
 
                     <button @click="videoModalOpen = true"
@@ -88,7 +96,7 @@
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
                         </svg>
-                        <span>Watch Our Story</span>
+                        <span>{{ $videoTitle }}</span>
                     </button>
                 </div>
             </div>

@@ -85,8 +85,8 @@
 <section class="relative isolate overflow-hidden bg-[#041f13] text-white">
     {{-- Background Image with Forest Depth Gradient Overlay --}}
     <div class="absolute inset-0 -z-10 overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1600&auto=format&fit=crop"
-             alt="Transparency at Hope Foundation"
+        <img src="{{ function_exists('setting') && setting('transparency_banner_image') ? asset('storage/' . setting('transparency_banner_image')) : 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1600&auto=format&fit=crop' }}"
+             alt="Transparency at {{ function_exists('setting') ? setting('ngo_name', 'Hope Foundation') : 'Hope Foundation' }}"
              class="h-full w-full object-cover object-[center_35%] opacity-40 mix-blend-luminosity brightness-110 contrast-105 sm:opacity-50">
         <div class="absolute inset-0 bg-gradient-to-r from-[#031b10] via-[#052819]/90 to-[#041f13]/40"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-[#031b10] via-transparent to-transparent opacity-80"></div>

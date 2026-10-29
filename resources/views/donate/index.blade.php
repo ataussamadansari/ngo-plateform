@@ -39,7 +39,7 @@
 <section class="relative overflow-hidden bg-[#0a2617]">
     <div class="absolute inset-0 z-0">
         <img
-            src="https://images.unsplash.com/photo-1542810634-71277d95dcbb?auto=format&fit=crop&w=1920&q=85"
+            src="{{ function_exists('setting') && setting('donate_banner_image') ? asset('storage/' . setting('donate_banner_image')) : 'https://images.unsplash.com/photo-1542810634-71277d95dcbb?auto=format&fit=crop&w=1920&q=85' }}"
             alt="Make a Donation - {{ $ngoName }}"
             class="w-full h-full object-cover object-center"
         >

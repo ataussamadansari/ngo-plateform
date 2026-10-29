@@ -71,7 +71,7 @@
         {{-- Background Image & Multi-Stop Dark Forest Overlay --}}
         <div class="absolute inset-0 z-0">
             <img
-                src="https://images.unsplash.com/photo-1542810634-71277d95dcbb?auto=format&fit=crop&w=1920&q=85"
+                src="{{ function_exists('setting') && setting('contact_banner_image') ? asset('storage/' . setting('contact_banner_image')) : 'https://images.unsplash.com/photo-1542810634-71277d95dcbb?auto=format&fit=crop&w=1920&q=85' }}"
                 alt="Contact {{ $ngoName }}"
                 class="w-full h-full object-cover object-center scale-105 transition-transform duration-1000"
             >

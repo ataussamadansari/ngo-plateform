@@ -7,6 +7,10 @@
 
     <title>@yield('title', (function_exists('setting') ? setting('ngo_name', 'Hope Foundation') : 'Hope Foundation') . ' — ' . (function_exists('setting') ? setting('ngo_tagline', 'For a Better Tomorrow') : 'For a Better Tomorrow'))</title>
 
+    @if(function_exists('setting') && setting('favicon_path'))
+        <link rel="icon" href="{{ asset('storage/' . setting('favicon_path')) }}">
+    @endif
+
     <!-- Google Fonts: Plus Jakarta Sans (UI/Headings) + Caveat (Handwritten Script Accents) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,11 +25,12 @@
         :root {
             --color-primary: {{ function_exists('setting') ? setting('primary_color', '#16a34a') : '#16a34a' }};
             --color-secondary: {{ function_exists('setting') ? setting('secondary_color', '#0f172a') : '#0f172a' }};
-            --color-primary-dark: #15803d;
-            --color-forest: #0a2617;
-            --color-footer: #071f12;
-            --color-mint-bg: #eef8f1;
-            --color-mint-border: #d8f3df;
+            --color-primary-dark: {{ function_exists('setting') ? setting('primary_dark_color', '#15803d') : '#15803d' }};
+            --color-forest: {{ function_exists('setting') ? setting('forest_bg_color', '#041f13') : '#041f13' }};
+            --color-footer: {{ function_exists('setting') ? setting('footer_bg_color', '#071f12') : '#071f12' }};
+            --color-mint-bg: {{ function_exists('setting') ? setting('mint_bg_color', '#eef8f1') : '#eef8f1' }};
+            --color-mint-border: {{ function_exists('setting') ? setting('mint_border_color', '#d8f3df') : '#d8f3df' }};
+            --color-accent: {{ function_exists('setting') ? setting('accent_color', '#4ade80') : '#4ade80' }};
         }
 
         body {

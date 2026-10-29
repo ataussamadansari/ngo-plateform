@@ -7,7 +7,7 @@
 <section class="relative isolate overflow-hidden bg-[#041f13] text-white">
     <!-- Background Image with Depth Gradient Overlay -->
     <div class="absolute inset-0 -z-10 overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1920&q=85"
+        <img src="{{ function_exists('setting') && setting('status_banner_image') ? asset('storage/' . setting('status_banner_image')) : 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1920&q=85' }}"
              alt="Children smiling together"
              class="h-full w-full object-cover object-[center_35%] opacity-45 mix-blend-luminosity brightness-110 contrast-105 sm:opacity-50">
         <!-- Dual Layer Gradient: solid dark green from left, fading smoothly across children -->

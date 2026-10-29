@@ -34,7 +34,7 @@
     ];
 
     // 6 Journey Milestones from Mockup
-    $milestones = [
+    $defaultMilestones = [
         ['year' => '2018', 'line1' => 'Foundation', 'line2' => 'Started'],
         ['year' => '2019', 'line1' => 'First Education', 'line2' => 'Program'],
         ['year' => '2020', 'line1' => 'Healthcare', 'line2' => 'Camps Initiated'],
@@ -42,14 +42,38 @@
         ['year' => '2023', 'line1' => 'Expanded to', 'line2' => '5+ States'],
         ['year' => '2025', 'line1' => '12,500+', 'line2' => 'Lives Impacted'],
     ];
+
+    $milestones = $defaultMilestones;
+    if (function_exists('setting') && setting('about_milestones')) {
+        $stored = json_decode(setting('about_milestones'), true);
+        if (is_array($stored) && !empty($stored)) {
+            $milestones = $stored;
+        }
+    }
+
+    $aboutBanner = function_exists('setting') && setting('about_banner_image')
+        ? asset('storage/' . setting('about_banner_image'))
+        : 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1920&q=85';
+    $aboutHeroTitle = function_exists('setting') ? setting('about_hero_title', 'About Us') : 'About Us';
+    $aboutHeroSubtitle = function_exists('setting') ? setting('about_hero_subtitle', 'People | Purpose | Positive Change') : 'People | Purpose | Positive Change';
+    $aboutHeroScript = function_exists('setting') ? setting('about_hero_script', 'Real People, Real Change 💚') : 'Real People, Real Change 💚';
+    $storyBadge = function_exists('setting') ? setting('about_story_badge', 'OUR STORY • The Grassroots Story') : 'OUR STORY • The Grassroots Story';
+    $storyTitle = function_exists('setting') ? setting('about_story_title', 'The Grassroots Story: A Small Step Towards a Brighter Tomorrow') : 'The Grassroots Story: A Small Step Towards a Brighter Tomorrow';
+    $storyContent = function_exists('setting') ? setting('about_story_content') : null;
+    $storyImage = function_exists('setting') && setting('about_story_image')
+        ? asset('storage/' . setting('about_story_image'))
+        : 'https://images.unsplash.com/photo-1542810634-71277d95dcbb?auto=format&fit=crop&w=1000&q=85';
+    $mission = function_exists('setting') ? setting('about_mission', 'To empower underprivileged communities through education, healthcare, clean environment and sustainable development.') : 'To empower underprivileged communities through education, healthcare, clean environment and sustainable development.';
+    $vision = function_exists('setting') ? setting('about_vision', 'A healthier, educated and more equal society where every individual can reach their full potential.') : 'A healthier, educated and more equal society where every individual can reach their full potential.';
+    $values = function_exists('setting') ? setting('about_values', 'Integrity, total transparency, direct empathy and unwavering community commitment.') : 'Integrity, total transparency, direct empathy and unwavering community commitment.';
 @endphp
 
 <!-- ================= 1. TOP HERO BANNER ================= -->
 <section class="relative min-h-[240px] sm:min-h-[280px] lg:min-h-[310px] flex items-center overflow-hidden bg-[#0a2617]">
     <!-- Background Photo + Warm Dark-Green Gradient Overlay -->
     <div class="absolute inset-0 z-0">
-        <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1920&q=85"
-             alt="Smiling children"
+        <img src="{{ $aboutBanner }}"
+             alt="{{ $ngoName }} About Us"
              class="w-full h-full object-cover object-center">
         <div class="absolute inset-0 bg-gradient-to-r from-[#071f12]/90 via-[#0a2617]/65 to-[#071f12]/70"></div>
     </div>
@@ -59,10 +83,10 @@
             <!-- Left: Title, Subtitle & Breadcrumb -->
             <div class="space-y-2" data-reveal>
                 <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-                    About Us
+                    {{ $aboutHeroTitle }}
                 </h1>
                 <p class="text-sm sm:text-lg font-medium text-white/90 tracking-wide">
-                    People &nbsp;|&nbsp; Purpose &nbsp;|&nbsp; Positive Change
+                    {{ $aboutHeroSubtitle }}
                 </p>
                 <nav class="flex items-center gap-2 text-xs font-medium text-white/75 pt-2">
                     <a href="{{ $homeUrl }}" class="hover:text-[#86efac] transition-colors">Home</a>
@@ -71,11 +95,10 @@
                 </nav>
             </div>
 
-            <!-- Right: Handwritten "Real People, Real Change" Script Overlay -->
+            <!-- Right: Handwritten Script Overlay -->
             <div class="hidden sm:block pr-4 -rotate-6 select-none" data-reveal data-reveal-delay="150">
                 <p class="font-script text-4xl lg:text-5xl text-white font-bold leading-none drop-shadow-md">
-                    Real People <span class="text-[#4ade80]">💚</span><br>
-                    <span class="pl-4">Real Change</span>
+                    {{ $aboutHeroScript }}
                 </p>
             </div>
         </div>
@@ -90,18 +113,22 @@
             <!-- Left Column (4 Cols): Our Story Narrative -->
             <div class="lg:col-span-4 space-y-4" data-reveal>
                 <span class="block text-xs font-extrabold uppercase tracking-[0.18em] text-[#16a34a]">
-                    OUR STORY &bull; The Grassroots Story
+                    {{ $storyBadge }}
                 </span>
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                    The Grassroots Story: A Small Step Towards a Brighter Tomorrow
+                    {{ $storyTitle }}
                 </h2>
                 <div class="space-y-3.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    <p>
-                        {{ $ngoName }} is a non-profit organization working towards education, health, environment and community development. We believe in a world where every individual gets equal opportunities to live a healthy, educated and dignified life.
-                    </p>
-                    <p>
-                        What started as a small initiative has now grown into a movement of thousands of supporters, volunteers and changemakers. Together, we are creating real and lasting impact in communities across India.
-                    </p>
+                    @if($storyContent)
+                        {!! nl2br(e($storyContent)) !!}
+                    @else
+                        <p>
+                            {{ $ngoName }} is a non-profit organization working towards education, health, environment and community development. We believe in a world where every individual gets equal opportunities to live a healthy, educated and dignified life.
+                        </p>
+                        <p>
+                            What started as a small initiative has now grown into a movement of thousands of supporters, volunteers and changemakers. Together, we are creating real and lasting impact in communities across India.
+                        </p>
+                    @endif
                 </div>
                 <div class="pt-2">
                     <a href="#our-journey"
@@ -117,8 +144,8 @@
             <!-- Center Column (4 Cols): Smiling Children Photo + White Brush Script Badge -->
             <div class="lg:col-span-4 relative" data-reveal data-reveal-delay="100">
                 <div class="relative rounded-3xl overflow-hidden shadow-lg aspect-4/3 sm:aspect-square lg:aspect-4/3 bg-slate-100">
-                    <img src="https://images.unsplash.com/photo-1542810634-71277d95dcbb?auto=format&fit=crop&w=1000&q=85"
-                         alt="Three smiling children"
+                    <img src="{{ $storyImage }}"
+                         alt="{{ $ngoName }} Story"
                          class="w-full h-full object-cover">
 
                     <!-- Bottom-Right White Brush-Stroke Quote Badge -->
@@ -138,7 +165,6 @@
                 <!-- Our Mission (Soft Mint Card) -->
                 <div class="bg-[#f0fdf4] rounded-2xl p-4 sm:p-5 border border-[#dcfce7] flex items-start gap-4">
                     <div class="w-11 h-11 rounded-full bg-white text-[#16a34a] shadow-2xs flex items-center justify-center shrink-0">
-                        <!-- Target Bullseye Icon -->
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" d="M12 3v2m0 14v2m9-9h-2M5 12H3"/>
                         </svg>
@@ -146,7 +172,7 @@
                     <div>
                         <h3 class="text-sm sm:text-base font-extrabold text-slate-900">Our Mission</h3>
                         <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                            To empower underprivileged communities through education, healthcare, clean environment and sustainable development.
+                            {{ $mission }}
                         </p>
                     </div>
                 </div>
@@ -154,7 +180,6 @@
                 <!-- Our Vision (Soft Sky Blue Card) -->
                 <div class="bg-[#eff6ff] rounded-2xl p-4 sm:p-5 border border-blue-100 flex items-start gap-4">
                     <div class="w-11 h-11 rounded-full bg-white text-blue-600 shadow-2xs flex items-center justify-center shrink-0">
-                        <!-- Eye Icon -->
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                             <circle cx="12" cy="12" r="3"/>
@@ -163,7 +188,7 @@
                     <div>
                         <h3 class="text-sm sm:text-base font-extrabold text-slate-900">Our Vision</h3>
                         <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                            A healthier, educated and more equal society where every individual can reach their full potential.
+                            {{ $vision }}
                         </p>
                     </div>
                 </div>
@@ -171,13 +196,17 @@
                 <!-- Our Values (Soft Warm Cream/Amber Card) -->
                 <div class="bg-[#fffbeb] rounded-2xl p-4 sm:p-5 border border-amber-100 flex items-start gap-4">
                     <div class="w-11 h-11 rounded-full bg-white text-amber-500 shadow-2xs flex items-center justify-center shrink-0">
-                        <!-- Heart in Hand Icon -->
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
                     </div>
                     <div>
                         <h3 class="text-sm sm:text-base font-extrabold text-slate-900">Our Values</h3>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            {{ $values }}
+                        </p>
+                    </div>
+                </div>
                         <p class="text-xs text-slate-600 mt-1 leading-relaxed">
                             Integrity, Transparency, Compassion, Impact and Community First.
                         </p>

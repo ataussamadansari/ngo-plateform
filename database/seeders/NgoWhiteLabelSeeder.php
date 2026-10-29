@@ -94,8 +94,38 @@ class NgoWhiteLabelSeeder extends Seeder
                 'group' => 'branding',
             ],
             [
+                'key' => 'primary_dark_color',
+                'value' => '#15803d',
+                'group' => 'branding',
+            ],
+            [
+                'key' => 'forest_bg_color',
+                'value' => '#041f13',
+                'group' => 'branding',
+            ],
+            [
+                'key' => 'footer_bg_color',
+                'value' => '#071f12',
+                'group' => 'branding',
+            ],
+            [
+                'key' => 'mint_bg_color',
+                'value' => '#eef8f1',
+                'group' => 'branding',
+            ],
+            [
+                'key' => 'mint_border_color',
+                'value' => '#d8f3df',
+                'group' => 'branding',
+            ],
+            [
                 'key' => 'secondary_color',
                 'value' => '#0f172a',
+                'group' => 'branding',
+            ],
+            [
+                'key' => 'accent_color',
+                'value' => '#4ade80',
                 'group' => 'branding',
             ],
             [
@@ -190,6 +220,11 @@ class NgoWhiteLabelSeeder extends Seeder
 
             // Group: hero_cms
             [
+                'key' => 'hero_script_tag',
+                'value' => 'Together',
+                'group' => 'hero_cms',
+            ],
+            [
                 'key' => 'hero_title',
                 'value' => 'Direct Impact, Zero Deductions, 100% Transparency',
                 'group' => 'hero_cms',
@@ -203,6 +238,48 @@ class NgoWhiteLabelSeeder extends Seeder
                 'key' => 'hero_cta_text',
                 'value' => 'Donate Now',
                 'group' => 'hero_cms',
+            ],
+
+            // Group: about_cms
+            [
+                'key' => 'about_hero_title',
+                'value' => 'About Us',
+                'group' => 'about_cms',
+            ],
+            [
+                'key' => 'about_hero_subtitle',
+                'value' => 'People | Purpose | Positive Change',
+                'group' => 'about_cms',
+            ],
+            [
+                'key' => 'about_hero_script',
+                'value' => 'Real People, Real Change 💚',
+                'group' => 'about_cms',
+            ],
+            [
+                'key' => 'about_story_badge',
+                'value' => 'OUR STORY • The Grassroots Story',
+                'group' => 'about_cms',
+            ],
+            [
+                'key' => 'about_story_title',
+                'value' => 'The Grassroots Story: A Small Step Towards a Brighter Tomorrow',
+                'group' => 'about_cms',
+            ],
+            [
+                'key' => 'about_mission',
+                'value' => 'To empower underprivileged communities through education, healthcare, clean environment and sustainable development.',
+                'group' => 'about_cms',
+            ],
+            [
+                'key' => 'about_vision',
+                'value' => 'A healthier, educated and more equal society where every individual can reach their full potential.',
+                'group' => 'about_cms',
+            ],
+            [
+                'key' => 'about_values',
+                'value' => 'Integrity, total transparency, direct empathy and unwavering community commitment.',
+                'group' => 'about_cms',
             ],
 
             // Group: social
