@@ -1,67 +1,62 @@
-# Requirements: Milestone v1.2 — Public Frontend UI/UX Polish & Visual Parity
+# Requirements: Milestone v1.1 — Native FilamentPHP Back-Office Migration & White-Label Administration
 
-Milestone: `v1.2`
-Target: Visual & UX Parity with Reference Mockups (`docs/ui/`) across all Public Laravel Blade Pages
-Status: **Active**
-
----
-
-## 1. Global Shell & Navigation Foundation
-
-- [x] **PUB-01**: Global Header, Navigation Bar & Institutional Footer:
-  - Sticky/elevated navbar with NGO brand identity, logo, navigation links, and primary "Donate" CTA.
-  - Mobile hamburger drawer with slide-out navigation and social links.
-  - Institutional footer with NGO registration details (80G, 12A, PAN, Darpan), quick links, office address, and social icons.
+Milestone: `v1.1`
+Target: Native FilamentPHP 5 Panel Integration, Full White-Label Admin UI, and Custom Admin Deprecation
+Status: **Completed (2026-10-26)**
 
 ---
 
-## 2. Institutional Brand & Outreach Pages
+## 1. Filament Panel Foundation & Access Control
 
-- [x] **PUB-02**: Flagship Homepage (`Hope Foundation_ Together for Tomorrow.png`):
-  - High-impact hero section with dynamic tagline, background overlay, and dual CTAs.
-  - Live metric impact counter cards (Total Raised, Distributed, Volunteers, Campaigns).
-  - Urgent cause spotlight cards with live progress bars.
-  - Core mission pillars and community photo grid.
-  - Upcoming events and volunteer call-to-action banner.
-- [x] **PUB-03**: About Us Institutional Page (`Hope Foundation About Us Mockup.png`):
-  - Organizational story, vision, and core values.
-  - Governance & leadership team profiles.
-  - Official tax exemptions and certifications badge showcase (80G, 12A, NGO Darpan).
-  - Ground impact statistics and milestones timeline.
-- [x] **PUB-04**: Contact Us Portal (`Hope Foundation Contact Us Mockup.png`):
-  - Clean two-column layout with office coordinates, helpline phone, email, and visiting hours.
-  - Reactive inquiry form with client-side feedback and rate-limited submission.
-- [x] **PUB-05**: Legal Compliance & Privacy Showcase (`Hope Foundation Privacy Policy Showcase.png`):
-  - Standardized legal layout for Privacy Policy, Terms of Service, and 80G Tax Exemption terms.
-  - Formatted typography, clear section anchor navigation, and data security guarantees.
+- [x] **FIL-01**: Native FilamentPHP 5 Panel Provider (`AdminPanelProvider`) mounted at `/admin` with custom branding, login, password reset, and `App\Models\User` implementing `FilamentUser` with `canAccessPanel()` gating (`super_admin` and `manager` roles allowed, inactive accounts denied).
 
 ---
 
-## 3. Campaigns & Community Engagement
+## 2. White-Label & Payment Methods Administration (New Admin UIs)
 
-- [ ] **PUB-06**: Campaigns Directory & Cause Story Portal (`Hope Foundation Campaigns Page.png`, `Hope Foundation Campaign Page.png`):
-  - Directory: Cause category filter tabs, search bar, campaign cards with thumbnail, progress percentage, goal vs raised badges, and urgent flags.
-  - Detail Page: Immersive hero, full rich story layout, target progress bar, organizer credentials, recent verified donors wall, and sticky donate CTA.
-- [ ] **PUB-07**: Events & RSVP Registration Portal (`Hope Foundation Events Page Mockup.png`):
-  - Events listing with upcoming/past status filters, date badges, venue, and map link.
-  - Interactive attendee RSVP registration modal/form with input validation.
-- [ ] **PUB-08**: Volunteer Onboarding Portal (`Hope Foundation Volunteer Page Mockup.png`):
-  - Engaging volunteer pitch with impact testimonials and perks.
-  - Multi-section application form: personal details, skills tags, availability selection, and ID proof upload dropzone.
+- [x] **FIL-02**: Native Filament `SiteSetting` Management (Settings Page or Resource) providing full UI for:
+  - NGO details: Legal name, tagline, email, phone, address.
+  - Theming: Primary color picker (`--color-primary`), Secondary color picker (`--color-secondary`), logo upload, favicon upload, digital stamp/signature upload.
+  - Compliance: PAN, 80G registration number & approval date, 12A registration number, NGO Darpan ID.
+  - Automatic cache clearing on save to ensure `setting()` reflects changes instantly across public pages.
+- [x] **FIL-03**: Native Filament `PaymentMethodResource` providing full CRUD for:
+  - Payment method name, type (`upi_qr`, `bank_transfer`).
+  - Dynamic UPI QR code image upload, UPI ID.
+  - Bank account name, account number, IFSC code, branch.
+  - Active toggle and display priority order.
 
 ---
 
-## 4. Financial Transparency & Frictionless Donations
+## 3. Core Operational Filament Resources
 
-- [ ] **PUB-09**: Manual Donation Experience (`Hope Foundation Donation UI Mockup.png`):
-  - Step-based or intuitive segmented form: cause selection, custom amount pills (₹500, ₹1000, ₹2500, etc.), 80G PAN details.
-  - Dynamic payment mode switcher: active UPI QR code with scan prompt vs bank account transfer details.
-  - UTR / Transaction ID submission with screenshot file upload preview.
-- [ ] **PUB-10**: Donation Status & Receipt Lookup Portal (`Hope Foundation Donation Status Portal.png`):
-  - Quick lookup by UTR number or donor phone number.
-  - Verification status tracker with stage indicators (Pending Reconciliation -> Verified -> 80G Receipt Issued).
-  - Direct 1-click PDF receipt download button for verified donations.
-- [ ] **PUB-11**: Public Transparency Ledger (`Hope Foundation Transparency Dashboard.png`):
-  - Live treasury overview: Total Raised, Ground Distributed, and Net Balance.
-  - Searchable, filterable fund expenditure ledger with date, beneficiary name, amount, and linked cause.
-  - Modal viewer for uploaded vendor invoices/bills and ground impact photos.
+- [x] **FIL-04**: Native Filament `DonationResource`:
+  - Data table with status badges (pending, verified, rejected), payment mode, campaign, date, and UTR search.
+  - Side-by-side proof check modal displaying donor UTR number directly alongside uploaded payment screenshot.
+  - Atomic verification action running in `DB::transaction()` to set status to `verified`, issue sequential receipt number (`KSF-YYYY-XXXX`), and increment campaign `raised_amount`.
+  - Rejection action modal with mandatory rejection remarks.
+  - Direct 80G PDF receipt stream/download action for verified donations.
+  - Direct manual cash donation creation by administrators.
+- [x] **FIL-05**: Native Filament `FundDistributionResource`:
+  - Ledger data table with beneficiary name, amount, date, and linked campaign.
+  - Creation/edit form with invoice/bill upload, impact photos upload, beneficiary notes, and atomic campaign `distributed_amount` increment inside `DB::transaction()`.
+- [x] **FIL-06**: Native Filament `CampaignResource` & `CauseCategoryResource`:
+  - Category CRUD with automatic slug generation.
+  - Campaign CRUD with goal amount, cover thumbnail upload, photo gallery upload, rich story editor, status toggle (draft, active, completed, paused), and live raised/distributed indicators.
+- [x] **FIL-07**: Native Filament `VolunteerResource`:
+  - Screening queue table with filters for status (pending, approved, rejected), skills, and availability.
+  - Approval action issuing sequential volunteer ID code (`VOL-YYYY-XXXX`).
+  - Rejection action with remarks.
+  - Downloadable/viewable applicant government ID proof.
+- [x] **FIL-08**: Native Filament `EventResource`:
+  - Event CRUD with date, time, venue, Google Maps link, and banner image.
+  - Event registrations RelationManager displaying attendee details and 1-click attendance check-in toggle (`attended`/`absent`).
+
+---
+
+## 4. Executive Dashboard & Legacy Admin Deprecation
+
+- [x] **FIL-09**: Native Filament Dashboard Widgets:
+  - `FinancialOverviewWidget`: Live stat cards for Total Verified Raised, Total Distributed on Ground, Net Available Treasury, and Pending Verifications count.
+  - `PendingDonationsQuickActionWidget`: Table widget of pending donations directly on dashboard with 1-click verify action.
+  - Responsive charts: `MonthlyDonationTrendWidget` (interactive line chart), `DonationsByModeWidget` (doughnut chart), `TopCampaignsRaisedWidget` (bar chart), and `FundsUtilizationSplitWidget` (pie chart).
+- [x] **FIL-10**: Full deprecation and removal of legacy `/admin` custom Blade views and controllers, route release from `web.php`, and zero regressions verified across test suite.

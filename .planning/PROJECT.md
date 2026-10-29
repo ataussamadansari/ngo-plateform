@@ -19,7 +19,7 @@ Frictionless, fee-free manual donation verification paired with 100% transparent
 
 - **Milestone v1.0 (Core MVP)**: Shipped 2026-10-25. 8 phases, 16 plans, 86 passing feature tests. All public donor, volunteer, event, and transparency interfaces operational.
 - **Milestone v1.1 (FilamentPHP Back-Office)**: Shipped 2026-10-26. 4 phases, 8 plans, 125 passing tests. Native Filament 5 admin, white-label settings, and executive dashboard charts.
-- **Active Milestone v1.2**: Public Frontend UI/UX Polish & Visual Parity with Reference Designs (`docs/ui/`).
+- **Status**: Milestone v1.1 Complete & Shipped. 135 passing tests. Ready for next milestone.
 
 ## Requirements
 
@@ -40,20 +40,6 @@ Frictionless, fee-free manual donation verification paired with 100% transparent
 - ✓ Native Filament `SiteSetting` Management and `PaymentMethodResource` (`FIL-02`, `FIL-03`) — Phase 10
 - ✓ Native Filament Resources for Donations, Distributions, Campaigns, Volunteers, and Events (`FIL-04` through `FIL-08`) — Phase 11
 - ✓ Native Filament Executive Dashboard Widgets with responsive Chart.js line, doughnut, bar, and pie charts (`FIL-09`, `FIL-10`) — Phase 12
-
-### Active (Milestone v1.2: Public Frontend UI/UX Polish)
-
-- [ ] **PUB-01**: Global Header, Navigation Bar, Mobile Drawer & Institutional Footer aligned with `Hope Foundation_ Together for Tomorrow.png`.
-- [ ] **PUB-02**: Flagship Homepage with high-impact hero, live metric counters, urgent causes, and mission pillars.
-- [ ] **PUB-03**: Institutional About Us Page matching `Hope Foundation About Us Mockup.png` with story, leadership profiles, and tax credentials.
-- [ ] **PUB-04**: Contact Us Portal matching `Hope Foundation Contact Us Mockup.png` with direct coordinates, inquiry form, and interactive map.
-- [ ] **PUB-05**: Legal Compliance & Privacy Showcase matching `Hope Foundation Privacy Policy Showcase.png`.
-- [ ] **PUB-06**: Campaigns Directory & Cause Story Portal matching `Hope Foundation Campaigns Page.png` and `Campaign Page.png`.
-- [ ] **PUB-07**: Events & RSVP Registration Portal matching `Hope Foundation Events Page Mockup.png`.
-- [ ] **PUB-08**: Volunteer Onboarding Portal matching `Hope Foundation Volunteer Page Mockup.png`.
-- [ ] **PUB-09**: Manual Donation Experience matching `Hope Foundation Donation UI Mockup.png` with dynamic UPI QR / Bank toggle.
-- [ ] **PUB-10**: Public Donation Status & Instant 80G Receipt Download Portal matching `Hope Foundation Donation Status Portal.png`.
-- [ ] **PUB-11**: Public Transparency Ledger & Proof Viewer matching `Hope Foundation Transparency Dashboard.png`.
 
 ### Out of Scope
 

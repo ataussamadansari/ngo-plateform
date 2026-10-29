@@ -25,11 +25,23 @@ class ContactInquiryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Inquiries';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Communication';
+    protected static UnitEnum|string|null $navigationGroup = 'Content & CMS';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'subject';
+
+    public static function getNavigationBadge(): ?string
+    {
+        $count = ContactInquiry::where('status', 'unread')->orWhere('status', 'pending')->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'danger';
+    }
 
     public static function form(Schema $schema): Schema
     {

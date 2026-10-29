@@ -1,416 +1,375 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ setting('ngo_name', 'Hope Foundation') }} - @yield('title', setting('ngo_tagline', 'For a Better Tomorrow'))</title>
+    <title>@yield('title', (function_exists('setting') ? setting('ngo_name', 'Hope Foundation') : 'Hope Foundation') . ' — ' . (function_exists('setting') ? setting('ngo_tagline', 'For a Better Tomorrow') : 'For a Better Tomorrow'))</title>
 
-    <!-- Dynamic Favicon -->
-    <link rel="icon" href="{{ setting('favicon_path') ? asset('storage/' . setting('favicon_path')) : asset('favicon.ico') }}">
-
-    <!-- Google Fonts: Inter & Caveat (Cursive Accent) -->
+    <!-- Google Fonts: Plus Jakarta Sans (UI/Headings) + Caveat (Handwritten Script Accents) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 
-    <!-- Dynamic CSS Custom Properties from White-Label Settings -->
+    <!-- Alpine.js for Carousels, Mobile Menu & Video Modal -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <style>
         :root {
-            --color-primary: {{ setting('primary_color', '#16a34a') }};
-            --color-secondary: {{ setting('secondary_color', '#0f172a') }};
+            --color-primary: {{ function_exists('setting') ? setting('primary_color', '#16a34a') : '#16a34a' }};
+            --color-secondary: {{ function_exists('setting') ? setting('secondary_color', '#0f172a') : '#0f172a' }};
+            --color-primary-dark: #15803d;
+            --color-forest: #0a2617;
+            --color-footer: #071f12;
+            --color-mint-bg: #eef8f1;
+            --color-mint-border: #d8f3df;
         }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #0f172a;
+            background-color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .font-script {
+            font-family: 'Caveat', cursive;
+        }
+
+        /* Smooth Scroll-Reveal Animations */
+        [data-reveal] {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-reveal].is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Brush-Stroke Badge Effect for "Real People, Real Change" */
+        .brush-badge {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            border-radius: 14px 4px 16px 6px;
+            box-shadow: 0 10px 25px -5px rgba(22, 163, 74, 0.45);
+        }
+
+        [x-cloak] { display: none !important; }
     </style>
-
-    <!-- Styles & Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @stack('styles')
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-800 antialiased font-sans flex flex-col justify-between selection:bg-emerald-500 selection:text-white"
-      x-data="{ mobileMenuOpen: false, searchOpen: false }"
-      @keydown.escape="mobileMenuOpen = false; searchOpen = false">
+<body x-data="{ mobileMenuOpen: false, videoModalOpen: false, searchOpen: false }" class="antialiased selection:bg-[#16a34a] selection:text-white">
 
-    @auth
-        @if(auth()->user()->isSuperAdmin() || auth()->user()->isManager())
-            <!-- Admin Global Command Strip -->
-            <div class="bg-slate-900 text-slate-300 text-xs py-1.5 px-4 sm:px-6 lg:px-8 flex items-center justify-between border-b border-slate-800 relative z-50">
-                <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    <span class="font-bold text-white">{{ auth()->user()->isSuperAdmin() ? 'Super Admin' : 'Manager' }}:</span>
-                    <span>{{ auth()->user()->name }}</span>
-                </div>
-                <div class="flex items-center gap-4">
-                    <a href="{{ url('/admin') }}" class="font-bold text-emerald-400 hover:text-emerald-300 transition">Back-Office Command &rarr;</a>
-                    <form action="{{ url('/admin/logout') }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="text-slate-400 hover:text-white transition font-medium">Logout</button>
-                    </form>
-                </div>
-            </div>
-        @endif
-    @endauth
+    @php
+        $ngoName = function_exists('setting') ? setting('ngo_name', 'Hope Foundation') : 'Hope Foundation';
+        $ngoTagline = function_exists('setting') ? setting('ngo_tagline', 'For a Better Tomorrow') : 'For a Better Tomorrow';
+        $contactPhone = function_exists('setting') ? setting('contact_phone', '+91 87654 32109') : '+91 87654 32109';
+        $contactEmail = function_exists('setting') ? setting('contact_email', 'info@hopefoundation.org') : 'info@hopefoundation.org';
+        $officeAddress = function_exists('setting') ? setting('office_address', '123 NGO Street, Varanasi, Uttar Pradesh - 221001') : '123 NGO Street, Varanasi, Uttar Pradesh - 221001';
+        $ngoRegNumber = function_exists('setting') ? setting('ngo_reg_number', 'UP/2024/0045891') : 'UP/2024/0045891';
+        $reg80g = function_exists('setting') ? setting('80g_reg_number', 'AABTK1234FF20241') : 'AABTK1234FF20241';
+        $panNumber = function_exists('setting') ? setting('ngo_pan_number', 'AABTK1234F') : 'AABTK1234F';
 
-    <!-- Top Navigation Header -->
-    <header class="bg-white/95 backdrop-blur-md border-b border-slate-100 sticky top-0 z-40 shadow-xs transition">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            
-            <!-- Brand Logo & Name -->
-            <a href="{{ url('/') }}" class="flex items-center gap-3 group">
-                @if(setting('logo_path') && file_exists(public_path('storage/' . setting('logo_path'))))
-                    <img src="{{ asset('storage/' . setting('logo_path')) }}" alt="{{ setting('ngo_name', 'Hope Foundation') }}" class="h-11 w-auto object-contain">
-                @else
-                    <div class="w-11 h-11 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
-                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
-                            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        $navLinks = [
+            ['label' => 'Home', 'url' => Route::has('home') ? route('home') : url('/'), 'active' => request()->routeIs('home') || request()->is('/')],
+            ['label' => 'About Us', 'url' => Route::has('about') ? route('about') : url('/about'), 'active' => request()->routeIs('about') || request()->is('about')],
+            ['label' => 'Campaigns', 'url' => Route::has('campaigns.index') ? route('campaigns.index') : url('/campaigns'), 'active' => request()->routeIs('campaigns.*') || request()->is('campaigns*')],
+            ['label' => 'Transparency', 'url' => Route::has('transparency.index') ? route('transparency.index') : url('/transparency'), 'active' => request()->routeIs('transparency.*') || request()->is('transparency*')],
+            ['label' => 'Events', 'url' => Route::has('events.index') ? route('events.index') : url('/events'), 'active' => request()->routeIs('events.*') || request()->is('events*')],
+            ['label' => 'Volunteer', 'url' => Route::has('volunteers.create') ? route('volunteers.create') : url('/volunteer-join'), 'active' => request()->routeIs('volunteers.*') || request()->is('volunteer*')],
+            ['label' => 'Contact', 'url' => Route::has('contact.index') ? route('contact.index') : url('/contact'), 'active' => request()->routeIs('contact.*') || request()->is('contact*')],
+        ];
+        $donateUrl = Route::has('donate.index') ? route('donate.index') : url('/donate');
+    @endphp
+
+    <!-- ================= STICKY HEADER / NAVBAR ================= -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+
+                <!-- Left: Brand Logo -->
+                <a href="{{ Route::has('home') ? route('home') : url('/') }}" class="flex items-center gap-3 group shrink-0">
+                    <div class="w-11 h-11 rounded-full bg-[#eef8f1] border border-[#bbf7d0] flex items-center justify-center text-[#16a34a] shadow-xs group-hover:bg-[#16a34a] group-hover:text-white transition-all duration-300">
+                        <!-- Heart in Hand Sprout Icon -->
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
                     </div>
-                @endif
-                <div>
-                    <span class="font-black text-xl text-slate-900 block leading-tight tracking-tight">{{ setting('ngo_name', 'Hope Foundation') }}</span>
-                    <span class="text-xs font-semibold text-emerald-700 tracking-wide block">{{ setting('ngo_tagline', 'For a Better Tomorrow') }}</span>
+                    <div>
+                        <span class="block text-lg font-extrabold text-slate-900 tracking-tight leading-none">{{ $ngoName }}</span>
+                        <span class="block text-[11px] font-medium text-slate-500 mt-1">{{ $ngoTagline }}</span>
+                    </div>
+                </a>
+
+                <!-- Center: Desktop Navigation Links -->
+                <nav class="hidden lg:flex items-center gap-7">
+                    @foreach($navLinks as $link)
+                        <a href="{{ $link['url'] }}"
+                           class="relative py-2 text-sm font-semibold transition-colors duration-200 {{ $link['active'] ? 'text-[#16a34a]' : 'text-slate-600 hover:text-[#16a34a]' }}">
+                            {{ $link['label'] }}
+                            @if($link['active'])
+                                <span class="absolute bottom-0 left-0 w-full h-0.5 bg-[#16a34a] rounded-full"></span>
+                            @endif
+                        </a>
+                    @endforeach
+                </nav>
+
+                <!-- Right: Search + Donate CTA Button -->
+                <div class="hidden lg:flex items-center gap-4">
+                    <a href="{{ Route::has('donate.status') ? route('donate.status') : url('/donation-status') }}"
+                       title="Track Donation / Search"
+                       class="w-10 h-10 rounded-full text-slate-600 hover:text-[#16a34a] hover:bg-[#eef8f1] flex items-center justify-center transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z"/>
+                        </svg>
+                    </a>
+
+                    <a href="{{ $donateUrl }}"
+                       class="inline-flex items-center justify-center rounded-full bg-[#16a34a] hover:bg-[#15803d] text-white text-sm font-bold px-6 py-2.5 shadow-md shadow-green-600/20 hover:shadow-lg hover:shadow-green-600/30 hover:-translate-y-0.5 transition-all duration-300">
+                        Donate Now
+                    </a>
                 </div>
-            </a>
 
-            <!-- Desktop Nav Links -->
-            <nav class="hidden lg:flex items-center gap-8">
-                <a href="{{ url('/') }}"
-                   class="text-sm font-bold transition pb-1 {{ request()->is('/') ? 'text-emerald-700 border-b-2 border-emerald-600' : 'text-slate-700 hover:text-emerald-700' }}">
-                    Home
-                </a>
-                <a href="{{ Route::has('about') ? route('about') : url('/about') }}"
-                   class="text-sm font-bold transition pb-1 {{ request()->is('about*') ? 'text-emerald-700 border-b-2 border-emerald-600' : 'text-slate-700 hover:text-emerald-700' }}">
-                    About Us
-                </a>
-                <a href="{{ route('campaigns.index') }}"
-                   class="text-sm font-bold transition pb-1 {{ request()->is('campaigns*') ? 'text-emerald-700 border-b-2 border-emerald-600' : 'text-slate-700 hover:text-emerald-700' }}">
-                    Campaigns
-                </a>
-                <a href="{{ route('transparency.index') }}"
-                   class="text-sm font-bold transition pb-1 {{ request()->is('transparency*') ? 'text-emerald-700 border-b-2 border-emerald-600' : 'text-slate-700 hover:text-emerald-700' }}">
-                    Transparency
-                </a>
-                <a href="{{ route('events.index') }}"
-                   class="text-sm font-bold transition pb-1 {{ request()->is('events*') ? 'text-emerald-700 border-b-2 border-emerald-600' : 'text-slate-700 hover:text-emerald-700' }}">
-                    Events
-                </a>
-                <a href="{{ route('volunteers.create') }}"
-                   class="text-sm font-bold transition pb-1 {{ request()->is('volunteer-join*') ? 'text-emerald-700 border-b-2 border-emerald-600' : 'text-slate-700 hover:text-emerald-700' }}">
-                    Volunteer
-                </a>
-                <a href="{{ Route::has('contact.index') ? route('contact.index') : url('/contact') }}"
-                   class="text-sm font-bold transition pb-1 {{ request()->is('contact*') ? 'text-emerald-700 border-b-2 border-emerald-600' : 'text-slate-700 hover:text-emerald-700' }}">
-                    Contact
-                </a>
-            </nav>
-
-            <!-- Action Area -->
-            <div class="flex items-center gap-3">
-                <!-- Quick Search Toggle -->
-                <button type="button" 
-                        @click="searchOpen = !searchOpen" 
-                        aria-label="Search Causes" 
-                        class="w-10 h-10 rounded-full text-slate-600 hover:text-emerald-700 hover:bg-slate-100 flex items-center justify-center transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="m21 21-4.3-4.3"/>
-                    </svg>
-                </button>
-
-                <!-- Solid Emerald Donate Now Pill Button -->
-                <a href="{{ route('donate.index') }}"
-                   class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-black px-6 py-2.5 rounded-full shadow-md hover:shadow-emerald-600/30 transition transform active:scale-95 shrink-0">
-                    <svg class="w-4 h-4 fill-current text-white/95" viewBox="0 0 24 24">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                    <span>Donate Now</span>
-                </a>
-
-                <!-- Mobile Hamburger Button -->
-                <button type="button" 
-                        @click="mobileMenuOpen = true"
-                        aria-label="Toggle Mobile Navigation"
-                        class="lg:hidden p-2 rounded-xl text-slate-700 hover:text-emerald-700 hover:bg-slate-100 focus:outline-none transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </button>
+                <!-- Mobile Hamburger Trigger -->
+                <div class="flex items-center gap-2 lg:hidden">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen"
+                            type="button"
+                            aria-label="Toggle Menu"
+                            class="p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 focus:outline-none">
+                        <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                        <svg x-show="mobileMenuOpen" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Quick Search Dropdown Overlay -->
-        <div x-show="searchOpen" 
+        <!-- Mobile Navigation Drawer -->
+        <div x-show="mobileMenuOpen"
+             x-cloak
              x-transition:enter="transition ease-out duration-200"
-             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-start="opacity-0 -translate-y-3"
              x-transition:enter-end="opacity-100 translate-y-0"
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100 translate-y-0"
-             x-transition:leave-end="opacity-0 -translate-y-2"
-             class="absolute inset-x-0 top-full bg-white border-b border-slate-200 shadow-xl py-4 px-4 sm:px-6 lg:px-8 z-30"
-             @click.away="searchOpen = false"
-             style="display: none;">
-            <div class="max-w-3xl mx-auto">
-                <form action="{{ route('campaigns.index') }}" method="GET" class="relative">
-                    <input type="text" name="search" placeholder="Search campaigns, causes, or initiatives..." 
-                           class="w-full bg-slate-50 border border-slate-300 rounded-full pl-12 pr-28 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
-                    <svg class="w-5 h-5 text-slate-400 absolute left-4 top-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-                    </svg>
-                    <button type="submit" class="absolute right-2 top-2 px-5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-bold transition">
-                        Search
-                    </button>
-                </form>
+             x-transition:leave-end="opacity-0 -translate-y-3"
+             @click.away="mobileMenuOpen = false"
+             class="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-2 shadow-xl">
+            @foreach($navLinks as $link)
+                <a href="{{ $link['url'] }}"
+                   class="block px-4 py-2.5 rounded-xl text-sm font-semibold {{ $link['active'] ? 'bg-[#eef8f1] text-[#16a34a]' : 'text-slate-700 hover:bg-slate-50' }}">
+                    {{ $link['label'] }}
+                </a>
+            @endforeach
+            <div class="pt-3 border-t border-slate-100 flex flex-col gap-2.5">
+                <a href="{{ Route::has('donate.status') ? route('donate.status') : url('/donation-status') }}"
+                   class="w-full py-2.5 text-center rounded-xl border border-slate-200 text-slate-700 text-sm font-semibold">
+                    Track Donation Status
+                </a>
+                <a href="{{ $donateUrl }}"
+                   class="w-full py-3 text-center rounded-xl bg-[#16a34a] text-white text-sm font-bold shadow-md">
+                    ♡ Donate Now
+                </a>
             </div>
         </div>
     </header>
 
-    <!-- Slide-Out Mobile Drawer (Alpine.js Off-Canvas) -->
-    <div x-show="mobileMenuOpen" 
-         class="fixed inset-0 z-50 lg:hidden overflow-hidden" 
-         role="dialog" 
-         aria-modal="true"
-         style="display: none;">
-        
-        <!-- Backdrop Overlay -->
-        <div x-show="mobileMenuOpen" 
-             x-transition:enter="transition-opacity ease-linear duration-300" 
-             x-transition:enter-start="opacity-0" 
-             x-transition:enter-end="opacity-100" 
-             x-transition:leave="transition-opacity ease-linear duration-300" 
-             x-transition:leave-start="opacity-100" 
-             x-transition:leave-end="opacity-0" 
-             class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs" 
-             @click="mobileMenuOpen = false"></div>
-
-        <!-- Sliding Off-Canvas Menu -->
-        <div class="fixed inset-y-0 right-0 max-w-xs w-full bg-white shadow-2xl flex flex-col justify-between overflow-y-auto"
-             x-show="mobileMenuOpen" 
-             x-transition:enter="transform transition ease-in-out duration-300" 
-             x-transition:enter-start="translate-x-full" 
-             x-transition:enter-end="translate-x-0" 
-             x-transition:leave="transform transition ease-in-out duration-300" 
-             x-transition:leave-start="translate-x-0" 
-             x-transition:leave-end="translate-x-full">
-            
-            <div>
-                <!-- Drawer Header -->
-                <div class="p-6 border-b border-slate-100 flex items-center justify-between">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center font-black">
-                            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
-                            </svg>
-                        </div>
-                        <span class="font-extrabold text-base text-slate-900">{{ setting('ngo_name', 'Hope Foundation') }}</span>
-                    </div>
-                    <button type="button" 
-                            @click="mobileMenuOpen = false"
-                            class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- Navigation Links -->
-                <nav class="p-6 space-y-1.5">
-                    <a href="{{ url('/') }}" 
-                       class="flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition {{ request()->is('/') ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <span>Home</span>
-                        @if(request()->is('/'))
-                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                        @endif
-                    </a>
-                    <a href="{{ Route::has('about') ? route('about') : url('/about') }}" 
-                       class="flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition {{ request()->is('about*') ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <span>About Us</span>
-                        @if(request()->is('about*'))
-                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                        @endif
-                    </a>
-                    <a href="{{ route('campaigns.index') }}" 
-                       class="flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition {{ request()->is('campaigns*') ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <span>Campaigns</span>
-                        @if(request()->is('campaigns*'))
-                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                        @endif
-                    </a>
-                    <a href="{{ route('transparency.index') }}" 
-                       class="flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition {{ request()->is('transparency*') ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <span>Transparency Ledger</span>
-                        @if(request()->is('transparency*'))
-                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                        @endif
-                    </a>
-                    <a href="{{ route('events.index') }}" 
-                       class="flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition {{ request()->is('events*') ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <span>Events</span>
-                        @if(request()->is('events*'))
-                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                        @endif
-                    </a>
-                    <a href="{{ route('volunteers.create') }}" 
-                       class="flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition {{ request()->is('volunteer-join*') ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <span>Volunteer</span>
-                        @if(request()->is('volunteer-join*'))
-                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                        @endif
-                    </a>
-                    <a href="{{ Route::has('contact.index') ? route('contact.index') : url('/contact') }}" 
-                       class="flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition {{ request()->is('contact*') ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <span>Contact</span>
-                        @if(request()->is('contact*'))
-                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                        @endif
-                    </a>
-                    <a href="{{ route('donation.status') }}" 
-                       class="flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition {{ request()->is('donation-status') ? 'bg-emerald-50 text-emerald-800' : 'text-slate-600 hover:bg-slate-50' }}">
-                        <span>Track Status</span>
-                    </a>
-                </nav>
-            </div>
-
-            <!-- Drawer Bottom Action -->
-            <div class="p-6 border-t border-slate-100 space-y-4">
-                <a href="{{ route('donate.index') }}"
-                   class="w-full py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm flex items-center justify-center gap-2 shadow-md transition">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                    <span>Donate Now</span>
-                </a>
-
-                @if(setting('contact_phone'))
-                    <div class="text-center text-xs text-slate-500">
-                        Need Help? Call <a href="tel:{{ setting('contact_phone') }}" class="font-bold text-emerald-700">{{ setting('contact_phone') }}</a>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content Body -->
-    <main class="flex-grow">
+    <!-- ================= MAIN PAGE CONTENT ================= -->
+    <main>
         @yield('content')
     </main>
 
-    <!-- Global High-Trust 4-Column Footer -->
-    <footer class="bg-[#061a14] text-slate-300 pt-16 pb-12 mt-20 border-t border-emerald-950/40">
+    <!-- ================= DEEP FOREST GREEN FOOTER ================= -->
+    <footer class="bg-[#071f12] text-white pt-16 pb-10 border-t border-white/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-14 border-b border-white/10">
-                
-                <!-- Col 1: Organization & Mission -->
-                <div class="space-y-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-black shadow-md shrink-0">
-                            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+
+            <!-- Institutional Credentials & Compliance Strip -->
+            <div class="border-b border-white/10 pb-8 mb-10 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center sm:text-left">
+                <div>
+                    <span class="block text-[11px] font-bold uppercase tracking-wider text-emerald-400">Registration No.</span>
+                    <span class="text-sm font-semibold text-slate-200">{{ $ngoRegNumber }}</span>
+                </div>
+                <div>
+                    <span class="block text-[11px] font-bold uppercase tracking-wider text-emerald-400">80G Tax Exemption Certified</span>
+                    <span class="text-sm font-semibold text-slate-200">{{ $reg80g }}</span>
+                </div>
+                <div>
+                    <span class="block text-[11px] font-bold uppercase tracking-wider text-emerald-400">PAN Number</span>
+                    <span class="text-sm font-semibold text-slate-200">{{ $panNumber }}</span>
+                </div>
+                <div>
+                    <span class="block text-[11px] font-bold uppercase tracking-wider text-emerald-400">Zero Platform Fees</span>
+                    <span class="text-sm font-semibold text-slate-200">100% Direct Impact</span>
+                </div>
+            </div>
+    
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-white/10">
+
+                <!-- Col 1: Brand & Socials (4 Cols) -->
+                <div class="lg:col-span-4 space-y-4">
+                    <a href="{{ Route::has('home') ? route('home') : url('/') }}" class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-[#16a34a] flex items-center justify-center text-white shadow-md">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                             </svg>
                         </div>
                         <div>
-                            <span class="text-white font-black text-xl block leading-tight tracking-tight">{{ setting('ngo_name', 'Hope Foundation') }}</span>
-                            <span class="text-xs text-emerald-400 font-semibold">{{ setting('ngo_tagline', 'For a Better Tomorrow') }}</span>
+                            <span class="block text-lg font-extrabold text-white leading-none">{{ $ngoName }}</span>
+                            <span class="block text-xs text-emerald-300/80 mt-1">{{ $ngoTagline }}</span>
                         </div>
-                    </div>
+                    </a>
 
-                    <p class="text-xs text-slate-400 leading-relaxed">
-                        Dedicated to creating sustainable grassroots impact through 100% transparent donations, verified bank-reconciled ledgers, and direct relief for education, healthcare, and clean water.
+                    <p class="text-sm text-slate-300/85 leading-relaxed max-w-sm">
+                        We work for education, health, environment and a better future for underprivileged communities with 100% ground transparency.
                     </p>
 
-                    <!-- Social Handles -->
-                    <div class="pt-2 flex items-center gap-3">
-                        @if(setting('facebook_url'))
-                            <a href="{{ setting('facebook_url') }}" target="_blank" aria-label="Facebook" class="w-9 h-9 rounded-full bg-white/5 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    <!-- 5 Social Icons -->
+                    <div class="flex items-center gap-2.5 pt-2">
+                        @foreach(['facebook', 'instagram', 'youtube', 'linkedin', 'x'] as $social)
+                            <a href="#" aria-label="{{ ucfirst($social) }}"
+                               class="w-9 h-9 rounded-full bg-white/10 hover:bg-[#16a34a] text-white flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5">
+                                @if($social === 'facebook')
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                                @elseif($social === 'instagram')
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                                @elseif($social === 'youtube')
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                @elseif($social === 'linkedin')
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+                                @else
+                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                @endif
                             </a>
-                        @endif
-                        @if(setting('instagram_url'))
-                            <a href="{{ setting('instagram_url') }}" target="_blank" aria-label="Instagram" class="w-9 h-9 rounded-full bg-white/5 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                            </a>
-                        @endif
-                        @if(setting('youtube_url'))
-                            <a href="{{ setting('youtube_url') }}" target="_blank" aria-label="YouTube" class="w-9 h-9 rounded-full bg-white/5 hover:bg-emerald-600 text-slate-300 hover:text-white flex items-center justify-center transition">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                            </a>
-                        @endif
+                        @endforeach
                     </div>
                 </div>
 
-                <!-- Col 2: Quick Links -->
-                <div>
-                    <span class="text-sm font-bold uppercase tracking-wider text-white block mb-5">Quick Links</span>
-                    <ul class="space-y-3 text-xs text-slate-400">
-                        <li><a href="{{ url('/') }}" class="hover:text-emerald-400 transition">Home</a></li>
-                        <li><a href="{{ Route::has('about') ? route('about') : url('/about') }}" class="hover:text-emerald-400 transition">About Us</a></li>
-                        <li><a href="{{ route('campaigns.index') }}" class="hover:text-emerald-400 transition">Campaigns</a></li>
-                        <li><a href="{{ route('transparency.index') }}" class="hover:text-emerald-400 transition">Transparency Ledger</a></li>
-                        <li><a href="{{ route('events.index') }}" class="hover:text-emerald-400 transition">Community Events</a></li>
-                        <li><a href="{{ route('volunteers.create') }}" class="hover:text-emerald-400 transition">Volunteer With Us</a></li>
-                        <li><a href="{{ Route::has('contact.index') ? route('contact.index') : url('/contact') }}" class="hover:text-emerald-400 transition">Contact Us</a></li>
-                        <li><a href="{{ route('donation.status') }}" class="hover:text-emerald-400 transition">Track Donation Status</a></li>
+                <!-- Col 2: Quick Links (2 Cols) -->
+                <div class="lg:col-span-2 space-y-3">
+                    <h4 class="text-sm font-bold text-white tracking-wide">Quick Links</h4>
+                    <ul class="space-y-2.5 text-sm text-slate-300/85">
+                        @foreach($navLinks as $link)
+                            <li>
+                                <a href="{{ $link['url'] }}" class="hover:text-[#86efac] transition-colors">{{ $link['label'] }}</a>
+                            </li>
+                        @endforeach
                     </ul>
                 </div>
 
-                <!-- Col 3: Our Work Categories -->
-                <div>
-                    <span class="text-sm font-bold uppercase tracking-wider text-white block mb-5">Our Work</span>
-                    <ul class="space-y-3 text-xs text-slate-400">
-                        <li><a href="{{ route('campaigns.index') }}" class="hover:text-emerald-400 transition">Education Support</a></li>
-                        <li><a href="{{ route('campaigns.index') }}" class="hover:text-emerald-400 transition">Healthcare & Medical Relief</a></li>
-                        <li><a href="{{ route('campaigns.index') }}" class="hover:text-emerald-400 transition">Clean Water Initiatives</a></li>
-                        <li><a href="{{ route('campaigns.index') }}" class="hover:text-emerald-400 transition">Environmental Sustainability</a></li>
-                        <li><a href="{{ route('campaigns.index') }}" class="hover:text-emerald-400 transition">Community Development</a></li>
-                        <li><a href="{{ route('campaigns.index') }}" class="hover:text-emerald-400 transition">Emergency Relief Appeals</a></li>
+                <!-- Col 3: Our Work (3 Cols) -->
+                <div class="lg:col-span-3 space-y-3">
+                    <h4 class="text-sm font-bold text-white tracking-wide">Our Work</h4>
+                    <ul class="space-y-2.5 text-sm text-slate-300/85">
+                        <li><a href="{{ Route::has('campaigns.index') ? route('campaigns.index', ['category' => 'education']) : url('/campaigns') }}" class="hover:text-[#86efac] transition-colors">Education</a></li>
+                        <li><a href="{{ Route::has('campaigns.index') ? route('campaigns.index', ['category' => 'healthcare']) : url('/campaigns') }}" class="hover:text-[#86efac] transition-colors">Healthcare</a></li>
+                        <li><a href="{{ Route::has('campaigns.index') ? route('campaigns.index', ['category' => 'clean-water']) : url('/campaigns') }}" class="hover:text-[#86efac] transition-colors">Clean Water</a></li>
+                        <li><a href="{{ Route::has('campaigns.index') ? route('campaigns.index', ['category' => 'environment']) : url('/campaigns') }}" class="hover:text-[#86efac] transition-colors">Environment</a></li>
+                        <li><a href="{{ Route::has('campaigns.index') ? route('campaigns.index') : url('/campaigns') }}" class="hover:text-[#86efac] transition-colors">Community Support</a></li>
                     </ul>
                 </div>
 
-                <!-- Col 4: Contact & Coordinates -->
-                <div class="space-y-4">
-                    <span class="text-sm font-bold uppercase tracking-wider text-white block mb-5">Contact Us</span>
-                    <ul class="space-y-3 text-xs text-slate-400">
+                <!-- Col 4: Contact Us (3 Cols) -->
+                <div class="lg:col-span-3 space-y-4">
+                    <h4 class="text-sm font-bold text-white tracking-wide">Contact Us</h4>
+                    <ul class="space-y-3 text-sm text-slate-300/90">
                         <li class="flex items-start gap-2.5">
-                            <svg class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-                            <span>{{ setting('contact_address', 'Registered Non-Profit Organisation, India') }}</span>
+                            <svg class="w-4 h-4 text-[#4ade80] shrink-0 mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            <span>{{ $officeAddress }}</span>
                         </li>
                         <li class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                            <a href="tel:{{ setting('contact_phone', '+91 9876543210') }}" class="hover:text-emerald-400 transition">{{ setting('contact_phone', '+91 9876543210') }}</a>
+                            <svg class="w-4 h-4 text-[#4ade80] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                            </svg>
+                            <span>{{ $contactPhone }}</span>
                         </li>
                         <li class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                            <a href="mailto:{{ setting('contact_email', 'contact@hopefoundation.org') }}" class="hover:text-emerald-400 transition">{{ setting('contact_email', 'contact@hopefoundation.org') }}</a>
+                            <svg class="w-4 h-4 text-[#4ade80] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            <span>{{ $contactEmail }}</span>
                         </li>
                     </ul>
 
-                    <div class="pt-2">
-                        <a href="{{ route('donate.index') }}"
-                           class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-5 py-2.5 rounded-full shadow-md transition">
-                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                            <span>Donate to a Cause</span>
+                    <div class="pt-1">
+                        <a href="{{ $donateUrl }}"
+                           class="inline-flex items-center gap-2 rounded-xl bg-[#16a34a] hover:bg-[#15803d] text-white text-sm font-bold px-6 py-2.5 shadow-md transition-all duration-300 group">
+                            <span>Donate Now</span>
+                            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
                         </a>
                     </div>
                 </div>
-
             </div>
 
-            <!-- Sub Footer -->
-            <div class="pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-                <div>
-                    &copy; {{ date('Y') }} {{ setting('ngo_name', 'Hope Foundation') }}. All rights reserved. 100% Transparent Non-Profit Platform.
-                </div>
-                <div class="flex items-center gap-5 text-slate-400">
-                    <a href="{{ route('legal.privacy') }}" class="hover:text-emerald-400 transition">Privacy Policy</a>
+            <!-- Bottom Copyright & Legal Bar -->
+            <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+                <p>© {{ date('Y') }} {{ $ngoName }}. All rights reserved.</p>
+                <div class="flex flex-wrap items-center gap-4">
+                    <a href="{{ Route::has('legal.privacy') ? route('legal.privacy') : url('/privacy') }}" class="hover:text-white transition-colors">Privacy Policy</a>
                     <span>|</span>
-                    <a href="{{ route('legal.terms') }}" class="hover:text-emerald-400 transition">Terms & Conditions</a>
+                    <a href="{{ Route::has('legal.terms') ? route('legal.terms') : url('/terms') }}" class="hover:text-white transition-colors">Terms & Conditions</a>
                     <span>|</span>
-                    <a href="{{ route('legal.disclaimer') }}" class="hover:text-emerald-400 transition">Disclaimer</a>
+                    <a href="{{ Route::has('legal.disclaimer') ? route('legal.disclaimer') : (Route::has('transparency.index') ? route('transparency.index') : url('/transparency')) }}" class="hover:text-white transition-colors">Disclaimer</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    @stack('scripts')
+    <!-- ================= STORY VIDEO LIGHTBOX MODAL ================= -->
+    <div x-show="videoModalOpen"
+         x-cloak
+         @keydown.escape.window="videoModalOpen = false"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div @click.away="videoModalOpen = false"
+             class="relative w-full max-w-3xl bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-white/15 p-6 text-center text-white">
+            <button @click="videoModalOpen = false"
+                    class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">
+                ✕
+            </button>
+            <div class="py-12 space-y-4">
+                <div class="w-16 h-16 rounded-full bg-[#16a34a]/20 border border-[#16a34a] text-[#4ade80] flex items-center justify-center mx-auto">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+                <h3 class="text-2xl font-bold">{{ $ngoName }} — Impact Story</h3>
+                <p class="text-sm text-slate-300 max-w-md mx-auto">
+                    Every rupee contributed goes directly to ground relief campaigns with 100% verified vendor bills and public transparency.
+                </p>
+                <div class="pt-4">
+                    <a href="{{ $donateUrl }}" class="inline-flex items-center gap-2 rounded-xl bg-[#16a34a] px-6 py-3 text-sm font-bold text-white">
+                        Support a Cause Today &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SCROLL-REVEAL INTERSECTION OBSERVER ================= -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const revealElements = document.querySelectorAll('[data-reveal]');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const delay = entry.target.getAttribute('data-reveal-delay') || 0;
+                        setTimeout(() => {
+                            entry.target.classList.add('is-visible');
+                        }, delay);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12 });
+
+            revealElements.forEach((el) => observer.observe(el));
+        });
+    </script>
 </body>
 </html>

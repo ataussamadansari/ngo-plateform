@@ -80,6 +80,15 @@ class CampaignController extends Controller
 
         $donorsCount = $campaign->verifiedDonations()->count();
 
-        return view('campaigns.show', compact('campaign', 'recentDonations', 'fundDistributions', 'donorsCount'));
+        $relatedCampaigns = Campaign::active()
+            ->where('id', '!=', $campaign->id)
+            ->when($campaign->category_id, function ($q) use ($campaign) {
+                $q->orderByRaw('category_id = ? DESC', [$campaign->category_id]);
+            })
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return view('campaigns.show', compact('campaign', 'recentDonations', 'fundDistributions', 'donorsCount', 'relatedCampaigns'));
     }
 }

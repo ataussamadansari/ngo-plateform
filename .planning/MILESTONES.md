@@ -24,6 +24,4 @@
 
 ## Active Milestone
 
-### v1.2: Public Frontend UI/UX Polish & Visual Parity with Reference Designs
-- **Status**: Planning & Execution
-- **Goal**: Audit, redesign, and polish all public Laravel Blade pages against the 11 high-fidelity mockups in `docs/ui/`. Fix typography, spacing, navigation, mobile drawer, hero sections, card layouts, donation flow, volunteer registration, transparency ledger, and legal pages to ensure visual excellence and design parity without altering admin architecture.
+*No active milestone. Run `/gsd-new-milestone` to define the next milestone.*

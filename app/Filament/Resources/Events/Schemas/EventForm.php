@@ -37,6 +37,12 @@ class EventForm
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
+                        Select::make('category_id')
+                            ->relationship('category', 'name')
+                            ->label('Cause Category')
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('Select related cause category (Optional)'),
                         DatePicker::make('event_date')
                             ->label('Event Date')
                             ->required(),
@@ -91,13 +97,18 @@ class EventForm
                             ->columnSpanFull(),
                     ])->columns(2),
 
-                Section::make('Event Description')
-                    ->description('Detailed overview of event schedule, volunteer roles, and purpose.')
+                Section::make('Event Description & Ground Outcomes')
+                    ->description('Detailed overview of event schedule and post-event impact summary.')
                     ->schema([
                         Textarea::make('description')
                             ->label('Description & Schedule')
-                            ->rows(5)
+                            ->rows(4)
                             ->required()
+                            ->columnSpanFull(),
+                        Textarea::make('outcome_summary')
+                            ->label('Ground Outcome & Impact Highlights (Post-Event)')
+                            ->placeholder('e.g. 120 female students certified; distributed 40 recycled study tablets...')
+                            ->rows(3)
                             ->columnSpanFull(),
                     ]),
             ]);

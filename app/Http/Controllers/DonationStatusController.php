@@ -33,6 +33,13 @@ class DonationStatusController extends Controller
                 ->get();
         }
 
-        return view('donate.status', compact('donations', 'query'));
+        $recentDonations = Donation::with('campaign')
+            ->where('status', 'verified')
+            ->latest('verified_at')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('donate.status', compact('donations', 'query', 'recentDonations'));
     }
 }

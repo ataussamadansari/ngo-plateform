@@ -33,6 +33,9 @@ class VolunteerForm
                             ->label('Email Address')
                             ->email()
                             ->maxLength(255),
+                        DatePicker::make('date_of_birth')
+                            ->label('Date of Birth')
+                            ->maxDate(now()),
                         TextInput::make('occupation')
                             ->label('Occupation / Profession')
                             ->maxLength(255),
@@ -76,6 +79,16 @@ class VolunteerForm
                             ])
                             ->default('pending')
                             ->required(),
+                        Select::make('area_of_interest')
+                            ->label('Primary Area of Interest')
+                            ->options([
+                                'Child Education & Literacy' => 'Child Education & Literacy',
+                                'Medical Camps & Emergency Aid' => 'Medical Camps & Emergency Aid',
+                                'Community Health & Sanitation' => 'Community Health & Sanitation',
+                                'Environmental Conservation & Drives' => 'Environmental Conservation & Drives',
+                                'Disaster Relief & Food Distribution' => 'Disaster Relief & Food Distribution',
+                                'Digital Literacy & Media' => 'Digital Literacy & Media',
+                            ]),
                         Select::make('availability')
                             ->label('Availability')
                             ->options([
@@ -89,6 +102,11 @@ class VolunteerForm
                         TagsInput::make('skills')
                             ->label('Skills & Areas of Contribution')
                             ->placeholder('Add skill and press enter')
+                            ->columnSpanFull(),
+                        Textarea::make('about_volunteer')
+                            ->label('Personal Statement / Background')
+                            ->placeholder('Brief overview of past volunteer work, motivations and aspirations...')
+                            ->rows(3)
                             ->columnSpanFull(),
                     ])->columns(2),
             ]);

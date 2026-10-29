@@ -32,6 +32,18 @@ class VolunteerResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'full_name';
 
+    public static function getNavigationBadge(): ?string
+    {
+        $count = Volunteer::where('status', 'pending')->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return VolunteerForm::configure($schema);
