@@ -62,16 +62,23 @@ class EventManagementAndRegistrationTest extends TestCase
             'status' => 'completed',
         ]);
 
-        // Default tab: upcoming
+        // Default tab: all events renders both upcoming and past events
         $response = $this->get(route('events.index'));
         $response->assertOk();
         $response->assertSee('Upcoming River Cleanliness Drive');
-        $response->assertDontSee('Completed Winter Warmth Blanket Drive');
+        $response->assertSee('Completed Winter Warmth Blanket Drive');
 
-        // Past tab: past events
+        // Upcoming filter: upcoming events only
+        $upcomingResponse = $this->get(route('events.index', ['type' => 'upcoming']));
+        $upcomingResponse->assertOk();
+        $upcomingResponse->assertSee('Upcoming River Cleanliness Drive');
+        $upcomingResponse->assertDontSee('Completed Winter Warmth Blanket Drive');
+
+        // Past filter: past events only
         $pastResponse = $this->get(route('events.index', ['type' => 'past']));
         $pastResponse->assertOk();
         $pastResponse->assertSee('Completed Winter Warmth Blanket Drive');
+        $pastResponse->assertDontSee('Upcoming River Cleanliness Drive');
     }
 
     public function test_public_can_register_for_upcoming_event(): void
@@ -220,5 +227,43 @@ class EventManagementAndRegistrationTest extends TestCase
         $this->assertNotNull($registration);
         $this->assertEquals($volunteer->id, $registration->volunteer_id);
         $this->assertEquals('Volunteer', $registration->role_assigned);
+    }
+
+    public function test_events_screen_matches_new_ui_ux_specification(): void
+    {
+        $response = $this->get(route('events.index'));
+
+        $response->assertOk();
+
+        // 1. Hero Section Content & Stickers
+        $response->assertSee('OUR EVENTS');
+        $response->assertSee('Join Our Events');
+        $response->assertSee('Be a Part of Change');
+        $response->assertSee('From awareness drives to community support programs');
+        $response->assertSee('People');
+        $response->assertSee('Impact');
+
+        // 2. Filter Bar Pills & Locations Dropdown
+        $response->assertSee('All Events');
+        $response->assertSee('Upcoming');
+        $response->assertSee('Past Events');
+        $response->assertSee('Education');
+        $response->assertSee('Healthcare');
+        $response->assertSee('Environment');
+        $response->assertSee('Community');
+        $response->assertSee('All Locations');
+
+        // 3. Upcoming Events Section & Action Buttons
+        $response->assertSee('Upcoming Events');
+        $response->assertSee('Register Now');
+
+        // 4. Past Events Section & Highlights
+        $response->assertSee('Past Events');
+        $response->assertSee('View Highlights');
+
+        // 5. Call To Action Organizer Banner
+        $response->assertSee('Want to Organize an Event with Us?');
+        $response->assertSee('Become a Volunteer');
+        $response->assertSee('Contact Us');
     }
 }
