@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Campaign;
 use App\Models\Donation;
 use App\Models\FundDistribution;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -42,87 +43,188 @@ class TransparencyController extends Controller
             ->join('cause_categories', 'campaigns.category_id', '=', 'cause_categories.id')
             ->select('cause_categories.name', DB::raw('SUM(fund_distributions.amount_spent) as total_spent'), DB::raw('COUNT(fund_distributions.id) as item_count'))
             ->groupBy('cause_categories.id', 'cause_categories.name')
-            ->get();
+            ->get()
+            ->keyBy(fn ($item) => strtolower(trim($item->name)));
 
         $generalReliefSpent = (float) FundDistribution::where('is_public', true)->whereNull('campaign_id')->sum('amount_spent');
 
         // Standardized Fund Utilization Distribution matching Design Donut Chart
-        $utilizationCategories = [
+        $defaultCategories = [
             [
                 'name' => 'Education',
+                'key' => 'education',
                 'percentage' => 32,
                 'color' => '#3b82f6',
                 'bg_color' => 'bg-blue-500',
                 'pill_bg' => 'bg-blue-50 text-blue-700 border-blue-200/60',
-                'amount' => $totalDistributed > 0 ? round($totalDistributed * 0.32) : 6744000,
+                'default_amount' => 6744000,
             ],
             [
                 'name' => 'Healthcare',
+                'key' => 'healthcare',
                 'percentage' => 24,
                 'color' => '#10b981',
                 'bg_color' => 'bg-emerald-500',
                 'pill_bg' => 'bg-emerald-50 text-emerald-700 border-emerald-200/60',
-                'amount' => $totalDistributed > 0 ? round($totalDistributed * 0.24) : 5058000,
+                'default_amount' => 5058000,
             ],
             [
                 'name' => 'Clean Water',
+                'key' => 'clean water',
                 'percentage' => 15,
                 'color' => '#06b6d4',
                 'bg_color' => 'bg-cyan-500',
                 'pill_bg' => 'bg-cyan-50 text-cyan-700 border-cyan-200/60',
-                'amount' => $totalDistributed > 0 ? round($totalDistributed * 0.15) : 3161250,
+                'default_amount' => 3161250,
             ],
             [
                 'name' => 'Food & Nutrition',
+                'key' => 'food & nutrition',
                 'percentage' => 12,
                 'color' => '#f97316',
                 'bg_color' => 'bg-orange-500',
                 'pill_bg' => 'bg-orange-50 text-orange-700 border-orange-200/60',
-                'amount' => $totalDistributed > 0 ? round($totalDistributed * 0.12) : 2529000,
+                'default_amount' => 2529000,
             ],
             [
                 'name' => 'Environment',
+                'key' => 'environment',
                 'percentage' => 10,
                 'color' => '#14b8a6',
                 'bg_color' => 'bg-teal-500',
                 'pill_bg' => 'bg-teal-50 text-teal-700 border-teal-200/60',
-                'amount' => $totalDistributed > 0 ? round($totalDistributed * 0.10) : 2107500,
+                'default_amount' => 2107500,
             ],
             [
                 'name' => 'Community',
+                'key' => 'community',
                 'percentage' => 7,
                 'color' => '#8b5cf6',
                 'bg_color' => 'bg-purple-500',
                 'pill_bg' => 'bg-purple-50 text-purple-700 border-purple-200/60',
-                'amount' => $totalDistributed > 0 ? round($totalDistributed * 0.07) : 1475250,
+                'default_amount' => 1475250,
             ],
         ];
+
+        $hasRealDistributions = $categoryBreakdown->isNotEmpty();
+        $totalDbCategorySpent = $categoryBreakdown->sum('total_spent') + $generalReliefSpent;
+
+        $utilizationCategories = [];
+        foreach ($defaultCategories as $cat) {
+            $matched = $categoryBreakdown->get($cat['key']);
+            if (! $matched) {
+                // Try fuzzy lookup for nutrition / water / health
+                foreach ($categoryBreakdown as $dbKey => $dbItem) {
+                    if (str_contains($dbKey, $cat['key']) || str_contains($cat['key'], $dbKey)) {
+                        $matched = $dbItem;
+                        break;
+                    }
+                }
+            }
+
+            if ($hasRealDistributions && $totalDbCategorySpent > 0 && $matched) {
+                $amt = (float) $matched->total_spent;
+                $pct = min(100, max(1, round(($amt / $totalDbCategorySpent) * 100)));
+            } else {
+                $pct = $cat['percentage'];
+                $amt = $totalDistributed > 0 ? round($totalDistributed * ($pct / 100)) : $cat['default_amount'];
+            }
+
+            $utilizationCategories[] = [
+                'name' => $cat['name'],
+                'percentage' => $pct,
+                'color' => $cat['color'],
+                'bg_color' => $cat['bg_color'],
+                'pill_bg' => $cat['pill_bg'],
+                'amount' => $amt,
+            ];
+        }
 
         // 3. Monthly Financials (Jan to Dec) for Grouped Bar Chart
         $selectedYear = (int) $request->input('year', 2025);
         $availableYears = [2026, 2025, 2024];
 
-        // Monthly overview base dataset matching the design chart proportions
-        $monthlyFinancials = [
-            ['month' => 'Jan', 'income' => 7200000, 'expense' => 4500000, 'income_pct' => 60, 'expense_pct' => 38],
-            ['month' => 'Feb', 'income' => 7800000, 'expense' => 5200000, 'income_pct' => 65, 'expense_pct' => 43],
-            ['month' => 'Mar', 'income' => 8400000, 'expense' => 5800000, 'income_pct' => 70, 'expense_pct' => 48],
-            ['month' => 'Apr', 'income' => 6900000, 'expense' => 4800000, 'income_pct' => 58, 'expense_pct' => 40],
-            ['month' => 'May', 'income' => 7600000, 'expense' => 5400000, 'income_pct' => 63, 'expense_pct' => 45],
-            ['month' => 'Jun', 'income' => 8200000, 'expense' => 6200000, 'income_pct' => 68, 'expense_pct' => 52],
-            ['month' => 'Jul', 'income' => 9500000, 'expense' => 7100000, 'income_pct' => 79, 'expense_pct' => 59],
-            ['month' => 'Aug', 'income' => 11000000, 'expense' => 8200000, 'income_pct' => 92, 'expense_pct' => 68],
-            ['month' => 'Sep', 'income' => 7900000, 'expense' => 6100000, 'income_pct' => 66, 'expense_pct' => 51],
-            ['month' => 'Oct', 'income' => 7400000, 'expense' => 5600000, 'income_pct' => 62, 'expense_pct' => 47],
-            ['month' => 'Nov', 'income' => 7100000, 'expense' => 5100000, 'income_pct' => 59, 'expense_pct' => 43],
-            ['month' => 'Dec', 'income' => 5800000, 'expense' => 4300000, 'income_pct' => 48, 'expense_pct' => 36],
+        // Fetch monthly aggregations using cross-database Carbon date bounds
+        $startOfYear = Carbon::create($selectedYear, 1, 1)->startOfYear();
+        $endOfYear = Carbon::create($selectedYear, 12, 31)->endOfDay();
+
+        $yearDonations = Donation::where('status', 'verified')
+            ->whereBetween('created_at', [$startOfYear, $endOfYear])
+            ->get(['amount', 'created_at']);
+
+        $yearDistributions = FundDistribution::where('is_public', true)
+            ->whereBetween('distribution_date', [$startOfYear, $endOfYear])
+            ->get(['amount_spent', 'distribution_date']);
+
+        $hasRealMonthlyData = $yearDonations->isNotEmpty() || $yearDistributions->isNotEmpty();
+
+        $monthlyDonations = $yearDonations->groupBy(fn ($d) => (int) $d->created_at->format('n'));
+        $monthlyDistributions = $yearDistributions->groupBy(fn ($d) => (int) $d->distribution_date->format('n'));
+
+        // Default mockup monthly amounts for aesthetic baseline
+        $mockupMonthly = [
+            1 => ['income' => 7200000, 'expense' => 4500000, 'in_pct' => 60, 'ex_pct' => 38],
+            2 => ['income' => 7800000, 'expense' => 5200000, 'in_pct' => 65, 'ex_pct' => 43],
+            3 => ['income' => 8400000, 'expense' => 5800000, 'in_pct' => 70, 'ex_pct' => 48],
+            4 => ['income' => 6900000, 'expense' => 4800000, 'in_pct' => 58, 'ex_pct' => 40],
+            5 => ['income' => 7600000, 'expense' => 5400000, 'in_pct' => 63, 'ex_pct' => 45],
+            6 => ['income' => 8200000, 'expense' => 6200000, 'in_pct' => 68, 'ex_pct' => 52],
+            7 => ['income' => 9500000, 'expense' => 7100000, 'in_pct' => 79, 'ex_pct' => 59],
+            8 => ['income' => 11000000, 'expense' => 8200000, 'in_pct' => 92, 'ex_pct' => 68],
+            9 => ['income' => 7900000, 'expense' => 6100000, 'in_pct' => 66, 'ex_pct' => 51],
+            10 => ['income' => 7400000, 'expense' => 5600000, 'in_pct' => 62, 'ex_pct' => 47],
+            11 => ['income' => 7100000, 'expense' => 5100000, 'in_pct' => 59, 'ex_pct' => 43],
+            12 => ['income' => 5800000, 'expense' => 4300000, 'in_pct' => 48, 'ex_pct' => 36],
         ];
+
+        $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        $monthlyFinancials = [];
+
+        // Dynamic scaling factor for bar heights
+        $maxMonthlyValue = 12000000;
+        if ($hasRealMonthlyData) {
+            $computedMax = 0;
+            for ($m = 1; $m <= 12; $m++) {
+                $inc = (float) ($monthlyDonations->get($m)?->sum('amount') ?? 0);
+                $exp = (float) ($monthlyDistributions->get($m)?->sum('amount_spent') ?? 0);
+                $computedMax = max($computedMax, $inc, $exp);
+            }
+            if ($computedMax > 0) {
+                $maxMonthlyValue = max($computedMax * 1.15, 10000);
+            }
+        }
+
+        for ($m = 1; $m <= 12; $m++) {
+            $monthName = $monthNames[$m - 1];
+            if ($hasRealMonthlyData) {
+                $income = (float) ($monthlyDonations->get($m)?->sum('amount') ?? 0);
+                $expense = (float) ($monthlyDistributions->get($m)?->sum('amount_spent') ?? 0);
+                $incomePct = $income > 0 ? min(100, max(4, round(($income / $maxMonthlyValue) * 100))) : 0;
+                $expensePct = $expense > 0 ? min(100, max(4, round(($expense / $maxMonthlyValue) * 100))) : 0;
+            } else {
+                $income = (float) $mockupMonthly[$m]['income'];
+                $expense = (float) $mockupMonthly[$m]['expense'];
+                $incomePct = $mockupMonthly[$m]['in_pct'];
+                $expensePct = $mockupMonthly[$m]['ex_pct'];
+            }
+
+            $monthlyFinancials[] = [
+                'month' => $monthName,
+                'income' => $income,
+                'expense' => $expense,
+                'income_pct' => $incomePct,
+                'expense_pct' => $expensePct,
+            ];
+        }
 
         // 4. Itemized Public Distributions query
         $query = FundDistribution::public()->with('campaign.category')->orderByDesc('distribution_date');
 
+        $currentCampaign = null;
         if ($request->filled('campaign')) {
-            $query->where('campaign_id', $request->input('campaign'));
+            $campaignId = $request->input('campaign');
+            $query->where('campaign_id', $campaignId);
+            $currentCampaign = Campaign::find($campaignId);
         }
 
         if ($request->filled('search')) {
@@ -134,14 +236,12 @@ class TransparencyController extends Controller
             });
         }
 
-        $distributions = $query->paginate(12)->withQueryString();
+        $allDistributions = (clone $query)->get();
+        $dbRecent = (clone $query)->take(5)->get();
 
         $campaigns = Campaign::orderBy('title')->get(['id', 'title', 'slug']);
 
-        // Recent Public Fund Distributions (strictly respects active filters)
-        $dbRecent = (clone $query)->take(5)->get();
-
-        // Standardized mockup items to ensure 100% design match
+        // Standardized mockup items to ensure 100% design match when DB has no distributions
         $mockupItems = [
             [
                 'title' => 'School Supplies Distribution',
@@ -200,8 +300,32 @@ class TransparencyController extends Controller
             ],
         ];
 
-        // 5. Latest Bills & Receipts matching mockup
-        $billsAndReceipts = [
+        // 5. Latest Bills & Receipts connected to real database records
+        $dbBills = FundDistribution::where('is_public', true)
+            ->whereNotNull('proof_bill_image')
+            ->with('campaign.category')
+            ->orderByDesc('distribution_date')
+            ->take(8)
+            ->get();
+
+        $billsAndReceipts = [];
+        if ($dbBills->isNotEmpty()) {
+            foreach ($dbBills as $b) {
+                $billsAndReceipts[] = [
+                    'title' => $b->title,
+                    'amount' => (float) $b->amount_spent,
+                    'date' => $b->distribution_date ? $b->distribution_date->format('d M Y') : 'Verified',
+                    'vendor' => $b->beneficiary_name,
+                    'ref' => $b->payment_reference ?? ('INV-AUDITED-'.$b->id),
+                    'image' => str_starts_with($b->proof_bill_image, 'http') ? $b->proof_bill_image : asset('storage/'.$b->proof_bill_image),
+                    'description' => $b->description,
+                    'category_name' => $b->campaign?->category?->name ?? 'General Relief',
+                ];
+            }
+        }
+
+        // Mockup fallback bills to guarantee 4 items in the carousel
+        $defaultBills = [
             [
                 'title' => 'Books Purchase',
                 'amount' => 150000.00,
@@ -209,6 +333,8 @@ class TransparencyController extends Controller
                 'vendor' => 'Varanasi Central Book Depot',
                 'ref' => 'INV-BK-2025-889',
                 'image' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400&q=80',
+                'description' => 'Official GST tax invoice for primary school textbooks.',
+                'category_name' => 'Education',
             ],
             [
                 'title' => 'Medical Supplies',
@@ -217,6 +343,8 @@ class TransparencyController extends Controller
                 'vendor' => 'Kashi Medical Gases & Healthcare',
                 'ref' => 'GST-MED-4412',
                 'image' => 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=400&q=80',
+                'description' => 'Medical equipment and pharmaceutical receipts.',
+                'category_name' => 'Healthcare',
             ],
             [
                 'title' => 'RO System',
@@ -225,6 +353,8 @@ class TransparencyController extends Controller
                 'vendor' => 'AquaPure Engineering Solutions',
                 'ref' => 'TAX-RO-2025-99',
                 'image' => 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=400&q=80',
+                'description' => 'Turnkey installation bill and warranty certificate.',
+                'category_name' => 'Clean Water',
             ],
             [
                 'title' => 'Food Packets',
@@ -233,11 +363,46 @@ class TransparencyController extends Controller
                 'vendor' => 'Annapurna Food Supply Cooperative',
                 'ref' => 'BILL-FD-3310',
                 'image' => 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=400&q=80',
+                'description' => 'Wholesale grocery invoice for 300 ration kits.',
+                'category_name' => 'Food',
             ],
         ];
 
-        // 6. Impact from the Ground Photos matching mockup
-        $groundPhotos = [
+        foreach ($defaultBills as $fb) {
+            if (count($billsAndReceipts) >= 4) {
+                break;
+            }
+            $billsAndReceipts[] = $fb;
+        }
+
+        // 6. Impact from the Ground Photos connected to database
+        $dbDistPhotos = FundDistribution::where('is_public', true)
+            ->whereNotNull('impact_photos')
+            ->with('campaign.category')
+            ->orderByDesc('distribution_date')
+            ->take(10)
+            ->get();
+
+        $groundPhotos = [];
+        foreach ($dbDistPhotos as $dp) {
+            $photos = is_array($dp->impact_photos) ? $dp->impact_photos : json_decode($dp->impact_photos, true);
+            if (is_array($photos)) {
+                foreach ($photos as $p) {
+                    if (! empty($p)) {
+                        $groundPhotos[] = [
+                            'title' => $dp->title,
+                            'category' => $dp->campaign?->category?->name ?? 'Impact',
+                            'image' => str_starts_with($p, 'http') ? $p : asset('storage/'.$p),
+                        ];
+                    }
+                    if (count($groundPhotos) >= 5) {
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        $defaultGroundPhotos = [
             [
                 'title' => 'Children receiving new textbooks',
                 'category' => 'Education',
@@ -265,6 +430,13 @@ class TransparencyController extends Controller
             ],
         ];
 
+        foreach ($defaultGroundPhotos as $gp) {
+            if (count($groundPhotos) >= 5) {
+                break;
+            }
+            $groundPhotos[] = $gp;
+        }
+
         return view('transparency.index', compact(
             'totalRaised',
             'totalDistributed',
@@ -280,12 +452,13 @@ class TransparencyController extends Controller
             'availableYears',
             'categoryBreakdown',
             'generalReliefSpent',
-            'distributions',
+            'allDistributions',
             'dbRecent',
             'mockupItems',
             'billsAndReceipts',
             'groundPhotos',
-            'campaigns'
+            'campaigns',
+            'currentCampaign'
         ));
     }
 

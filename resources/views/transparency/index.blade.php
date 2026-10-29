@@ -50,6 +50,35 @@
             ];
         });
     }
+
+    $allDistributionsFormatted = collect($allDistributions ?? [])->map(function($dist) {
+        $catName = $dist->campaign && $dist->campaign->category ? $dist->campaign->category->name : 'General Relief';
+        $catClass = match(strtolower($catName)) {
+            'education' => 'bg-blue-50 text-blue-700 border-blue-200/60',
+            'healthcare', 'medical' => 'bg-rose-50 text-rose-700 border-rose-200/60',
+            'clean water', 'water' => 'bg-cyan-50 text-cyan-700 border-cyan-200/60',
+            'food & nutrition', 'nutrition', 'food' => 'bg-amber-50 text-amber-700 border-amber-200/60',
+            'environment' => 'bg-emerald-50 text-emerald-700 border-emerald-200/60',
+            default => 'bg-purple-50 text-purple-700 border-purple-200/60',
+        };
+
+        $img = !empty($dist->proof_bill_image)
+            ? (str_starts_with($dist->proof_bill_image, 'http') ? $dist->proof_bill_image : asset('storage/' . $dist->proof_bill_image))
+            : (isset($dist->impact_photos[0]) ? (str_starts_with($dist->impact_photos[0], 'http') ? $dist->impact_photos[0] : asset('storage/' . $dist->impact_photos[0])) : null);
+
+        return [
+            'id' => $dist->id,
+            'title' => $dist->title,
+            'description' => $dist->description,
+            'category_name' => $catName,
+            'category_class' => $catClass,
+            'amount' => (float) $dist->amount_spent,
+            'date' => $dist->distribution_date ? $dist->distribution_date->format('d M Y') : now()->format('d M Y'),
+            'image' => $img ?? 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=400&q=80',
+            'beneficiary' => $dist->beneficiary_name,
+            'ref' => $dist->payment_reference ?? 'VERIFIED-DIRECT',
+        ];
+    });
 @endphp
 
 {{-- ================= HERO SECTION ================= --}}
@@ -101,7 +130,9 @@
         activeTab: 'overview',
         billsIndex: 0,
         selectedYear: '{{ $selectedYear }}',
-        activeFilter: 'all',
+        campaignDropdownOpen: false,
+        viewAllModalOpen: false,
+        viewAllTab: 'distributions',
         ledgerModalOpen: false,
         modalItem: null,
         openModal(item) {
@@ -111,6 +142,13 @@
         closeModal() {
             this.ledgerModalOpen = false;
             this.modalItem = null;
+        },
+        openViewAll(tab = 'distributions') {
+            this.viewAllTab = tab;
+            this.viewAllModalOpen = true;
+        },
+        closeViewAll() {
+            this.viewAllModalOpen = false;
         },
         scrollToSection(id) {
             const el = document.getElementById(id);
@@ -122,6 +160,22 @@
         }
      }">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
+
+        {{-- Active Filter Notification Badge (If filtered by campaign) --}}
+        @if($currentCampaign)
+            <div class="flex items-center justify-between gap-3 bg-emerald-50 border border-emerald-200/90 rounded-2xl p-3 sm:px-4 text-xs text-emerald-950 shadow-2xs">
+                <div class="flex items-center gap-2">
+                    <span class="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="font-medium text-slate-600">Filtering Cause:</span>
+                    <span class="font-bold text-emerald-900">{{ $currentCampaign->title }}</span>
+                </div>
+                <a href="{{ route('transparency.index', ['year' => $selectedYear]) }}"
+                   class="font-bold text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-2xs transition">
+                    <span>Clear</span>
+                    <span>&times;</span>
+                </a>
+            </div>
+        @endif
 
         {{-- ================= TOP CONTROLS + METRIC CARDS CONTAINER ================= --}}
         {{-- Responsive Reordering: On mobile, 4 Cards appear first (order-1), sub-nav appears second (order-2) per Mockup --}}
@@ -162,13 +216,35 @@
                         <span>Fund Utilization</span>
                     </button>
 
-                    <button type="button"
-                            @click="activeTab = 'campaign_wise'; scrollToSection('recent-utilization-section')"
-                            :class="activeTab === 'campaign_wise' ? 'bg-[#16a34a] text-white border-[#16a34a] shadow-xs' : 'bg-white border-slate-200/90 text-slate-700 hover:border-emerald-300'"
-                            class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3.5 sm:px-4 text-xs font-bold transition-all duration-200 cursor-pointer">
-                        <svg class="h-3.5 w-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                        <span>Campaign Wise</span>
-                    </button>
+                    {{-- Campaign Wise Tab with Interactive Dropdown Filter --}}
+                    <div class="relative shrink-0" @click.outside="campaignDropdownOpen = false">
+                        <button type="button"
+                                @click="campaignDropdownOpen = !campaignDropdownOpen; activeTab = 'campaign_wise'"
+                                :class="activeTab === 'campaign_wise' ? 'bg-[#16a34a] text-white border-[#16a34a] shadow-xs' : 'bg-white border-slate-200/90 text-slate-700 hover:border-emerald-300'"
+                                class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border px-3.5 sm:px-4 text-xs font-bold transition-all duration-200 cursor-pointer">
+                            <svg class="h-3.5 w-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            <span>Campaign Wise</span>
+                            <svg class="h-3 w-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+
+                        <div x-show="campaignDropdownOpen"
+                             x-cloak
+                             class="absolute left-0 top-full mt-2 w-72 rounded-2xl bg-white border border-slate-200 shadow-xl p-2 z-40">
+                            <div class="text-[10px] font-bold text-slate-400 px-3 py-1.5 uppercase tracking-wider">
+                                Filter by Campaign
+                            </div>
+                            <a href="{{ route('transparency.index', ['year' => $selectedYear]) }}"
+                               class="block px-3 py-2 text-xs font-bold rounded-xl {{ !request('campaign') ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50' }}">
+                                All Supported Causes
+                            </a>
+                            @foreach($campaigns as $camp)
+                                <a href="{{ route('transparency.index', ['campaign' => $camp->id, 'year' => $selectedYear]) }}"
+                                   class="block px-3 py-2 text-xs font-medium rounded-xl truncate {{ request('campaign') == $camp->id ? 'bg-emerald-50 text-emerald-800 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                                    {{ $camp->title }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
 
                     <button type="button"
                             @click="activeTab = 'bills'; scrollToSection('bills-receipts-section')"
@@ -190,6 +266,9 @@
                 {{-- Year Dropdown Selector --}}
                 <div class="hidden sm:flex items-center shrink-0">
                     <form action="{{ route('transparency.index') }}" method="GET" class="relative">
+                        @if(request('campaign'))
+                            <input type="hidden" name="campaign" value="{{ request('campaign') }}">
+                        @endif
                         <label for="year-select" class="sr-only">Select Financial Year</label>
                         <div class="relative inline-flex items-center">
                             <span class="absolute left-3 pointer-events-none text-slate-400">
@@ -386,36 +465,28 @@
                     </h2>
 
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-                        {{-- Donut Graphic --}}
+                        {{-- Donut Graphic with Dynamic SVG Dash Calculations --}}
                         <div class="relative w-36 h-36 sm:w-40 sm:h-40 shrink-0 flex items-center justify-center">
-                            {{-- SVG Donut Chart with Precise Arc Proportions --}}
+                            @php
+                                $circumference = 364.42; // 2 * pi * 58
+                                $cumulativeOffset = 0;
+                            @endphp
                             <svg class="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
                                 {{-- Background Track --}}
                                 <circle cx="80" cy="80" r="58" fill="transparent" stroke="#f1f5f9" stroke-width="22"/>
 
-                                {{-- Education: 32% (377 * 0.32 = 120.6) --}}
-                                <circle cx="80" cy="80" r="58" fill="transparent" stroke="#3b82f6" stroke-width="22"
-                                        stroke-dasharray="116.6 247.4" stroke-dashoffset="0" class="transition-all duration-500 hover:opacity-90"/>
-
-                                {{-- Healthcare: 24% (377 * 0.24 = 90.5) --}}
-                                <circle cx="80" cy="80" r="58" fill="transparent" stroke="#10b981" stroke-width="22"
-                                        stroke-dasharray="87.5 276.5" stroke-dashoffset="-120.6" class="transition-all duration-500 hover:opacity-90"/>
-
-                                {{-- Clean Water: 15% (377 * 0.15 = 56.5) --}}
-                                <circle cx="80" cy="80" r="58" fill="transparent" stroke="#06b6d4" stroke-width="22"
-                                        stroke-dasharray="54.5 309.5" stroke-dashoffset="-211.1" class="transition-all duration-500 hover:opacity-90"/>
-
-                                {{-- Food & Nutrition: 12% (377 * 0.12 = 45.2) --}}
-                                <circle cx="80" cy="80" r="58" fill="transparent" stroke="#f97316" stroke-width="22"
-                                        stroke-dasharray="43.2 320.8" stroke-dashoffset="-267.6" class="transition-all duration-500 hover:opacity-90"/>
-
-                                {{-- Environment: 10% (377 * 0.10 = 37.7) --}}
-                                <circle cx="80" cy="80" r="58" fill="transparent" stroke="#14b8a6" stroke-width="22"
-                                        stroke-dasharray="35.7 328.3" stroke-dashoffset="-312.8" class="transition-all duration-500 hover:opacity-90"/>
-
-                                {{-- Community: 7% (377 * 0.07 = 26.4) --}}
-                                <circle cx="80" cy="80" r="58" fill="transparent" stroke="#8b5cf6" stroke-width="22"
-                                        stroke-dasharray="24.4 339.6" stroke-dashoffset="-350.5" class="transition-all duration-500 hover:opacity-90"/>
+                                @foreach($utilizationCategories as $cat)
+                                    @php
+                                        $pct = max(1, $cat['percentage']);
+                                        $dash = round(($pct / 100) * $circumference, 1);
+                                        $gap = round($circumference - $dash, 1);
+                                        $offset = round(-$cumulativeOffset, 1);
+                                        $cumulativeOffset += $dash;
+                                    @endphp
+                                    <circle cx="80" cy="80" r="58" fill="transparent" stroke="{{ $cat['color'] }}" stroke-width="22"
+                                            stroke-dasharray="{{ $dash }} {{ $gap }}" stroke-dashoffset="{{ $offset }}"
+                                            class="transition-all duration-500 hover:opacity-90"/>
+                                @endforeach
                             </svg>
 
                             {{-- Center Text of Donut --}}
@@ -510,16 +581,16 @@
                     <h2 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
                         Recent Fund Utilization
                     </h2>
-                    <a href="#ledger-table"
-                       @click.prevent="scrollToSection('ledger-table')"
-                       class="text-xs font-bold text-[#16a34a] hover:text-[#15803d] transition inline-flex items-center gap-1 cursor-pointer">
+                    <button type="button"
+                            @click="openViewAll('distributions')"
+                            class="text-xs font-bold text-[#16a34a] hover:text-[#15803d] transition inline-flex items-center gap-1 cursor-pointer">
                         <span>View All</span>
                         <span>→</span>
-                    </a>
+                    </button>
                 </div>
 
                 <div class="divide-y divide-slate-100">
-                    @foreach($itemsList as $item)
+                    @forelse($itemsList as $item)
                         <div class="py-3.5 first:pt-3.5 last:pb-1 flex items-start justify-between gap-3 group cursor-pointer"
                              @click="openModal({{ json_encode($item) }})">
                             <div class="flex items-start gap-3 min-w-0 flex-1">
@@ -551,7 +622,11 @@
                                 </span>
                             </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="py-8 text-center text-xs text-slate-400">
+                            No fund distributions recorded for this selection yet.
+                        </div>
+                    @endforelse
                 </div>
             </div>
 
@@ -565,12 +640,12 @@
                             Latest Bills &amp; Receipts
                         </h2>
                         <div class="flex items-center gap-2">
-                            <a href="#ledger-table"
-                               @click.prevent="scrollToSection('ledger-table')"
-                               class="text-xs font-bold text-[#16a34a] hover:text-[#15803d] transition inline-flex items-center gap-1 cursor-pointer mr-2">
+                            <button type="button"
+                                    @click="openViewAll('bills')"
+                                    class="text-xs font-bold text-[#16a34a] hover:text-[#15803d] transition inline-flex items-center gap-1 cursor-pointer mr-2">
                                 <span>View All</span>
                                 <span>→</span>
-                            </a>
+                            </button>
                             <div class="flex items-center gap-1">
                                 <button type="button"
                                         @click="billsIndex = Math.max(0, billsIndex - 1)"
@@ -590,7 +665,7 @@
 
                     {{-- 4 Bill Cards Row --}}
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        @foreach($billsAndReceipts as $bill)
+                        @foreach(array_slice($billsAndReceipts, 0, 4) as $bill)
                             <div class="rounded-xl border border-slate-200/90 p-2.5 bg-slate-50/50 hover:bg-white hover:border-emerald-300 hover:shadow-xs transition duration-200 group cursor-pointer flex flex-col justify-between"
                                  @click="openModal({{ json_encode($bill) }})">
                                 {{-- Scanned Document Thumbnail Preview --}}
@@ -627,16 +702,16 @@
                         <h2 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
                             Impact from the Ground
                         </h2>
-                        <a href="#ledger-table"
-                           @click.prevent="scrollToSection('ledger-table')"
-                           class="text-xs font-bold text-[#16a34a] hover:text-[#15803d] transition inline-flex items-center gap-1 cursor-pointer">
+                        <button type="button"
+                                @click="openViewAll('photos')"
+                                class="text-xs font-bold text-[#16a34a] hover:text-[#15803d] transition inline-flex items-center gap-1 cursor-pointer">
                             <span>View All</span>
                             <span>→</span>
-                        </a>
+                        </button>
                     </div>
 
                     <div class="grid grid-cols-3 sm:grid-cols-5 gap-2.5">
-                        @foreach($groundPhotos as $photo)
+                        @foreach(array_slice($groundPhotos, 0, 5) as $photo)
                             <div class="relative h-20 sm:h-24 rounded-xl overflow-hidden group cursor-pointer border border-slate-200/80 shadow-2xs"
                                  @click="openModal({ title: '{{ $photo['title'] }}', image: '{{ $photo['image'] }}', category_name: '{{ $photo['category'] }}' })">
                                 <img src="{{ $photo['image'] }}"
@@ -649,95 +724,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        {{-- ================= DETAILED AUDITED LEDGER TABLE SECTION ================= --}}
-        <div id="ledger-table" class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 p-5 sm:p-8 shadow-2xs scroll-mt-24">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-                <div>
-                    <h2 class="text-base sm:text-lg font-extrabold text-slate-900">
-                        Itemized Financial Ledger & Public Distributions
-                    </h2>
-                    <p class="text-xs text-slate-500 mt-0.5">
-                        Every single rupee verified against bank statements, invoices, and physical proofs.
-                    </p>
-                </div>
-
-                {{-- Filter by Campaign & Search --}}
-                <form action="{{ route('transparency.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
-                    <input type="hidden" name="year" value="{{ $selectedYear }}">
-                    <select name="campaign" onchange="this.form.submit()"
-                            class="h-9 px-3 text-xs font-medium rounded-xl border border-slate-200 bg-white text-slate-700 focus:border-emerald-500 focus:outline-hidden">
-                        <option value="">All Supported Causes</option>
-                        @foreach($campaigns as $camp)
-                            <option value="{{ $camp->id }}" {{ request('campaign') == $camp->id ? 'selected' : '' }}>
-                                {{ $camp->title }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <input type="text" name="search" value="{{ request('search') }}"
-                           placeholder="Search purpose, beneficiary..."
-                           class="h-9 px-3 text-xs rounded-xl border border-slate-200 text-slate-800 placeholder-slate-400 focus:border-emerald-500 focus:outline-hidden">
-
-                    <button type="submit"
-                            class="h-9 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition">
-                        Filter
-                    </button>
-
-                    @if(request()->hasAny(['campaign', 'search']))
-                        <a href="{{ route('transparency.index') }}" class="text-xs font-semibold text-slate-400 hover:text-slate-600 px-2 py-1">
-                            Clear
-                        </a>
-                    @endif
-                </form>
-            </div>
-
-            {{-- Table / Cards Grid --}}
-            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                @forelse($distributions as $dist)
-                    <div class="rounded-2xl border border-slate-200/90 bg-slate-50/40 hover:bg-white hover:border-emerald-300 transition duration-200 p-4 sm:p-5 flex flex-col justify-between shadow-2xs">
-                        <div>
-                            <div class="flex items-center justify-between gap-2 mb-2 text-[11px] font-semibold text-slate-400">
-                                <span>{{ $dist->distribution_date ? $dist->distribution_date->format('d M Y') : 'Verified' }}</span>
-                                @if($dist->campaign)
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 truncate max-w-[140px]">
-                                        {{ $dist->campaign->title }}
-                                    </span>
-                                @else
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
-                                        General Relief
-                                    </span>
-                                @endif
-                            </div>
-
-                            <h3 class="text-xs sm:text-sm font-bold text-slate-900 line-clamp-1">{{ $dist->title }}</h3>
-                            <p class="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">{{ $dist->description }}</p>
-                        </div>
-
-                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                            <div>
-                                <span class="text-[10px] font-medium text-slate-400 block">Beneficiary</span>
-                                <span class="text-xs font-bold text-slate-800 truncate block max-w-[140px]">{{ $dist->beneficiary_name }}</span>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-[10px] font-medium text-slate-400 block">Disbursed</span>
-                                <span class="text-xs sm:text-sm font-black text-slate-900 block">₹{{ number_format($dist->amount_spent, 2) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="col-span-1 md:col-span-2 lg:col-span-3 py-10 text-center text-slate-400 text-xs">
-                        No additional filtered records found.
-                    </div>
-                @endforelse
-            </div>
-
-            @if($distributions->hasPages())
-                <div class="mt-6 flex justify-center">
-                    {{ $distributions->links() }}
-                </div>
-            @endif
         </div>
 
         {{-- ================= CALL TO ACTION BANNER ================= --}}
@@ -804,6 +790,132 @@
             <template x-if="modalItem && modalItem.description">
                 <p class="text-xs text-slate-600 leading-relaxed p-3 rounded-xl bg-slate-50 border border-slate-100" x-text="modalItem.description"></p>
             </template>
+        </div>
+    </div>
+
+    {{-- ================= FULL VIEW-ALL ARCHIVE MODAL ================= --}}
+    <div x-show="viewAllModalOpen"
+         x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-xs"
+         @keydown.escape.window="closeViewAll()">
+        <div class="bg-white rounded-3xl max-w-4xl w-full p-5 sm:p-7 shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col justify-between"
+             @click.outside="closeViewAll()">
+
+            {{-- Modal Header --}}
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div>
+                    <span class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider block">Audited Records Archive</span>
+                    <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">
+                        Transparency &amp; Verification Vault
+                    </h3>
+                </div>
+                <button type="button"
+                        @click="closeViewAll()"
+                        class="h-8 w-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 font-bold cursor-pointer">
+                    &times;
+                </button>
+            </div>
+
+            {{-- Tab Selectors inside View All Modal --}}
+            <div class="flex items-center gap-2 pt-4 pb-3 border-b border-slate-100">
+                <button type="button"
+                        @click="viewAllTab = 'distributions'"
+                        :class="viewAllTab === 'distributions' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer">
+                    <span>Fund Distributions ({{ count($allDistributionsFormatted) }})</span>
+                </button>
+                <button type="button"
+                        @click="viewAllTab = 'bills'"
+                        :class="viewAllTab === 'bills' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer">
+                    <span>Bills &amp; Receipts ({{ count($billsAndReceipts) }})</span>
+                </button>
+                <button type="button"
+                        @click="viewAllTab = 'photos'"
+                        :class="viewAllTab === 'photos' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer">
+                    <span>Ground Impact Photos ({{ count($groundPhotos) }})</span>
+                </button>
+            </div>
+
+            {{-- Content Area --}}
+            <div class="flex-1 overflow-y-auto py-4 space-y-4 max-h-[60vh] pr-1">
+                {{-- TAB 1: ALL DISTRIBUTIONS --}}
+                <div x-show="viewAllTab === 'distributions'" class="space-y-3">
+                    @forelse($allDistributionsFormatted as $dist)
+                        <div class="p-3.5 rounded-2xl border border-slate-200/90 bg-slate-50/50 hover:bg-white hover:border-emerald-300 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-start gap-3 min-w-0 flex-1">
+                                <img src="{{ $dist['image'] }}" alt="{{ $dist['title'] }}" class="h-12 w-12 rounded-xl object-cover shrink-0 border border-slate-200">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full border {{ $dist['category_class'] }}">
+                                            {{ $dist['category_name'] }}
+                                        </span>
+                                        <span class="text-[11px] font-semibold text-slate-400">{{ $dist['date'] }}</span>
+                                    </div>
+                                    <h4 class="text-xs sm:text-sm font-bold text-slate-900 truncate mt-1">{{ $dist['title'] }}</h4>
+                                    <p class="text-[11px] text-slate-500 line-clamp-1 mt-0.5">{{ $dist['description'] }}</p>
+                                    <span class="text-[11px] text-slate-400 block mt-0.5">Beneficiary: {{ $dist['beneficiary'] }}</span>
+                                </div>
+                            </div>
+                            <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-200/60">
+                                <span class="text-sm sm:text-base font-black text-slate-900">₹{{ number_format($dist['amount'], 2) }}</span>
+                                <button type="button"
+                                        @click="closeViewAll(); openModal({{ json_encode($dist) }})"
+                                        class="mt-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700 underline cursor-pointer">
+                                    View Audit Proof
+                                </button>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="py-12 text-center text-xs text-slate-400">
+                            No distributions match the current filter.
+                        </div>
+                    @endforelse
+                </div>
+
+                {{-- TAB 2: ALL BILLS & RECEIPTS --}}
+                <div x-show="viewAllTab === 'bills'" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    @foreach($billsAndReceipts as $bill)
+                        <div class="rounded-2xl border border-slate-200 p-3 bg-slate-50/50 hover:bg-white hover:border-emerald-300 transition cursor-pointer flex flex-col justify-between"
+                             @click="closeViewAll(); openModal({{ json_encode($bill) }})">
+                            <div class="relative h-32 w-full rounded-xl bg-white border border-slate-200/80 overflow-hidden flex items-center justify-center">
+                                <img src="{{ $bill['image'] }}" alt="{{ $bill['title'] }}" class="h-full w-full object-cover">
+                                <span class="absolute bottom-1.5 right-1.5 text-[9px] font-bold bg-white/95 text-slate-800 px-1.5 py-0.5 rounded shadow-xs">
+                                    Verified
+                                </span>
+                            </div>
+                            <div class="pt-2">
+                                <span class="block text-xs font-bold text-slate-900 truncate">{{ $bill['title'] }}</span>
+                                <span class="block text-xs font-black text-slate-900 mt-0.5">₹{{ number_format($bill['amount'], 2) }}</span>
+                                <span class="block text-[10px] text-slate-400 mt-0.5">{{ $bill['date'] }}</span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                {{-- TAB 3: ALL GROUND IMPACT PHOTOS --}}
+                <div x-show="viewAllTab === 'photos'" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    @foreach($groundPhotos as $photo)
+                        <div class="relative h-28 sm:h-36 rounded-2xl overflow-hidden group cursor-pointer border border-slate-200 shadow-2xs"
+                             @click="closeViewAll(); openModal({ title: '{{ $photo['title'] }}', image: '{{ $photo['image'] }}', category_name: '{{ $photo['category'] }}' })">
+                            <img src="{{ $photo['image'] }}" alt="{{ $photo['title'] }}" class="h-full w-full object-cover group-hover:scale-105 transition duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-2.5">
+                                <span class="text-[11px] font-bold text-white line-clamp-1 drop-shadow-sm">{{ $photo['title'] }}</span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Modal Footer --}}
+            <div class="pt-3 border-t border-slate-100 flex justify-end">
+                <button type="button"
+                        @click="closeViewAll()"
+                        class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition cursor-pointer">
+                    Close Archive
+                </button>
+            </div>
         </div>
     </div>
 </div>

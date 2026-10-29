@@ -243,4 +243,38 @@ class PublicTransparencyTest extends TestCase
         $response->assertSee('Be a Part of Transparent Change');
         $response->assertSee('Donate Now');
     }
+
+    public function test_old_ui_ledger_table_is_completely_removed(): void
+    {
+        $response = $this->get('/transparency');
+
+        $response->assertStatus(200);
+        $response->assertDontSee('id="ledger-table"', false);
+        $response->assertDontSee('Itemized Financial Ledger & Public Distributions');
+        $response->assertDontSee('Itemized Financial Ledger &amp; Public Distributions', false);
+    }
+
+    public function test_backend_bills_and_impact_photos_are_rendered_from_database(): void
+    {
+        FundDistribution::create([
+            'title' => 'Laboratory Equipment Invoice',
+            'beneficiary_name' => 'Apex Scientific Labs',
+            'amount_spent' => 95000.00,
+            'distribution_date' => now(),
+            'description' => 'Procurement of microscopes and test tubes.',
+            'is_public' => true,
+            'proof_bill_image' => 'https://example.com/audited-lab-bill.jpg',
+            'impact_photos' => ['https://example.com/lab-students-impact.jpg'],
+            'campaign_id' => $this->campaignB->id,
+            'created_by' => $this->admin->id,
+        ]);
+
+        $response = $this->get('/transparency');
+
+        $response->assertStatus(200);
+        $response->assertSee('Laboratory Equipment Invoice');
+        $response->assertSee('https://example.com/audited-lab-bill.jpg');
+        $response->assertSee('https://example.com/lab-students-impact.jpg');
+        $response->assertSee('95,000.00');
+    }
 }
